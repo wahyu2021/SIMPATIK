@@ -1,32 +1,54 @@
+# Tech Stack — SIMPATIK
+
 ### 1. Core System (Backend & Frontend UI)
-Karena kita membuang Inertia/React dan kembali ke ekosistem murni, ini adalah pondasi utamamu:
-* **Framework Inti:** Laravel (Versi 10 atau 11) - *Sebagai penyedia struktur database, routing, dan API Client.*
-* **Admin Panel & UI Framework:** Filament PHP (Versi 3) - *Berjalan di atas TALL stack bawaannya. Menangani seluruh antarmuka pengguna (baik Admin Gudang maupun Staf Divisi).*
-* **Styling:** Tailwind CSS - *Bawaan Filament untuk merapikan desain form dan tabel.*
+
+| Komponen | Teknologi | Versi | Keterangan |
+|----------|-----------|-------|------------|
+| Framework Inti | Laravel | 12.56.0 | Routing, Eloquent ORM, Queue, API Client |
+| Admin Panel & UI | Filament PHP | 5.3.5 | TALL Stack + Livewire 4, menangani seluruh antarmuka |
+| Styling | Tailwind CSS | 4.x | Bawaan Filament 5 |
+| Livewire | Livewire | 4.2.4 | Reactive UI tanpa JavaScript framework terpisah |
 
 ### 2. Database & Storage
-* **Relational Database:** MySQL atau PostgreSQL - *Untuk menyimpan master data barang, data user, histori transaksi, dan *audit log*.*
-* **File Storage:** Local Storage Laravel (`storage/app/public`) - *Untuk menyimpan file fisik gambar tanda tangan (`.png`) hasil *onboarding* user.*
+
+| Komponen | Teknologi | Keterangan |
+|----------|-----------|------------|
+| Relational Database | MySQL 8.4.3 | Master data, transaksi, audit log |
+| File Storage | Laravel Local Storage | `storage/app/public/signatures/` untuk gambar tanda tangan |
 
 ### 3. Machine Learning Microservice (Otak Prediksi)
-Ini berjalan sebagai *server* terpisah (API) yang akan dihubungi oleh Laravel:
-* **Bahasa Pemrograman:** Python (Versi 3.9+)
-* **Web Framework:** FastAPI - *Sangat ringan dan super cepat untuk membuat endpoint API.*
-* **ML Algorithm:** XGBoost (`xgboost`) - *Algoritma utama untuk peramalan (forecasting) kebutuhan barang ATK.*
-* **Data Processing:** Pandas (`pandas`) dan NumPy (`numpy`) - *Untuk mengolah data historis JSON dari Laravel sebelum dimasukkan ke model XGBoost.*
+
+> **Catatan:** Berjalan sebagai server terpisah (API) di project Python lain.
+
+| Komponen | Teknologi | Keterangan |
+|----------|-----------|------------|
+| Bahasa | Python 3.9+ | — |
+| Web Framework | FastAPI | Endpoint API untuk prediksi |
+| ML Algorithm | XGBoost | Forecasting kebutuhan ATK |
+| Data Processing | Pandas + NumPy | Olah data historis JSON dari Laravel |
 
 ---
 
-### 4. Daftar Plugin & Package Wajib (Composer)
-Ini adalah "Cheat Code" yang wajib kamu *install* di Laravel agar fiturnya langsung berjalan tanpa koding manual berbulan-bulan:
+### 4. Daftar Package Terinstall (Composer)
 
-* **`filament/filament`** (Bawaan)
-  Paket utama untuk membuat CRUD Master Data dan Dashboard dengan sangat cepat.
-* **`coolsam/signature-pad`** (Atau alternatifnya: `creagia/filament-signature-pad`)
-  Ini adalah *plugin* kuncian untuk halaman "Mandatory Onboarding". Digunakan sekali oleh *user* saat melengkapi profil untuk menggambar tanda tangan mereka agar bisa disimpan di *database*.
-* **`spatie/laravel-permission`**
-  Karena semua *user* (Admin Gudang & Staf Divisi) login ke satu portal Filament yang sama, *plugin* ini wajib dipasang. Fungsinya untuk membatasi hak akses. (Contoh: Staf cuma bisa lihat menu "Pengajuan", Admin bisa lihat semua menu gudang).
-* **`barryvdh/laravel-dompdf`**
-  Digunakan untuk mengekspor data BAST (Berita Acara Serah Terima) dari HTML ke wujud file PDF. Di file PDF inilah kamu nanti akan menempelkan teks *"Approval by System"* dan menempelkan gambar tanda tangan otomatis dari *database*.
-* **`simplesoftwareio/simple-qrcode`** *(Opsional tapi Sangat Disarankan)*
-  Untuk men- *generate* QR Code di bagian bawah cetakan dokumen PDF sebagai bukti tambahan bahwa dokumen tersebut sah dikeluarkan oleh sistem bank, memperkuat konsep *"By System"* yang diminta dospem-mu.
+| Package | Versi | Fungsi |
+|---------|-------|--------|
+| `filament/filament` | ^5.3.5 | Admin panel, CRUD, dashboard |
+| `saade/filament-autograph` | ^4.1 | Signature pad untuk mandatory onboarding tanda tangan digital |
+| `spatie/laravel-permission` | ^7.2 | Role & permission management (warehouse_admin, general_affairs, division_head, staff) |
+| `barryvdh/laravel-dompdf` | ^3.1 | Export dokumen BAST/SPB ke PDF dengan tanda tangan & QR Code |
+| `simplesoftwareio/simple-qrcode` | ^4.2 | Generate QR Code validasi di dokumen PDF |
+
+> **Catatan Perubahan:** `coolsam/signature-pad` pada rancangan awal diganti dengan `saade/filament-autograph` karena kompatibilitas dengan Filament 5.
+
+---
+
+### 5. Lingkungan Development
+
+| Tool | Versi |
+|------|-------|
+| PHP | 8.3.30 |
+| Composer | 2.8.6 |
+| Node.js | 24.5.0 |
+| MySQL | 8.4.3 (Laragon) |
+| OS | Windows |

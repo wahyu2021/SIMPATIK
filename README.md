@@ -1,66 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIMPATIK
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Sistem Manajemen Persediaan ATK** — Aplikasi manajemen gudang ATK & formulir cetakan untuk Bank Sumsel Babel Cabang A. Rivai.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Tentang Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+SIMPATIK adalah sistem informasi berbasis web yang dirancang untuk mendigitalisasi proses pengelolaan persediaan ATK (Alat Tulis Kantor) dan formulir cetakan di lingkungan perbankan. Sistem ini menggantikan proses manual pencatatan stok, pengajuan barang, dan pelaporan mutasi menjadi alur kerja digital yang terintegrasi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Fitur Utama
 
-## Learning Laravel
+- 🔐 **Multi-Role Authentication** — Admin Gudang, Staff Bagian Umum, Pimpinan, dan Staf Unit Kerja
+- ✍️ **Mandatory Signature Onboarding** — Tanda tangan digital wajib saat pertama kali login
+- 📦 **Manajemen Gudang** — Penerimaan barang (inbound) dan distribusi barang (outbound)
+- ✅ **Approval Workflow** — Pengajuan barang oleh staf, disetujui oleh Staff Bagian Umum / Admin secara digital
+- 📄 **Cetak Dokumen Otomatis** — Generate PDF SPB/BAST dengan tanda tangan digital & QR Code
+- 📊 **Kartu Mutasi Stok** — Ledger digital untuk rekap saldo barang (masuk/keluar/sisa)
+- 🤖 **Prediksi Kebutuhan (ML)** — Forecasting kebutuhan ATK menggunakan XGBoost via API Python
+- ⚠️ **Low Stock Alert** — Notifikasi otomatis saat stok menyentuh batas minimum
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Layer | Teknologi | Versi |
+|-------|-----------|-------|
+| **Framework** | Laravel | 12.56.0 |
+| **Admin Panel** | Filament PHP | 5.3.5 |
+| **Database** | MySQL | 8.4.3 |
+| **Role & Permission** | Spatie Laravel Permission | 7.2 |
+| **Tanda Tangan Digital** | Saade Filament Autograph | 4.1 |
+| **PDF Generator** | Barryvdh Laravel DomPDF | 3.1 |
+| **QR Code** | SimpleSoftwareIO QR Code | 4.2 |
+| **ML Forecasting** | Python + FastAPI + XGBoost | Microservice terpisah |
+| **Runtime** | PHP 8.3 / Node.js 24 | - |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📂 Struktur Branch
 
-### Premium Partners
+| Branch | Fungsi |
+|--------|--------|
+| `dev` | Development — fitur baru dikembangkan di sini |
+| `staging` | Staging — testing sebelum production |
+| `production` | Production — versi live yang digunakan |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## ⚙️ Instalasi & Setup
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prasyarat
 
-## Code of Conduct
+- PHP >= 8.3 (dengan ekstensi: `zip`, `bz2`, `gd`, `mbstring`, `openssl`, `pdo_mysql`)
+- Composer >= 2.x
+- Node.js >= 20.x
+- MySQL >= 8.0
+- Git
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Langkah Instalasi
 
-## Security Vulnerabilities
+```bash
+# 1. Clone repository
+git clone https://github.com/wahyu2021/SIMPATIK.git
+cd SIMPATIK
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 2. Install dependencies
+composer install
+npm install
 
-## License
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 4. Konfigurasi database di .env
+# DB_CONNECTION=mysql
+# DB_DATABASE=simpatik
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# 5. Jalankan migrasi & seeder
+php artisan migrate --seed
+
+# 6. Buat user admin pertama
+php artisan make:filament-user
+
+# 7. Build frontend assets
+npm run build
+
+# 8. Jalankan server
+php artisan serve
+```
+
+### Akses Aplikasi
+
+- **Panel Admin**: `http://localhost:8000/admin`
+
+---
+
+## 👥 Role & Hak Akses
+
+| Role | Deskripsi | Akses Utama |
+|------|-----------|-------------|
+| `warehouse_admin` | Admin Gudang | Full access, kelola user & settings |
+| `general_affairs` | Staff Bagian Umum | Audit, approve pengajuan, kelola transaksi & master data |
+| `division_head` | Pimpinan | View dashboard, laporan, & forecasting |
+| `staff` | Staf Unit Kerja | Ajukan barang, lihat pengajuan divisi sendiri |
+
+---
+
+## 📄 Lisensi
+
+Proprietary — Hak cipta © 2026 Bank Sumsel Babel. Hanya untuk penggunaan internal.
+Lihat file [LICENSE](LICENSE) untuk detail lengkap.

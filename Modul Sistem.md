@@ -1,46 +1,52 @@
-### **1. Modul Keamanan & Manajemen Akses (*Security & Access*)**
+# Modul Sistem — SIMPATIK
+
+### 1. Modul Keamanan & Manajemen Akses (*Security & Access*)
 
 *Modul ini mengatur keamanan pintu masuk dan rekam jejak digital aplikasi.*
 
-* **Autentikasi Multi-Peran:** Akses masuk sistem tidak lagi hanya untuk Admin Gudang, melainkan terbagi untuk **Admin Gudang**, **Pimpinan**, dan **Staf Unit Kerja** (sebagai peminta barang).
-* **Mandatory Signature Onboarding:** Fitur pemaksaan (intersepsi) di mana setiap pengguna yang baru pertama kali *login* diwajibkan untuk menggambar dan menyimpan tanda tangan digital mereka di profil sebelum bisa menggunakan fitur lain.
-* **Digital Audit Trail:** Sistem secara permanen mencatat IP *Address*, nama *user*, dan *timestamp* (waktu spesifik) setiap kali ada aktivitas pengajuan atau persetujuan barang.
+* **Autentikasi Multi-Peran:** Akses masuk sistem terbagi untuk 4 role:
+  - **Admin Gudang** (`warehouse_admin`) — full access, superadmin sistem
+  - **Staff Bagian Umum** (`general_affairs`) — audit & approve pengajuan, kelola transaksi gudang
+  - **Pimpinan** (`division_head`) — view dashboard, laporan, & forecasting
+  - **Staf Unit Kerja** (`staff`) — ajukan barang, lihat pengajuan per divisi sendiri
+* **Mandatory Signature Onboarding:** Setiap pengguna yang baru pertama kali *login* diwajibkan menggambar dan menyimpan tanda tangan digital di profil sebelum bisa menggunakan fitur lain. Menggunakan plugin `saade/filament-autograph`.
+* **Digital Audit Trail:** Sistem secara permanen mencatat IP Address, nama user, dan timestamp setiap kali ada aktivitas pengajuan atau persetujuan barang.
 
-### **2. Modul Data Induk (*Master Data*)**
+### 2. Modul Data Induk (*Master Data*)
 
 *Pusat informasi barang dan struktur organisasi.*
 
-* **Kelola Data Barang & Kategori:** Mencakup Nama Barang (seperti Form KSG R-2), Harga Satuan, Kategori Barang, dan Stok Minimum.
+* **Kelola Data Barang & Kategori:** Nama Barang, Harga Satuan, Kategori, dan Stok Minimum.
 * **Kelola Data Unit Kerja:** Daftar unit di kantor cabang A. Rivai (Unit KSG, Teller, CS, dll).
-* **Kelola Pengguna (User Management):** Menggantikan manajemen "Penjaga Gudang". Admin mengelola semua akun pegawai yang berhak menggunakan sistem, mengatur *role* (hak akses), dan memantau status tanda tangan digital masing-masing akun.
+* **Kelola Pengguna (User Management):** Admin mengelola semua akun pegawai, mengatur role, dan memantau status tanda tangan digital.
 
-### **3. Modul Transaksi Gudang (*Warehouse Transaction & Approval*)**
+### 3. Modul Transaksi Gudang (*Warehouse Transaction & Approval*)
 
-*(Catatan: Ini adalah modul yang paling banyak berubah dari draf awal. Alurnya tidak lagi Admin yang menginput semuanya, melainkan Staf yang meminta).*
+*Alur kerja: Staf mengajukan → Staff Bagian Umum / Admin Gudang meng-approve.*
 
-* **Penerimaan Barang (Inbound):** Admin mencatat stok masuk dari vendor atau pusat beserta nomor surat jalannya.
-* **Portal Pengajuan Barang (Self-Service Request):** Staf dari divisi lain *login* ke sistem dan memilih barang yang ingin diambil menggunakan fitur keranjang/repeater. Pengajuan ini akan masuk ke antrean Admin dengan status *"Pending"*.
-* **Sistem Persetujuan (Approval By System):** Admin Gudang mengecek ketersediaan stok di layar, lalu cukup menekan tombol **"Setujui"**. Otomatis status berubah dan stok berkurang.
-* **Cetak Berita Acara (Automated SPB/BAST Generator):** Tombol "Cetak" akan menghasilkan dokumen PDF yang sah, berisi:
+* **Penerimaan Barang (Inbound):** Admin/Staff Bagian Umum mencatat stok masuk dari vendor atau pusat beserta nomor surat jalannya.
+* **Portal Pengajuan Barang (Self-Service Request):** Staf dari divisi lain login ke sistem, memilih barang via keranjang/repeater. Pengajuan masuk ke antrean dengan status *"Pending"*.
+* **Sistem Persetujuan (Approval By System):** Staff Bagian Umum / Admin Gudang mengecek ketersediaan stok, lalu menekan tombol **"Setujui"**. Status berubah otomatis dan stok berkurang.
+* **Cetak Berita Acara (Automated SPB/BAST Generator):** Tombol "Cetak" menghasilkan dokumen PDF berisi:
     * Daftar barang dan jumlahnya.
-    * Tanda tangan digital si Peminta dan Admin (yang ditarik otomatis dari *database* profil).
-    * **QR Code & Pernyataan Sistem:** Teks validasi di bawah dokumen yang menyatakan bahwa *"Dokumen ini telah diotorisasi secara elektronik oleh sistem"*, menghilangkan kebutuhan tanda tangan basah manual.
+    * Tanda tangan digital si Peminta dan Approver (ditarik otomatis dari database profil).
+    * **QR Code & Pernyataan Sistem:** Teks validasi *"Dokumen ini telah diotorisasi secara elektronik oleh sistem"*.
 
-### **4. Modul Pelaporan & Mutasi (*Reporting*)**
+### 4. Modul Pelaporan & Mutasi (*Reporting*)
 
 *Menggantikan rekapitulasi manual di akhir bulan.*
 
-* **Laporan Mutasi Barang (Ledger):** Mengolah data persetujuan menjadi kartu stok (Saldo Awal + Masuk - Keluar = Saldo Akhir).
-* **Export Laporan Berstandar:** Fitur untuk mengunduh laporan ke format Excel atau PDF sesuai dengan standar pelaporan internal Bank Sumsel Babel.
+* **Laporan Mutasi Barang (Ledger):** Kartu stok digital (Saldo Awal + Masuk - Keluar = Saldo Akhir).
+* **Export Laporan Berstandar:** Unduh laporan ke format Excel atau PDF sesuai standar pelaporan internal Bank Sumsel Babel.
 
-### **5. Modul Peramalan Cerdas (*Intelligent Forecasting - XGBoost*)**
+### 5. Modul Peramalan Cerdas (*Intelligent Forecasting - XGBoost*)
 
-*Fitur unggulan berbasis kecerdasan buatan.*
+*Fitur unggulan berbasis kecerdasan buatan. Menggunakan microservice Python terpisah.*
 
-* **Dashboard Prediksi Kebutuhan:** Menggunakan model *Machine Learning* XGBoost via API Python untuk memprediksi jumlah ATK/Formulir yang harus dipesan bulan depan berdasarkan data historis mutasi barang.
-* **Saran Pemesanan Otomatis:** Sistem secara pintar akan menghitung (Angka Prediksi XGBoost - Sisa Stok Saat Ini) untuk merekomendasikan jumlah pengadaan barang secara akurat dan efisien.
+* **Dashboard Prediksi Kebutuhan:** Model XGBoost via API Python memprediksi jumlah ATK/Formulir yang harus dipesan bulan depan berdasarkan data historis mutasi.
+* **Saran Pemesanan Otomatis:** Sistem menghitung (Prediksi XGBoost - Sisa Stok Saat Ini) untuk merekomendasikan jumlah pengadaan.
 
-### **6. Modul Dashboard Analitik & Peringatan (*Analytics & Alerts*)**
+### 6. Modul Dashboard Analitik & Peringatan (*Analytics & Alerts*)
 
-* **Visualisasi Tren:** Grafik batang/garis yang menampilkan barang apa yang paling sering diminta dan divisi mana yang paling konsumtif.
-* **Low Stock Alert:** Notifikasi *real-time* di panel admin jika ada barang cetakan yang stoknya menyentuh batas minimum, mencegah kehabisan stok kritis di tengah operasional bank.
+* **Visualisasi Tren:** Grafik batang/garis menampilkan barang paling sering diminta dan divisi paling konsumtif.
+* **Low Stock Alert:** Notifikasi real-time di panel admin jika stok menyentuh batas minimum.
