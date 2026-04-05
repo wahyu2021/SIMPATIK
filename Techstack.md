@@ -5,9 +5,11 @@
 | Komponen | Teknologi | Versi | Keterangan |
 |----------|-----------|-------|------------|
 | Framework Inti | Laravel | 12.56.0 | Routing, Eloquent ORM, Queue, API Client |
-| Admin Panel & UI | Filament PHP | 5.3.5 | TALL Stack + Livewire 4, menangani seluruh antarmuka |
-| Styling | Tailwind CSS | 4.x | Bawaan Filament 5 |
-| Livewire | Livewire | 4.2.4 | Reactive UI tanpa JavaScript framework terpisah |
+| Frontend Framework | React (TypeScript) | 18.x | UI Components & State Management |
+| UI Bridge | Inertia.js | 3.0.1 | SPA without API (Laravel ↔ React) |
+| Routing Helper | Ziggy | 2.6.2 | Laravel routes in React TypeScript |
+| Styling | Tailwind CSS | 4.x | Utility-first CSS framework |
+| Build Tool | Vite | 6.x | Fast bundler & HMR |
 
 ### 2. Database & Storage
 
@@ -33,13 +35,11 @@
 
 | Package | Versi | Fungsi |
 |---------|-------|--------|
-| `filament/filament` | ^5.3.5 | Admin panel, CRUD, dashboard |
-| `saade/filament-autograph` | ^4.1 | Signature pad untuk mandatory onboarding tanda tangan digital |
+| `inertiajs/inertia-laravel` | ^3.0 | Server-side adapter untuk Inertia.js |
+| `tightenco/ziggy` | ^2.6 | Laravel routes untuk JavaScript/TypeScript |
 | `spatie/laravel-permission` | ^7.2 | Role & permission management (warehouse_admin, general_affairs, division_head, staff) |
 | `barryvdh/laravel-dompdf` | ^3.1 | Export dokumen BAST/SPB ke PDF dengan tanda tangan & QR Code |
 | `simplesoftwareio/simple-qrcode` | ^4.2 | Generate QR Code validasi di dokumen PDF |
-
-> **Catatan Perubahan:** `coolsam/signature-pad` pada rancangan awal diganti dengan `saade/filament-autograph` karena kompatibilitas dengan Filament 5.
 
 ---
 

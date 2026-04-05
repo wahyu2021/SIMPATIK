@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
+use App\Traits\HasSignature;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,10 +11,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, SoftDeletes;
+    use HasFactory, HasRoles, HasSignature, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -40,11 +39,33 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    public function canAccessPanel(Panel $panel): bool
+    /**
+     * Check if user is active
+     */
+    public function isActive(): bool
     {
         return $this->is_active;
     }
+
+    /**
+     * Check if user needs to complete signature onboarding
+     */
+    public function needsSignatureOnboarding(): bool
+    {
+        return !$this->hasSignature();
+    }
+
+    /**
+     * Get user's role name
+     */
+    public function getRoleName(): ?string
+    {
+        return $this->roles->first()?->name;
+    }
     
+    /**
+     * Relationships
+     */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
@@ -65,3 +86,4 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(OutboundTransaction::class, 'approver_id');
     }
 }
+
