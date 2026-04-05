@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { Users, Package, Clock, BarChart3 } from 'lucide-react';
-import { PageProps } from '../../types';
+import { PageProps } from '../../Types';
 
 interface DashboardProps extends PageProps {
     auth: {

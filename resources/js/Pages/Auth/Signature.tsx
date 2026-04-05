@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Trash2, Save, PenTool } from 'lucide-react';
-import Button from '../../Components/Atoms/Button';
-import { User } from '../../types';
+import Button from '../../Components/UI/Button';
+import { User } from '../../Types';
 
 interface Props {
     user: User;
