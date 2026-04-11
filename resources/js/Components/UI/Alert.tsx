@@ -1,3 +1,12 @@
+import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
+
+/**
+ * Props untuk komponen Alert.
+ * @property type - Jenis alert: 'success' | 'error' | 'warning' | 'info'
+ * @property children - Isi pesan alert
+ * @property onClose - Callback saat tombol close diklik (opsional, menampilkan tombol X)
+ * @property className - Custom CSS class tambahan
+ */
 interface AlertProps {
     type?: 'success' | 'error' | 'warning' | 'info';
     children: React.ReactNode;
@@ -5,6 +14,16 @@ interface AlertProps {
     className?: string;
 }
 
+/**
+ * Komponen Alert — menampilkan pesan notifikasi/flash message.
+ *
+ * @example
+ * // Flash message dari Laravel controller
+ * {flash?.success && <Alert type="success">{flash.success}</Alert>}
+ *
+ * // Dengan tombol close
+ * <Alert type="warning" onClose={() => setShow(false)}>Stok hampir habis!</Alert>
+ */
 export default function Alert({ type = 'info', children, onClose, className = '' }: AlertProps) {
     const styles = {
         success: 'bg-emerald-50 border-emerald-300 text-emerald-800',
@@ -14,15 +33,17 @@ export default function Alert({ type = 'info', children, onClose, className = ''
     };
 
     const icons = {
-        success: '✓',
-        error: '✕',
-        warning: '⚠',
-        info: 'ℹ',
+        success: CheckCircle,
+        error: XCircle,
+        warning: AlertTriangle,
+        info: Info,
     };
+
+    const Icon = icons[type];
 
     return (
         <div className={`flex items-center gap-3 px-4 py-3 border rounded-lg ${styles[type]} ${className}`}>
-            <span className="text-lg font-bold shrink-0">{icons[type]}</span>
+            <Icon className="w-5 h-5 shrink-0" />
             <span className="text-sm flex-1">{children}</span>
             {onClose && (
                 <button
@@ -30,7 +51,7 @@ export default function Alert({ type = 'info', children, onClose, className = ''
                     className="shrink-0 opacity-60 hover:opacity-100 transition-opacity"
                     aria-label="Close"
                 >
-                    ✕
+                    <X className="w-4 h-4" />
                 </button>
             )}
         </div>

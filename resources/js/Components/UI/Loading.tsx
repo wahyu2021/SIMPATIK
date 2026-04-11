@@ -1,9 +1,25 @@
+/**
+ * Props untuk komponen Loading.
+ * @property size - Ukuran spinner: 'sm' | 'md' | 'lg'
+ * @property text - Teks di bawah spinner (opsional)
+ * @property fullPage - Jika true, tampilkan overlay loading seluruh layar
+ */
 interface LoadingProps {
     size?: 'sm' | 'md' | 'lg';
     text?: string;
     fullPage?: boolean;
 }
 
+/**
+ * Komponen Loading — spinner animasi untuk loading state.
+ *
+ * @example
+ * // Inline loading
+ * <Loading text="Memuat data..." />
+ *
+ * // Full page overlay (saat submit form)
+ * <Loading fullPage text="Menyimpan..." />
+ */
 export default function Loading({ size = 'md', text, fullPage = false }: LoadingProps) {
     const sizes = {
         sm: 'w-5 h-5 border-2',

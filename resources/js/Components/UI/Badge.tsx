@@ -1,3 +1,9 @@
+/**
+ * Props untuk komponen Badge.
+ * @property variant - Varian warna: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued'
+ * @property size - Ukuran badge: 'sm' (kecil) | 'md' (sedang)
+ * @property children - Teks yang ditampilkan
+ */
 interface BadgeProps {
     variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued';
     size?: 'sm' | 'md';
@@ -5,6 +11,14 @@ interface BadgeProps {
     className?: string;
 }
 
+/**
+ * Komponen Badge — label kecil berwarna untuk status atau info ringkas.
+ *
+ * @example
+ * <Badge variant="success">Aktif</Badge>
+ * <Badge variant="danger">Nonaktif</Badge>
+ * <Badge variant="info" size="md">15 barang</Badge>
+ */
 export default function Badge({ variant = 'default', size = 'sm', children, className = '' }: BadgeProps) {
     const variants = {
         default: 'bg-gray-100 text-gray-700',

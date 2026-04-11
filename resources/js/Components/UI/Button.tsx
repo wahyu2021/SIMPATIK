@@ -1,10 +1,25 @@
 import { ButtonHTMLAttributes } from 'react';
 
+/**
+ * Props untuk komponen Button.
+ * @property variant - Style tombol: 'primary' (biru BSB), 'secondary' (abu), 'danger' (merah), 'link'
+ * @property size - Ukuran: 'sm' | 'md' | 'lg'
+ * Extends semua props standar <button> (onClick, disabled, type, dll)
+ */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'danger' | 'link';
     size?: 'sm' | 'md' | 'lg';
 }
 
+/**
+ * Komponen Button — tombol aksi dengan 4 varian warna dan 3 ukuran.
+ * Otomatis disabled state (opacity + cursor) saat props disabled=true.
+ *
+ * @example
+ * <Button variant="primary">Simpan</Button>
+ * <Button variant="danger" size="sm" onClick={handleDelete}>Hapus</Button>
+ * <Button disabled={processing}>{processing ? 'Menyimpan...' : 'Simpan'}</Button>
+ */
 export default function Button({
     variant = 'primary',
     size = 'md',

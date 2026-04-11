@@ -1,10 +1,30 @@
 import { TextareaHTMLAttributes } from 'react';
 
+/**
+ * Props untuk komponen Textarea.
+ * @property error - Pesan error validasi (ditampilkan merah di bawah field)
+ * @property label - Label di atas textarea (opsional, otomatis tampil tanda * jika required)
+ * Extends semua props standar <textarea> (rows, placeholder, dll)
+ */
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
     error?: string;
     label?: string;
 }
 
+/**
+ * Komponen Textarea — input multi-baris dengan label dan error bawaan.
+ * Pattern sama seperti komponen Input.
+ *
+ * @example
+ * <Textarea
+ *     label="Catatan"
+ *     rows={3}
+ *     value={data.notes}
+ *     onChange={(e) => setData('notes', e.target.value)}
+ *     error={errors.notes}
+ *     placeholder="Tulis catatan pengajuan..."
+ * />
+ */
 export default function Textarea({ error, label, className = '', ...props }: TextareaProps) {
     return (
         <div>

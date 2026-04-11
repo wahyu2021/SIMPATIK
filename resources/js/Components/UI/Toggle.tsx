@@ -1,3 +1,11 @@
+/**
+ * Props untuk komponen Toggle.
+ * @property label - Teks label di samping toggle
+ * @property description - Teks kecil di bawah label (opsional)
+ * @property checked - Status on/off
+ * @property onChange - Callback saat toggle diklik, menerima nilai boolean baru
+ * @property disabled - Nonaktifkan toggle
+ */
 interface ToggleProps {
     label: string;
     description?: string;
@@ -6,6 +14,18 @@ interface ToggleProps {
     disabled?: boolean;
 }
 
+/**
+ * Komponen Toggle — switch on/off untuk field boolean.
+ * Warna aktif menggunakan BSB Blue (#0052A3).
+ *
+ * @example
+ * <Toggle
+ *     label="Pesanan Khusus"
+ *     description="Aktifkan jika ini bukan permintaan rutin bulanan"
+ *     checked={data.is_special_request}
+ *     onChange={(val) => setData('is_special_request', val)}
+ * />
+ */
 export default function Toggle({ label, description, checked, onChange, disabled = false }: ToggleProps) {
     return (
         <label className={`flex items-center gap-3 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>

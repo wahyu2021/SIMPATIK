@@ -1,3 +1,11 @@
+/**
+ * Props untuk komponen StatCard.
+ * @property title - Label statistik (misal "Total Barang")
+ * @property value - Angka/nilai utama yang ditampilkan besar
+ * @property icon - Icon ReactNode (gunakan dari lucide-react)
+ * @property trend - Indikator tren: { value: '+12 bulan ini', type: 'up' | 'down' | 'neutral' }
+ * @property color - Warna aksen icon: 'blue' | 'green' | 'yellow' | 'red' | 'purple'
+ */
 interface StatCardProps {
     title: string;
     value: string | number;
@@ -10,6 +18,13 @@ interface StatCardProps {
     className?: string;
 }
 
+/**
+ * Komponen StatCard — widget statistik untuk halaman Dashboard.
+ *
+ * @example
+ * import { Package } from 'lucide-react';
+ * <StatCard title="Total Barang" value={156} icon={<Package />} color="blue" />
+ */
 export default function StatCard({ title, value, icon, trend, color = 'blue', className = '' }: StatCardProps) {
     const colors = {
         blue: 'bg-blue-50 text-[#0052A3]',

@@ -1,3 +1,11 @@
+/**
+ * Props untuk komponen Card.
+ * @property title - Judul card (opsional)
+ * @property description - Sub-judul card (opsional)
+ * @property children - Isi/body card
+ * @property footer - Konten footer, misal tombol aksi (opsional)
+ * @property noPadding - Hilangkan padding body, berguna saat isi card adalah tabel
+ */
 interface CardProps {
     title?: string;
     description?: string;
@@ -7,6 +15,16 @@ interface CardProps {
     noPadding?: boolean;
 }
 
+/**
+ * Komponen Card — container putih dengan border, header, dan footer opsional.
+ *
+ * @example
+ * // Card biasa
+ * <Card title="Informasi Barang"><p>Konten</p></Card>
+ *
+ * // Card untuk tabel (tanpa padding)
+ * <Card title="Daftar Barang" noPadding><DataTable ... /></Card>
+ */
 export default function Card({ title, description, children, footer, className = '', noPadding = false }: CardProps) {
     return (
         <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${className}`}>

@@ -1,6 +1,13 @@
 import { Link } from '@inertiajs/react';
 import { PaginationLink } from '../../Types';
 
+/**
+ * Props untuk komponen Pagination.
+ * @property links - Array PaginationLink dari response Laravel paginate()
+ * @property from - Nomor record awal di halaman ini
+ * @property to - Nomor record akhir di halaman ini
+ * @property total - Total seluruh record
+ */
 interface PaginationProps {
     links: PaginationLink[];
     from?: number;
@@ -8,6 +15,18 @@ interface PaginationProps {
     total?: number;
 }
 
+/**
+ * Komponen Pagination — navigasi halaman untuk data yang di-paginate.
+ * Otomatis tersembunyi jika hanya 1 halaman.
+ *
+ * @example
+ * <Pagination
+ *     links={categories.links}
+ *     from={categories.from}
+ *     to={categories.to}
+ *     total={categories.total}
+ * />
+ */
 export default function Pagination({ links, from, to, total }: PaginationProps) {
     if (links.length <= 3) return null; // Hanya prev + 1 page + next = tidak perlu pagination
 
