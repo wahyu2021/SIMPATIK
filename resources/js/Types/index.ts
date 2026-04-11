@@ -150,6 +150,37 @@ export interface Setting extends Timestamps {
     value: string;
 }
 
+// --- Dashboard DTOs ---
+export interface DashboardStats {
+    total_items: number;
+    total_categories: number;
+    total_departments: number;
+    total_users: number;
+    low_stock_count: number;
+    pending_requests: number;
+    approved_today: number;
+    inbound_this_month: number;
+}
+
+export interface RecentRequest {
+    id: number;
+    document_number: string;
+    requester: string;
+    department: string;
+    status: OutboundStatus;
+    date: string;
+}
+
+export interface LowStockItemData {
+    id: number;
+    name: string;
+    item_code: string;
+    category: string;
+    current_stock: number;
+    minimum_stock: number;
+    unit: string;
+}
+
 // --- Inertia Page Props ---
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {

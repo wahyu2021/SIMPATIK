@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OutboundStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,10 +30,11 @@ class OutboundTransaction extends Model
     protected function casts(): array
     {
         return [
-            'transaction_date' => 'date',
-            'approved_at' => 'datetime',
-            'issued_at' => 'datetime',
-            'is_special_request' => 'boolean',
+            'transaction_date'  => 'date',
+            'approved_at'       => 'datetime',
+            'issued_at'         => 'datetime',
+            'is_special_request'=> 'boolean',
+            'status'            => OutboundStatus::class,
         ];
     }
 
@@ -67,21 +69,21 @@ class OutboundTransaction extends Model
 
     public function isPending(): bool
     {
-        return $this->status === 'Pending';
+        return $this->status === OutboundStatus::Pending;
     }
 
     public function isApproved(): bool
     {
-        return $this->status === 'Approved';
+        return $this->status === OutboundStatus::Approved;
     }
 
     public function isIssued(): bool
     {
-        return $this->status === 'Issued';
+        return $this->status === OutboundStatus::Issued;
     }
 
     public function isRejected(): bool
     {
-        return $this->status === 'Rejected';
+        return $this->status === OutboundStatus::Rejected;
     }
 }
