@@ -15,65 +15,64 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create default department if not exists
-        $department = \App\Models\Department::firstOrCreate(
-            ['name' => 'IT Department'],
-            []
-        );
+        // Create default departments
+        $bagianUmum = Department::firstOrCreate(['name' => 'Bagian Umum']);
+        $pelayanan = Department::firstOrCreate(['name' => 'Pelayanan Jasa & Informasi']);
+        $teller = Department::firstOrCreate(['name' => 'Teller']);
+        $cs = Department::firstOrCreate(['name' => 'Customer Service']);
 
-        // Create Warehouse Admin
-        $admin = \App\Models\User::firstOrCreate(
+        // 1. Admin Gudang (superadmin)
+        $admin = User::firstOrCreate(
             ['email' => 'admin@simpatik.test'],
             [
                 'name' => 'Admin Gudang',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'department_id' => $department->id,
+                'password' => Hash::make('password'),
+                'department_id' => $bagianUmum->id,
                 'is_active' => true,
             ]
         );
-        $admin->assignRole(\App\Enums\UserRole::WAREHOUSE_ADMIN->value);
+        $admin->assignRole(UserRole::WAREHOUSE_ADMIN->value);
 
-        // Create General Affairs Staff
-        $generalAffairs = \App\Models\User::firstOrCreate(
+        // 2. Staff Bagian Umum (Mba Ajeng — kelola gudang harian)
+        $generalAffairs = User::firstOrCreate(
             ['email' => 'bagianumum@simpatik.test'],
             [
-                'name' => 'Staff Bagian Umum',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'department_id' => $department->id,
+                'name' => 'Ajeng (Bagian Umum)',
+                'password' => Hash::make('password'),
+                'department_id' => $bagianUmum->id,
                 'is_active' => true,
             ]
         );
-        $generalAffairs->assignRole(\App\Enums\UserRole::GENERAL_AFFAIRS->value);
+        $generalAffairs->assignRole(UserRole::GENERAL_AFFAIRS->value);
 
-        // Create Division Head
-        $divisionHead = \App\Models\User::firstOrCreate(
-            ['email' => 'pimpinan@simpatik.test'],
+        // 3. Penyelia (Kak Redho — approve + cek stok bulanan)
+        $supervisor = User::firstOrCreate(
+            ['email' => 'penyelia@simpatik.test'],
             [
-                'name' => 'Pimpinan Divisi',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'department_id' => $department->id,
+                'name' => 'Redho (Penyelia)',
+                'password' => Hash::make('password'),
+                'department_id' => $bagianUmum->id,
                 'is_active' => true,
             ]
         );
-        $divisionHead->assignRole(\App\Enums\UserRole::DIVISION_HEAD->value);
+        $supervisor->assignRole(UserRole::SUPERVISOR->value);
 
-        // Create Staff
-        $staff = \App\Models\User::firstOrCreate(
+        // 4. Staff Unit Kerja (contoh: staff dari unit Pelayanan)
+        $staff = User::firstOrCreate(
             ['email' => 'staff@simpatik.test'],
             [
-                'name' => 'Staff Unit Kerja',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'department_id' => $department->id,
+                'name' => 'Staff Pelayanan',
+                'password' => Hash::make('password'),
+                'department_id' => $pelayanan->id,
                 'is_active' => true,
             ]
         );
-        $staff->assignRole(\App\Enums\UserRole::STAFF->value);
+        $staff->assignRole(UserRole::STAFF->value);
 
-        $this->command->info('Default users created successfully!');
-        $this->command->info('Admin: admin@simpatik.test / password');
-        $this->command->info('Bagian Umum: bagianumum@simpatik.test / password');
-        $this->command->info('Pimpinan: pimpinan@simpatik.test / password');
-        $this->command->info('Staff: staff@simpatik.test / password');
+        $this->command->info('Default users & departments created:');
+        $this->command->info('  Admin:        admin@simpatik.test / password');
+        $this->command->info('  Bagian Umum:  bagianumum@simpatik.test / password');
+        $this->command->info('  Penyelia:     penyelia@simpatik.test / password');
+        $this->command->info('  Staff:        staff@simpatik.test / password');
     }
 }
-

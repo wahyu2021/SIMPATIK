@@ -2,16 +2,7 @@ import { Head } from '@inertiajs/react';
 import { Users, Package, Clock, BarChart3 } from 'lucide-react';
 import { PageProps } from '../../Types';
 
-interface DashboardProps extends PageProps {
-    auth: {
-        user: {
-            id: number;
-            name: string;
-            email: string;
-            roles?: Array<{ name: string }>;
-        };
-    };
-}
+interface DashboardProps extends PageProps {}
 
 export default function Dashboard({ auth }: DashboardProps) {
     const role = auth.user.roles?.[0]?.name || 'Unknown';

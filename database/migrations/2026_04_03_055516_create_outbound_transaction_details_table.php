@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('outbound_transaction_id')->constrained()->cascadeOnDelete();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
-            $table->integer('quantity');
+            $table->integer('quantity_requested');
+            $table->integer('quantity_approved')->default(0);
+            $table->string('notes', 255)->nullable();
         });
     }
 

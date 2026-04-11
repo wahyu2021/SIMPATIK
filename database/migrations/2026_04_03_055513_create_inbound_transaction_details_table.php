@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('inbound_transaction_id')->constrained()->cascadeOnDelete();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
+            $table->decimal('unit_price', 15, 2)->default(0);
         });
     }
 

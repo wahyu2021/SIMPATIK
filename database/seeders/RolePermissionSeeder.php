@@ -19,17 +19,35 @@ class RolePermissionSeeder extends Seeder
 
         // Create all permissions
         $permissions = [
+            // Dashboard
             'view-dashboard',
+
+            // User & System Management
             'manage-users',
+            'manage-settings',
+
+            // Master Data
             'manage-items',
             'manage-categories',
             'manage-departments',
+
+            // Inbound (Barang Masuk)
             'view-inbound',
             'create-inbound',
-            'approve-outbound',
+
+            // Outbound (Pengajuan Barang)
             'create-outbound-request',
-            'view-own-requests',
+            'approve-outbound',         // Penyelia approve/reject permintaan
+            'issue-outbound',           // Staff gudang serahkan barang (status → Issued)
+            'view-own-requests',        // Lihat pengajuan sendiri
+            'view-own-unit-requests',   // Lihat pengajuan se-unit kerja
+            'view-all-requests',        // Lihat semua pengajuan
+
+            // Reporting
             'view-reports',
+            'export-reports',
+
+            // Forecasting
             'view-forecasting',
         ];
 
@@ -46,4 +64,3 @@ class RolePermissionSeeder extends Seeder
         $this->command->info('Roles and permissions seeded successfully!');
     }
 }
-

@@ -15,13 +15,16 @@ class OutboundTransactionDetail extends Model
     protected $fillable = [
         'outbound_transaction_id',
         'item_id',
-        'quantity',
+        'quantity_requested',
+        'quantity_approved',
+        'notes',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
+            'quantity_requested' => 'integer',
+            'quantity_approved' => 'integer',
         ];
     }
 

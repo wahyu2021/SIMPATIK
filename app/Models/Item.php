@@ -55,4 +55,14 @@ class Item extends Model
     {
         return $this->hasMany(DemandForecast::class);
     }
+
+    // --- Helpers ---
+
+    /**
+     * Check if stock is at or below minimum level (trigger for WA notification)
+     */
+    public function isLowStock(): bool
+    {
+        return $this->current_stock <= $this->minimum_stock_level;
+    }
 }

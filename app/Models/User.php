@@ -85,5 +85,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(OutboundTransaction::class, 'approver_id');
     }
+
+    public function outboundRequestsAsIssuer(): HasMany
+    {
+        return $this->hasMany(OutboundTransaction::class, 'issued_by');
+    }
 }
 
