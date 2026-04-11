@@ -1,0 +1,52 @@
+import { OutboundStatus } from '../../../Types';
+import { Card, StatusBadge, EmptyState } from '../../UI';
+import { ListItem, CardLink } from '../../Fragments';
+
+/**
+ * Data satu pengajuan terbaru dari DashboardService.
+ */
+export interface RecentRequest {
+    id: number;
+    document_number: string;
+    requester: string;
+    department: string;
+    status: OutboundStatus;
+    date: string;
+}
+
+/**
+ * Komponen RecentRequests — kartu daftar 5 pengajuan terbaru.
+ * Dipakai khusus di halaman Dashboard.
+ *
+ * @example
+ * <RecentRequests data={recentRequests} />
+ */
+export default function RecentRequests({ data }: { data: RecentRequest[] }) {
+    return (
+        <Card title="Pengajuan Terbaru" description="5 pengajuan barang terakhir" noPadding>
+            {data.length === 0 ? (
+                <EmptyState
+                    title="Belum Ada Pengajuan"
+                    message="Belum ada pengajuan barang yang tercatat."
+                />
+            ) : (
+                <div className="divide-y divide-gray-100">
+                    {data.map((req) => (
+                        <ListItem
+                            key={req.id}
+                            title={req.document_number}
+                            subtitle={`${req.requester} — ${req.department}`}
+                            trailing={
+                                <>
+                                    <span className="text-xs text-gray-400 hidden sm:block">{req.date}</span>
+                                    <StatusBadge status={req.status} />
+                                </>
+                            }
+                        />
+                    ))}
+                    <CardLink href="/outbound">Lihat semua pengajuan</CardLink>
+                </div>
+            )}
+        </Card>
+    );
+}

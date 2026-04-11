@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SignatureController;
 use App\Http\Controllers\Auth\UserManagementController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -47,9 +48,7 @@ Route::middleware(['auth'])->group(function () {
     // Routes that require signature completion
     Route::middleware(['signature'])->group(function () {
         // Dashboard
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard/Index');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // User Management (Admin only)
         Route::middleware(['role:warehouse_admin'])->group(function () {
