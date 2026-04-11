@@ -9,20 +9,7 @@ import {
     Building2,
 } from 'lucide-react';
 import { StatCard } from '../../UI';
-
-/**
- * Data statistik dari DashboardService.
- */
-export interface DashboardStats {
-    total_items: number;
-    total_categories: number;
-    total_departments: number;
-    total_users: number;
-    low_stock_count: number;
-    pending_requests: number;
-    approved_today: number;
-    inbound_this_month: number;
-}
+import { DashboardStats } from '../../../Types';
 
 /**
  * Komponen StatsGrid — 2 baris × 4 kolom StatCard untuk Dashboard.

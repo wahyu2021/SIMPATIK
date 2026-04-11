@@ -1,8 +1,8 @@
-import { PageProps } from '../../Types';
+import { PageProps, DashboardStats, RecentRequest, LowStockItemData } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import StatsGrid, { DashboardStats } from '../../Components/Features/Dashboard/StatsGrid';
-import RecentRequests, { RecentRequest } from '../../Components/Features/Dashboard/RecentRequests';
-import LowStockAlerts, { LowStockItemData } from '../../Components/Features/Dashboard/LowStockAlerts';
+import StatsGrid from '../../Components/Features/Dashboard/StatsGrid';
+import RecentRequests from '../../Components/Features/Dashboard/RecentRequests';
+import LowStockAlerts from '../../Components/Features/Dashboard/LowStockAlerts';
 
 interface DashboardProps extends PageProps {
     stats: DashboardStats;

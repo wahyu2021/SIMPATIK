@@ -1,19 +1,7 @@
 import { CheckCircle } from 'lucide-react';
+import { LowStockItemData } from '../../../Types';
 import { Card, Badge, EmptyState } from '../../UI';
 import { ListItem, CardLink } from '../../Fragments';
-
-/**
- * Data satu barang stok rendah dari DashboardService.
- */
-export interface LowStockItemData {
-    id: number;
-    name: string;
-    item_code: string;
-    category: string;
-    current_stock: number;
-    minimum_stock: number;
-    unit: string;
-}
 
 /**
  * Komponen LowStockAlerts — kartu daftar barang yang stoknya di bawah minimum.

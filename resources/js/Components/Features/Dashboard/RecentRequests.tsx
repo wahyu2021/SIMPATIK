@@ -1,18 +1,6 @@
-import { OutboundStatus } from '../../../Types';
+import { RecentRequest } from '../../../Types';
 import { Card, StatusBadge, EmptyState } from '../../UI';
 import { ListItem, CardLink } from '../../Fragments';
-
-/**
- * Data satu pengajuan terbaru dari DashboardService.
- */
-export interface RecentRequest {
-    id: number;
-    document_number: string;
-    requester: string;
-    department: string;
-    status: OutboundStatus;
-    date: string;
-}
 
 /**
  * Komponen RecentRequests — kartu daftar 5 pengajuan terbaru.
