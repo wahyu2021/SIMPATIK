@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Trash2, Save, PenTool } from 'lucide-react';
 import Button from '../../Components/UI/Button';
@@ -10,41 +10,89 @@ interface Props {
 
 export default function Signature({ user }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [hasDrawn, setHasDrawn] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    /**
+     * Sinkronkan ukuran internal canvas dengan ukuran fisik (CSS).
+     * Ini yang menghilangkan bug offset — canvas resolution = display size.
+     */
+    const resizeCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container) return;
+
+        const rect = container.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        // Set internal resolution sesuai display size × device pixel ratio
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+
+        // Set display size via CSS
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = `${rect.height}px`;
+
+        // Scale context untuk DPR agar goresan tajam di retina display
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.scale(dpr, dpr);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+    }, []);
+
+    useEffect(() => {
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        return () => window.removeEventListener('resize', resizeCanvas);
+    }, [resizeCanvas]);
+
+    /** Hitung posisi titik relatif terhadap canvas (mouse & touch) */
+    const getPosition = (e: React.MouseEvent | React.TouchEvent) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+
+        const rect = canvas.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+        };
+    };
+
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        e.preventDefault();
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
+        const { x, y } = getPosition(e);
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.beginPath();
             ctx.moveTo(x, y);
             setIsDrawing(true);
+            setHasDrawn(true);
         }
     };
 
-    const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        e.preventDefault();
         if (!isDrawing) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
+        const { x, y } = getPosition(e);
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.lineTo(x, y);
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
             ctx.stroke();
         }
     };
@@ -60,6 +108,7 @@ export default function Signature({ user }: Props) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            setHasDrawn(false);
         }
     };
 
@@ -80,14 +129,14 @@ export default function Signature({ user }: Props) {
     return (
         <>
             <Head title="Tanda Tangan Digital" />
-            <div 
+            <div
                 className="min-h-screen flex items-center justify-center px-4 py-12"
                 style={{ background: 'linear-gradient(135deg, #003366 0%, #0052A3 100%)' }}
             >
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
                         {/* Header */}
-                        <div 
+                        <div
                             className="px-8 py-8 text-center"
                             style={{ background: 'linear-gradient(135deg, #003366 0%, #0052A3 100%)' }}
                         >
@@ -108,25 +157,40 @@ export default function Signature({ user }: Props) {
                                 <label className="block text-sm font-medium text-gray-700 mb-3">
                                     Kanvas Tanda Tangan
                                 </label>
-                                <canvas
-                                    ref={canvasRef}
-                                    width={300}
-                                    height={150}
-                                    onMouseDown={startDrawing}
-                                    onMouseMove={draw}
-                                    onMouseUp={stopDrawing}
-                                    onMouseLeave={stopDrawing}
-                                    className="border-2 border-gray-300 rounded-lg cursor-crosshair w-full bg-white"
-                                />
+                                <div
+                                    ref={containerRef}
+                                    className="relative w-full border-2 border-gray-300 rounded-lg bg-white overflow-hidden"
+                                    style={{ height: '180px' }}
+                                >
+                                    <canvas
+                                        ref={canvasRef}
+                                        onMouseDown={startDrawing}
+                                        onMouseMove={draw}
+                                        onMouseUp={stopDrawing}
+                                        onMouseLeave={stopDrawing}
+                                        onTouchStart={startDrawing}
+                                        onTouchMove={draw}
+                                        onTouchEnd={stopDrawing}
+                                        className="cursor-pen touch-none absolute inset-0"
+                                    />
+                                    {/* Placeholder text saat belum menggambar */}
+                                    {!hasDrawn && (
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <p className="text-gray-300 text-sm select-none">
+                                                Gambar tanda tangan di sini
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Buttons */}
-                            <div className="flex gap-3 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                                 <Button
                                     type="button"
                                     variant="secondary"
                                     onClick={clearCanvas}
-                                    className="flex-1 flex items-center justify-center gap-2"
+                                    className="flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     <Trash2 className="w-5 h-5" />
                                     Hapus
@@ -134,8 +198,8 @@ export default function Signature({ user }: Props) {
                                 <Button
                                     type="button"
                                     onClick={handleSubmit}
-                                    disabled={isSubmitting}
-                                    className="flex-1 flex items-center justify-center gap-2"
+                                    disabled={isSubmitting || !hasDrawn}
+                                    className="flex-1 flex items-center justify-center gap-2 whitespace-nowrap"
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -145,7 +209,7 @@ export default function Signature({ user }: Props) {
                                     ) : (
                                         <>
                                             <Save className="w-5 h-5" />
-                                            Simpan Tanda Tangan
+                                            Simpan
                                         </>
                                     )}
                                 </Button>
