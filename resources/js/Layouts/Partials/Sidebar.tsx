@@ -1,40 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import {
-    LayoutDashboard,
-    PackagePlus,
-    Send,
-    FolderTree,
-    Building2,
-    Users,
-    BarChart3,
-    Settings,
-    ChevronLeft,
-    type LucideIcon,
-} from 'lucide-react';
-
-/**
- * Definisi satu item menu sidebar.
- * @property label - Teks menu
- * @property href - URL tujuan (Inertia route)
- * @property icon - Komponen icon dari lucide-react
- * @property routeMatch - Pattern untuk deteksi active state (match awal URL)
- */
-interface MenuItem {
-    label: string;
-    href: string;
-    icon: LucideIcon;
-    routeMatch: string;
-}
-
-/**
- * Definisi grup menu di sidebar (misal "Master Data", "Transaksi").
- * @property title - Judul grup (tersembunyi saat collapsed)
- * @property items - Array MenuItem di dalam grup ini
- */
-interface MenuGroup {
-    title: string;
-    items: MenuItem[];
-}
+import { ChevronLeft } from 'lucide-react';
+import { menuGroups, type MenuGroup } from '../../Config/navigation';
+import { PageProps } from '../../Types';
 
 /**
  * Props untuk komponen Sidebar.
@@ -48,48 +15,34 @@ interface SidebarProps {
     onClose?: () => void;
 }
 
-/** Konfigurasi seluruh menu navigasi SIMPATIK */
-const menuGroups: MenuGroup[] = [
-    {
-        title: 'Utama',
-        items: [
-            { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, routeMatch: '/dashboard' },
-        ],
-    },
-    {
-        title: 'Transaksi',
-        items: [
-            { label: 'Barang Masuk', href: '/inbound', icon: PackagePlus, routeMatch: '/inbound' },
-            { label: 'Pengajuan Barang', href: '/outbound', icon: Send, routeMatch: '/outbound' },
-        ],
-    },
-    {
-        title: 'Master Data',
-        items: [
-            { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories' },
-            { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments' },
-        ],
-    },
-    {
-        title: 'Sistem',
-        items: [
-            { label: 'Pengguna', href: '/users', icon: Users, routeMatch: '/users' },
-            { label: 'Laporan', href: '/reports', icon: BarChart3, routeMatch: '/reports' },
-            { label: 'Pengaturan', href: '/settings', icon: Settings, routeMatch: '/settings' },
-        ],
-    },
-];
+/**
+ * Filter menu groups berdasarkan role user.
+ * Jika item.roles kosong/undefined, menu ditampilkan untuk semua role.
+ */
+function filterMenuByRole(groups: MenuGroup[], userRole: string): MenuGroup[] {
+    return groups
+        .map((group) => ({
+            ...group,
+            items: group.items.filter(
+                (item) => !item.roles || item.roles.length === 0 || item.roles.includes(userRole)
+            ),
+        }))
+        .filter((group) => group.items.length > 0);
+}
 
 /**
  * Komponen Sidebar — navigasi utama SIMPATIK di sisi kiri.
  * Mendukung mode collapsed (icon only), expanded (full label), dan mobile drawer.
  * Warna menggunakan BSB Dark Blue (#003366) dengan aksen BSB Blue (#0052A3).
+ * Menu di-filter berdasarkan role user yang login.
  *
  * @example
  * <Sidebar collapsed={false} onToggle={() => setCollapsed(!collapsed)} />
  */
 export default function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
-    const { url } = usePage();
+    const { url, props } = usePage<PageProps>();
+    const userRole = props.auth.user.roles?.[0]?.name ?? '';
+    const filteredGroups = filterMenuByRole(menuGroups, userRole);
 
     /** Cek apakah menu ini aktif berdasarkan URL saat ini */
     const isActive = (routeMatch: string) => {
@@ -127,7 +80,7 @@ export default function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) 
 
             {/* ── Menu Groups ── */}
             <nav className="flex-1 overflow-x-hidden overflow-y-auto py-4 sidebar-scrollbar">
-                {menuGroups.map((group) => (
+                {filteredGroups.map((group) => (
                     <div key={group.title} className="mb-4">
                         {/* Group Title — hidden saat collapsed */}
                         {!collapsed && (
