@@ -1,5 +1,6 @@
 import {
     LayoutDashboard,
+    Package,
     PackagePlus,
     Send,
     FolderTree,
@@ -61,6 +62,7 @@ export const menuGroups: MenuGroup[] = [
     {
         title: 'Master Data',
         items: [
+            { label: 'Barang', href: '/items', icon: Package, routeMatch: '/items' },
             { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories' },
             { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments' },
         ],

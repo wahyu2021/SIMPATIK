@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\DashboardRepositoryInterface;
+use App\Repositories\Contracts\ItemRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\DashboardRepository;
+use App\Repositories\Eloquent\ItemRepository;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,6 +20,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public array $bindings = [
         UserRepositoryInterface::class      => UserRepository::class,
         DashboardRepositoryInterface::class  => DashboardRepository::class,
+        ItemRepositoryInterface::class       => ItemRepository::class,
     ];
 
     /**
