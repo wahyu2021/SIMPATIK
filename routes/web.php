@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SignatureController;
 use App\Http\Controllers\Auth\UserManagementController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,6 +50,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['signature'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Items (Barang)
+        Route::resource('items', ItemController::class);
 
         // User Management (Admin only)
         Route::middleware(['role:warehouse_admin'])->group(function () {
