@@ -9,7 +9,7 @@ export default function CategoriesIndex() {
             <Breadcrumbs items={[{ label: 'Kategori' }]} />
             <ComingSoon
                 title="Kategori Barang"
-                description="Modul pengelolaan kategori barang ATK. Dikerjakan oleh Rekan 1."
+                description="Modul pengelolaan kategori barang ATK."
             />
         </AuthenticatedLayout>
     );

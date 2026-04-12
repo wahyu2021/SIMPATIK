@@ -9,7 +9,7 @@ export default function DepartmentsIndex() {
             <Breadcrumbs items={[{ label: 'Unit Kerja' }]} />
             <ComingSoon
                 title="Unit Kerja"
-                description="Modul pengelolaan data unit kerja kantor cabang. Dikerjakan oleh Rekan 2."
+                description="Modul pengelolaan data unit kerja kantor cabang."
             />
         </AuthenticatedLayout>
     );
