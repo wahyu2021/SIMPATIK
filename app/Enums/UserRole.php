@@ -5,16 +5,16 @@ namespace App\Enums;
 enum UserRole: string
 {
     case WAREHOUSE_ADMIN = 'warehouse_admin';
+    case DIVISION_HEAD = 'division_head';
     case GENERAL_AFFAIRS = 'general_affairs';
-    case SUPERVISOR = 'supervisor';
     case STAFF = 'staff';
 
     public function label(): string
     {
         return match($this) {
             self::WAREHOUSE_ADMIN => 'Admin Gudang',
+            self::DIVISION_HEAD => 'Penyelia / Kepala Unit Kerja',
             self::GENERAL_AFFAIRS => 'Staff Bagian Umum',
-            self::SUPERVISOR => 'Penyelia',
             self::STAFF => 'Staf Unit Kerja',
         };
     }
@@ -22,9 +22,9 @@ enum UserRole: string
     public function description(): string
     {
         return match($this) {
-            self::WAREHOUSE_ADMIN => 'Full access ke seluruh sistem, kelola users & settings',
-            self::GENERAL_AFFAIRS => 'Kelola gudang harian, serah terima barang, laporan (Mba Ajeng)',
-            self::SUPERVISOR => 'Approve/reject permintaan unit, pengecekan stok bulanan (Kak Redho / Penyelia)',
+            self::WAREHOUSE_ADMIN => 'Pengelola tunggal gudang, full control: barang, stok, transaksi, user & settings',
+            self::DIVISION_HEAD => 'Approve/reject pengajuan staf di unit kerjanya (Penyelia masing-masing)',
+            self::GENERAL_AFFAIRS => 'Monitoring, cek laporan, dan audit stok bulanan',
             self::STAFF => 'Ajukan permintaan barang per unit kerja',
         };
     }
@@ -49,26 +49,19 @@ enum UserRole: string
                 'export-reports',
                 'view-forecasting',
             ],
-            self::GENERAL_AFFAIRS => [
-                'view-dashboard',
-                'manage-items',
-                'manage-categories',
-                'view-inbound',
-                'create-inbound',
-                'issue-outbound',
-                'create-outbound-request',
-                'view-all-requests',
-                'view-reports',
-                'export-reports',
-            ],
-            self::SUPERVISOR => [
+            self::DIVISION_HEAD => [
                 'view-dashboard',
                 'approve-outbound',
                 'create-outbound-request',
                 'view-own-unit-requests',
                 'view-reports',
                 'export-reports',
-                'view-forecasting',
+            ],
+            self::GENERAL_AFFAIRS => [
+                'view-dashboard',
+                'view-reports',
+                'export-reports',
+                'view-all-requests',
             ],
             self::STAFF => [
                 'view-dashboard',

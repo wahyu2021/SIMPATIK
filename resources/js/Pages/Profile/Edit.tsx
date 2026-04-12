@@ -16,7 +16,9 @@ export default function ProfileEdit({ user, signatureUrl }: Props) {
 
     const roleLabels: Record<string, string> = {
         warehouse_admin: 'Admin Gudang',
-        warehouse_head: 'Kepala Gudang',
+        division_head: 'Penyelia / Kepala Unit Kerja',
+        general_affairs: 'Staff Bagian Umum',
+        staff: 'Staf Unit Kerja',
     };
     const roleName = user.roles?.[0]?.name ?? '';
     const roleLabel = roleLabels[roleName] || roleName;
