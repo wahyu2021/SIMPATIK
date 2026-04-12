@@ -6,6 +6,7 @@ export { default as Badge } from './Badge';
 export { default as Breadcrumbs } from './Breadcrumbs';
 export { default as Button } from './Button';
 export { default as Card } from './Card';
+export { default as ComingSoon } from './ComingSoon';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as DataTable } from './DataTable';
 export { default as EmptyState } from './EmptyState';

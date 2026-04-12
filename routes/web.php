@@ -69,6 +69,14 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
             Route::put('/signature', [ProfileController::class, 'updateSignature'])->name('signature');
         });
+
+        // Coming Soon — Placeholder routes
+        Route::get('/inbound', fn () => Inertia::render('Inbound/Index'))->name('inbound.index');
+        Route::get('/outbound', fn () => Inertia::render('Outbound/Index'))->name('outbound.index');
+        Route::get('/categories', fn () => Inertia::render('Categories/Index'))->name('categories.index');
+        Route::get('/departments', fn () => Inertia::render('Departments/Index'))->name('departments.index');
+        Route::get('/reports', fn () => Inertia::render('Reports/Index'))->name('reports.index');
+        Route::get('/settings', fn () => Inertia::render('Settings/Index'))->name('settings.index');
     });
 });
 
