@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+class ProfileService
+{
+    /**
+     * Update profil user (nama & email).
+     */
+    public function updateProfile(User $user, array $data): bool
+    {
+        return $user->update([
+            'name'  => $data['name'],
+            'email' => $data['email'],
+        ]);
+    }
+
+    /**
+     * Ganti password user.
+     */
+    public function updatePassword(User $user, string $newPassword): bool
+    {
+        return $user->update([
+            'password' => Hash::make($newPassword),
+        ]);
+    }
+
+    /**
+     * Update tanda tangan user dari base64 data.
+     */
+    public function updateSignature(User $user, string $signatureBase64): string
+    {
+        return $user->saveSignature($signatureBase64);
+    }
+
+    /**
+     * Ambil data profil lengkap untuk ditampilkan.
+     */
+    public function getProfileData(User $user): array
+    {
+        $user->load('department', 'roles');
+
+        return [
+            'user'         => $user,
+            'signatureUrl' => $user->getSignatureUrl(),
+        ];
+    }
+}

@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SignatureController;
 use App\Http\Controllers\Auth\UserManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -62,11 +63,12 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Profile
-        Route::get('/profile', function () {
-            return Inertia::render('Profile/Edit', [
-                'user' => auth()->user()->load('department'),
-            ]);
-        })->name('profile.edit');
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+            Route::put('/update', [ProfileController::class, 'updateProfile'])->name('update');
+            Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
+            Route::put('/signature', [ProfileController::class, 'updateSignature'])->name('signature');
+        });
     });
 });
 
