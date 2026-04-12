@@ -55,23 +55,23 @@ export const menuGroups: MenuGroup[] = [
     {
         title: 'Transaksi',
         items: [
-            { label: 'Barang Masuk', href: '/inbound', icon: PackagePlus, routeMatch: '/inbound' },
+            { label: 'Barang Masuk', href: '/inbound', icon: PackagePlus, routeMatch: '/inbound', roles: ['warehouse_admin'] },
             { label: 'Pengajuan Barang', href: '/outbound', icon: Send, routeMatch: '/outbound' },
         ],
     },
     {
         title: 'Master Data',
         items: [
-            { label: 'Barang', href: '/items', icon: Package, routeMatch: '/items' },
-            { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories' },
-            { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments' },
+            { label: 'Barang', href: '/items', icon: Package, routeMatch: '/items', roles: ['warehouse_admin'] },
+            { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories', roles: ['warehouse_admin'] },
+            { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments', roles: ['warehouse_admin'] },
         ],
     },
     {
         title: 'Sistem',
         items: [
             { label: 'Pengguna', href: '/users', icon: Users, routeMatch: '/users', roles: ['warehouse_admin'] },
-            { label: 'Laporan', href: '/reports', icon: BarChart3, routeMatch: '/reports' },
+            { label: 'Laporan', href: '/reports', icon: BarChart3, routeMatch: '/reports', roles: ['warehouse_admin', 'general_affairs'] },
             { label: 'Pengaturan', href: '/settings', icon: Settings, routeMatch: '/settings', roles: ['warehouse_admin'] },
         ],
     },

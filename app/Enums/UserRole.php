@@ -52,10 +52,7 @@ enum UserRole: string
             self::DIVISION_HEAD => [
                 'view-dashboard',
                 'approve-outbound',
-                'create-outbound-request',
                 'view-own-unit-requests',
-                'view-reports',
-                'export-reports',
             ],
             self::GENERAL_AFFAIRS => [
                 'view-dashboard',

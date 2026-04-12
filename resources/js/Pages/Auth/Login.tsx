@@ -43,7 +43,7 @@ export default function Login({ errors = {} }: LoginPageProps) {
                             <DemoCredentials />
 
                             <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 text-center text-xs text-gray-600">
-                                <p>© 2024 Bank Sumsel Babel. All rights reserved.</p>
+                                <p>© 2026 Bank Sumsel Babel. All rights reserved.</p>
                             </div>
                         </div>
 
