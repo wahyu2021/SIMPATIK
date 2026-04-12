@@ -9,12 +9,12 @@
 
 ```
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│ Staff Unit   │    │  Penyelia    │    │ Bagian Umum  │    │  Pemeriksa   │
+│ Staff Unit   │    │  Penyelia    │    │ Admin Gudang │    │ Bagian Umum  │
 │ (Pemohon)    │───▶│  (Approver)  │───▶│ (Mba Ajeng)  │    │ (Kak Redho)  │
 │              │    │              │    │              │    │              │
 │ Isi formulir │    │ Approve/     │    │ Serahkan     │    │ Cek stok     │
 │ permintaan   │    │ Tolak        │    │ barang       │    │ bulanan      │
-│ ATK          │    │ permintaan   │    │ + catat      │    │ + laporan    │
+│ ATK          │    │ permintaan   │    │ + catat stok │    │ + laporan    │
 └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
@@ -34,9 +34,9 @@
 *Modul ini mengatur keamanan pintu masuk dan rekam jejak digital aplikasi.*
 
 * **Autentikasi Multi-Peran:** Akses masuk sistem terbagi untuk 4 role:
-  - **Admin Gudang** (`warehouse_admin`) — full access, superadmin sistem, kelola users & settings
-  - **Staff Bagian Umum** (`general_affairs`) — input permintaan harian, serah terima barang, kelola transaksi gudang *(mapping: Mba Ajeng)*
-  - **Pimpinan/Pemeriksa** (`division_head`) — pengecekan stok fisik vs sistem, laporan bulanan *(mapping: Kak Redho)*
+  - **Admin Gudang** (`warehouse_admin`) — pengelola tunggal gudang, full control: kelola barang, stok, transaksi, user & settings *(mapping: Mba Ajeng)*
+  - **Penyelia / Kepala Unit Kerja** (`division_head`) — approve pengajuan staf di unit kerjanya
+  - **Staff Bagian Umum** (`general_affairs`) — monitoring, cek laporan, audit stok bulanan *(mapping: Kak Redho)*
   - **Staf Unit Kerja** (`staff`) — ajukan barang per unit, lihat pengajuan divisi sendiri
 * **Mandatory Signature Onboarding:** Setiap pengguna yang baru pertama kali *login* diwajibkan menggambar dan menyimpan tanda tangan digital sebelum bisa menggunakan fitur lain. Menggunakan plugin `saade/filament-autograph`.
 * **Digital Audit Trail:** Sistem mencatat IP Address, nama user, dan timestamp setiap aktivitas pengajuan atau persetujuan barang.
@@ -54,7 +54,7 @@
 *Alur kerja digitalisasi "Daftar Permintaan ATK" dan "Daftar Pengeluaran Barang" sesuai formulir Bank BSB.*
 
 #### 3a. Penerimaan Barang (Inbound)
-Admin/Staff Bagian Umum mencatat stok masuk dari **vendor** beserta nomor surat jalan dan harga per satuan. Saat disimpan:
+Admin Gudang (Mba Ajeng) mencatat stok masuk dari **vendor** beserta nomor surat jalan dan harga per satuan. Saat disimpan:
 - `current_stock` item otomatis **bertambah**
 - Record `StockLedger` otomatis tercatat (movement_type: `IN`)
 
@@ -70,8 +70,8 @@ Digitalisasi formulir **"Daftar Permintaan ATK"** dengan flow 4 status:
     │            ↳ TTD 1: Mengetahui (Penyelia)
     │            ↳ Jika ditolak → [Rejected] + alasan penolakan
     ▼
-[Issued]   ──── Staff Bagian Umum menyerahkan barang fisik
-    │            ↳ TTD 2: Yang Mengeluarkan (Staff gudang)
+[Issued]   ──── Admin Gudang (Mba Ajeng) menyerahkan barang fisik
+    │            ↳ TTD 2: Yang Mengeluarkan (Admin Gudang)
     │            ↳ TTD 3: Yang Menerima (Staff unit)
     │            ↳ Stok otomatis berkurang
     │            ↳ StockLedger otomatis tercatat (movement_type: OUT)
@@ -85,7 +85,7 @@ Digitalisasi formulir **"Daftar Permintaan ATK"** dengan flow 4 status:
 |--------|--------|------|
 | `Pending` | Staff unit | Buat permintaan, pilih barang & jumlah |
 | `Approved` | Penyelia unit | Klik "Setujui" atau "Tolak" + alasan |
-| `Issued` | Staff Bagian Umum | Klik "Serahkan Barang" → stok berkurang otomatis |
+| `Issued` | Admin Gudang (Mba Ajeng) | Klik "Serahkan Barang" → stok berkurang otomatis |
 | `Rejected` | Penyelia | Permintaan ditolak, wajib isi alasan |
 
 **Pesanan Khusus:**
@@ -109,7 +109,7 @@ Dua template PDF sesuai dokumen fisik Bank BSB:
 - Tanda tangan digital 3 pihak:
   - **Yang Menerima** (Staff unit pemohon)
   - **Menyetujui** (Penyelia)
-  - **Yang Mengeluarkan** (Staff Bagian Umum, Palembang)
+  - **Yang Mengeluarkan** (Admin Gudang, Palembang)
 - QR Code validasi: *"Dokumen ini telah diotorisasi secara elektronik oleh sistem SIMPATIK"*
 
 ### 4. Modul Pelaporan & Mutasi (*Reporting*)
@@ -137,5 +137,5 @@ Dua template PDF sesuai dokumen fisik Bank BSB:
 * **Widget Stok Kritis:** Tabel barang dengan stok di bawah minimum — ditandai warna merah.
 * **Widget Pengajuan Menunggu:** Jumlah permintaan berstatus `Pending` dan `Approved` yang belum diserahkan.
 * **Widget Nilai Gudang:** Total nilai stok gudang (∑ harga satuan × stok saat ini).
-* **Notifikasi WhatsApp Stok Tipis:** Ketika stok menyentuh batas minimum, sistem mengirim alert otomatis ke WhatsApp Staff Bagian Umum melalui API (Fonnte/WATool/Meta Cloud API).
-* **Low Stock Alert Panel:** Notifikasi real-time di panel admin Filament.
+* **Notifikasi WhatsApp Stok Tipis:** Ketika stok menyentuh batas minimum, sistem mengirim alert otomatis ke WhatsApp Admin Gudang melalui API (Fonnte/WATool/Meta Cloud API).
+* **Low Stock Alert Panel:** Notifikasi real-time di dashboard Admin Gudang.
