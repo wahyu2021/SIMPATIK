@@ -10,6 +10,7 @@ export { default as ComingSoon } from './ComingSoon';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as DataTable } from './DataTable';
 export { default as EmptyState } from './EmptyState';
+export { default as InfoField } from './InfoField';
 export { default as Input } from './Input';
 export { default as Label } from './Label';
 export { default as Loading } from './Loading';

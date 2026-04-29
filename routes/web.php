@@ -8,6 +8,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\InboundController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\OutboundController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -77,7 +78,11 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role:warehouse_admin'])->group(function () {
             Route::resource('inbound', InboundController::class);
         });
-        Route::get('/outbound', fn () => Inertia::render('Outbound/Index'))->name('outbound.index');
+        // Pengajuan Barang (Outbound) — semua role bisa akses (filter di controller)
+        Route::resource('outbound', OutboundController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+        Route::post('outbound/{id}/approve', [OutboundController::class, 'approve'])->name('outbound.approve');
+        Route::post('outbound/{id}/reject', [OutboundController::class, 'reject'])->name('outbound.reject');
+        Route::post('outbound/{id}/issue', [OutboundController::class, 'issue'])->name('outbound.issue');
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);
         Route::get('/reports', fn () => Inertia::render('Reports/Index'))->name('reports.index');
