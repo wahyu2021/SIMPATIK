@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
-import { SearchInput, Input, Select } from '../../UI';
+import { SearchInput, Combobox, DatePicker } from '../../UI';
+import { ComboboxOption } from '../../UI/Combobox';
 import useDebounce from '../../../Hooks/useDebounce';
 import { Department } from '../../../Types';
 
@@ -13,6 +14,13 @@ interface OutboundFiltersProps {
     };
     departments: Department[];
 }
+
+const statusOptions: ComboboxOption[] = [
+    { value: 'Pending', label: 'Menunggu' },
+    { value: 'Approved', label: 'Disetujui' },
+    { value: 'Issued', label: 'Diserahkan' },
+    { value: 'Rejected', label: 'Ditolak' },
+];
 
 /** Bar filter halaman pengajuan barang — search, status, unit kerja, tanggal. */
 export default function OutboundFilters({ filters, departments }: OutboundFiltersProps) {
@@ -30,6 +38,11 @@ export default function OutboundFilters({ filters, departments }: OutboundFilter
         applyFilter('search', value);
     }, 400);
 
+    const deptOptions: ComboboxOption[] = departments.map((dept) => ({
+        value: dept.id.toString(),
+        label: dept.name,
+    }));
+
     return (
         <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
@@ -39,49 +52,40 @@ export default function OutboundFilters({ filters, departments }: OutboundFilter
                     onSearch={debouncedSearch}
                 />
             </div>
-            <div className="w-full sm:w-40">
-                <Select
-                    id="status_filter"
-                    value={filters.status || ''}
-                    onChange={(e) => applyFilter('status', e.target.value)}
-                >
-                    <option value="">Semua Status</option>
-                    <option value="Pending">Menunggu</option>
-                    <option value="Approved">Disetujui</option>
-                    <option value="Issued">Diserahkan</option>
-                    <option value="Rejected">Ditolak</option>
-                </Select>
-            </div>
             <div className="w-full sm:w-44">
-                <Select
-                    id="department_filter"
-                    value={filters.department_id || ''}
-                    onChange={(e) => applyFilter('department_id', e.target.value)}
-                >
-                    <option value="">Semua Unit Kerja</option>
-                    {departments.map((dept) => (
-                        <option key={dept.id} value={dept.id}>{dept.name}</option>
-                    ))}
-                </Select>
-            </div>
-            <div className="w-full sm:w-40">
-                <Input
-                    id="date_from"
-                    type="date"
-                    label=""
-                    placeholder="Dari tanggal"
-                    value={filters.date_from || ''}
-                    onChange={(e) => applyFilter('date_from', e.target.value)}
+                <Combobox
+                    id="status_filter"
+                    options={statusOptions}
+                    value={filters.status || ''}
+                    onChange={(val) => applyFilter('status', val)}
+                    placeholder="Semua Status"
+                    searchPlaceholder="Cari status..."
                 />
             </div>
-            <div className="w-full sm:w-40">
-                <Input
+            <div className="w-full sm:w-48">
+                <Combobox
+                    id="department_filter"
+                    options={deptOptions}
+                    value={filters.department_id || ''}
+                    onChange={(val) => applyFilter('department_id', val)}
+                    placeholder="Semua Unit Kerja"
+                    searchPlaceholder="Cari unit kerja..."
+                />
+            </div>
+            <div className="w-full sm:w-44">
+                <DatePicker
+                    id="date_from"
+                    value={filters.date_from || ''}
+                    onChange={(val) => applyFilter('date_from', val)}
+                    placeholder="Dari tanggal"
+                />
+            </div>
+            <div className="w-full sm:w-44">
+                <DatePicker
                     id="date_to"
-                    type="date"
-                    label=""
-                    placeholder="Sampai tanggal"
                     value={filters.date_to || ''}
-                    onChange={(e) => applyFilter('date_to', e.target.value)}
+                    onChange={(val) => applyFilter('date_to', val)}
+                    placeholder="Sampai tanggal"
                 />
             </div>
         </div>

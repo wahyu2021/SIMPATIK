@@ -2,7 +2,7 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { PageProps, InboundTransaction, Item } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Button, Input, Breadcrumbs, Textarea } from '../../Components/UI';
+import { PageHeader, Button, Input, Breadcrumbs, Textarea, DatePicker } from '../../Components/UI';
 import InboundDetailRow, { DetailRow, emptyDetail } from '../../Components/Features/Inbound/InboundDetailRow';
 import { formatCurrency, normalizeDate } from '../../Lib/formatters';
 
@@ -116,13 +116,12 @@ export default function InboundForm({ inbound, items, nextReference }: Props) {
                             error={errors.reference_number}
                             required
                         />
-                        <Input
+                        <DatePicker
                             id="transaction_date"
                             label="Tanggal Transaksi"
-                            type="date"
                             max={new Date().toISOString().split('T')[0]}
                             value={data.transaction_date}
-                            onChange={(e) => setData('transaction_date', e.target.value)}
+                            onChange={(val) => setData('transaction_date', val)}
                             error={errors.transaction_date}
                             required
                         />

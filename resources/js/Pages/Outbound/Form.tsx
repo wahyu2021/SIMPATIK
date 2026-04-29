@@ -2,7 +2,8 @@ import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { PageProps, Item, Department } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Button, Input, Select, Breadcrumbs, Textarea, Label } from '../../Components/UI';
+import { PageHeader, Button, Combobox, Breadcrumbs, Textarea, Label, DatePicker } from '../../Components/UI';
+import { ComboboxOption } from '../../Components/UI/Combobox';
 import OutboundDetailRowComponent, { OutboundDetailRow, emptyDetail } from '../../Components/Features/Outbound/OutboundDetailRow';
 import { normalizeDate } from '../../Lib/formatters';
 
@@ -78,30 +79,30 @@ export default function OutboundForm({ items, departments, nextDocument }: Props
                             </div>
                         </div>
 
-                        <Input
+                        <DatePicker
                             id="transaction_date"
                             label="Tanggal Pengajuan"
-                            type="date"
                             max={new Date().toISOString().split('T')[0]}
                             value={data.transaction_date}
-                            onChange={(e) => setData('transaction_date', e.target.value)}
+                            onChange={(val) => setData('transaction_date', val)}
                             error={errors.transaction_date}
                             required
                         />
 
                         <div>
                             <Label htmlFor="department_id" required>Unit Kerja</Label>
-                            <Select
+                            <Combobox
                                 id="department_id"
+                                options={departments.map((dept): ComboboxOption => ({
+                                    value: dept.id.toString(),
+                                    label: dept.name,
+                                }))}
                                 value={data.department_id}
-                                onChange={(e) => setData('department_id', e.target.value)}
+                                onChange={(val) => setData('department_id', val)}
+                                placeholder="— Cari unit kerja —"
+                                searchPlaceholder="Ketik nama unit kerja..."
                                 error={errors.department_id}
-                            >
-                                <option value="">— Pilih Unit Kerja —</option>
-                                {departments.map((dept) => (
-                                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                ))}
-                            </Select>
+                            />
                         </div>
 
                         <div className="flex items-center gap-3 mt-6">
