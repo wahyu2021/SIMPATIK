@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SignatureController;
 use App\Http\Controllers\Auth\UserManagementController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\InboundController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -71,8 +72,10 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/signature', [ProfileController::class, 'updateSignature'])->name('signature');
         });
 
-        // Coming Soon — Placeholder routes
-        Route::get('/inbound', fn () => Inertia::render('Inbound/Index'))->name('inbound.index');
+        // Barang Masuk (Inbound) — Admin Gudang only
+        Route::middleware(['role:warehouse_admin'])->group(function () {
+            Route::resource('inbound', InboundController::class);
+        });
         Route::get('/outbound', fn () => Inertia::render('Outbound/Index'))->name('outbound.index');
         Route::get('/categories', fn () => Inertia::render('Categories/Index'))->name('categories.index');
         Route::resource('departments', DepartmentController::class);
