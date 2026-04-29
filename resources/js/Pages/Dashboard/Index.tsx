@@ -3,14 +3,29 @@ import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import StatsGrid from '../../Components/Features/Dashboard/StatsGrid';
 import RecentRequests from '../../Components/Features/Dashboard/RecentRequests';
 import LowStockAlerts from '../../Components/Features/Dashboard/LowStockAlerts';
+import MonthlyTrendChart from '../../Components/Features/Dashboard/MonthlyTrendChart';
+import StatusDistributionChart from '../../Components/Features/Dashboard/StatusDistributionChart';
+
+interface MonthlyTrend {
+    month: string;
+    inbound: number;
+    outbound: number;
+}
+
+interface StatusDist {
+    status: string;
+    count: number;
+}
 
 interface DashboardProps extends PageProps {
     stats: DashboardStats;
     recentRequests: RecentRequest[];
     lowStockItems: LowStockItemData[];
+    monthlyTrend: MonthlyTrend[];
+    statusDistribution: StatusDist[];
 }
 
-export default function Dashboard({ auth, stats, recentRequests, lowStockItems }: DashboardProps) {
+export default function Dashboard({ auth, stats, recentRequests, lowStockItems, monthlyTrend, statusDistribution }: DashboardProps) {
     return (
         <AuthenticatedLayout title="Dashboard">
             {/* ── Welcome Header ── */}
@@ -21,10 +36,20 @@ export default function Dashboard({ auth, stats, recentRequests, lowStockItems }
                 </p>
             </div>
 
-            {/* ── Stats ── */}
+            {/* ── Stats Cards ── */}
             <StatsGrid stats={stats} />
 
-            {/* ── Content Cards ── */}
+            {/* ── Charts ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div className="lg:col-span-2">
+                    <MonthlyTrendChart data={monthlyTrend} />
+                </div>
+                <div>
+                    <StatusDistributionChart data={statusDistribution} />
+                </div>
+            </div>
+
+            {/* ── Tables ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <RecentRequests data={recentRequests} />
                 <LowStockAlerts data={lowStockItems} />

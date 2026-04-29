@@ -21,6 +21,8 @@ class DashboardService
             'stats'          => $this->getStats(),
             'recentRequests' => $this->mapRecentRequests(),
             'lowStockItems'  => $this->mapLowStockItems(),
+            'monthlyTrend'   => $this->dashboardRepository->getMonthlyTransactionTrend(),
+            'statusDistribution' => $this->dashboardRepository->getOutboundStatusDistribution(),
         ];
     }
 

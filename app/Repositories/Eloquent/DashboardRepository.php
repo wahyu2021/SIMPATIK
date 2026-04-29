@@ -75,4 +75,44 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->take($limit)
             ->get();
     }
+
+    public function getMonthlyTransactionTrend(int $months = 6): array
+    {
+        $result = [];
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date = Carbon::now()->startOfMonth()->subMonths($i);
+            $month = $date->month;
+            $year = $date->year;
+
+            $inbound = InboundTransaction::whereMonth('transaction_date', $month)
+                ->whereYear('transaction_date', $year)
+                ->count();
+
+            $outbound = OutboundTransaction::whereMonth('transaction_date', $month)
+                ->whereYear('transaction_date', $year)
+                ->where('status', OutboundStatus::Issued)
+                ->count();
+
+            $result[] = [
+                'month' => $date->translatedFormat('M Y'),
+                'inbound' => $inbound,
+                'outbound' => $outbound,
+            ];
+        }
+
+        return $result;
+    }
+
+    public function getOutboundStatusDistribution(): array
+    {
+        return OutboundTransaction::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->map(fn ($row) => [
+                'status' => $row->status instanceof OutboundStatus ? $row->status->value : $row->status,
+                'count' => $row->count,
+            ])
+            ->toArray();
+    }
 }
