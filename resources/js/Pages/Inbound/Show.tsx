@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { PageProps, InboundTransaction } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { Breadcrumbs, Button, Badge } from '../../Components/UI';
+import { Breadcrumbs, Button, Badge, InfoField } from '../../Components/UI';
 import { formatCurrency, formatDateLong, formatNumber } from '../../Lib/formatters';
 
 interface Props extends PageProps {
@@ -51,36 +51,15 @@ export default function InboundShow({ inbound }: Props) {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Transaksi</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div>
-                        <dt className="text-sm font-medium text-gray-500">No. Referensi</dt>
-                        <dd className="mt-1 text-sm font-mono font-semibold text-gray-900">
-                            {inbound.reference_number}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-medium text-gray-500">Tanggal Transaksi</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                            {formatDateLong(inbound.transaction_date)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-medium text-gray-500">Dicatat Oleh</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                            {inbound.user?.name ?? '-'}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-medium text-gray-500">Dicatat Pada</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
-                            {formatDateLong(inbound.created_at)}
-                        </dd>
-                    </div>
+                    <InfoField label="No. Referensi" mono>{inbound.reference_number}</InfoField>
+                    <InfoField label="Tanggal Transaksi">{formatDateLong(inbound.transaction_date)}</InfoField>
+                    <InfoField label="Dicatat Oleh">{inbound.user?.name ?? '-'}</InfoField>
+                    <InfoField label="Dicatat Pada">{formatDateLong(inbound.created_at)}</InfoField>
                 </div>
 
                 {inbound.notes && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                        <dt className="text-sm font-medium text-gray-500">Catatan</dt>
-                        <dd className="mt-1 text-sm text-gray-700">{inbound.notes}</dd>
+                        <InfoField label="Catatan">{inbound.notes}</InfoField>
                     </div>
                 )}
             </div>
