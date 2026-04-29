@@ -11,7 +11,7 @@ interface LoginPageProps {
 export default function Login({ errors = {} }: LoginPageProps) {
     return (
         <>
-            <Head title="Login - SIMPATIK" />
+            <Head title="Login" />
             <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-linear-to-br from-[#003366] to-[#0052A3]">
                 <div className="w-full max-w-md lg:max-w-6xl flex gap-20 justify-center items-center">
                     
