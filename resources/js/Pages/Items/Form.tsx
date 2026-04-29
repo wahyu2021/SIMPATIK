@@ -46,7 +46,7 @@ export default function ItemForm({ item, categories, nextCode }: Props) {
                 backUrl="/items"
             />
 
-            <div className="max-w-2xl">
+            <div className="max-w-4xl">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Kategori */}
