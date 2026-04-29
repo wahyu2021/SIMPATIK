@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { type LucideIcon } from 'lucide-react';
 
 interface InfoFieldProps {
     label: string;
@@ -6,13 +7,17 @@ interface InfoFieldProps {
     className?: string;
     mono?: boolean;
     labelClassName?: string;
+    icon?: LucideIcon;
 }
 
 /** Field info reusable (dt/dd) untuk halaman detail transaksi. */
-export default function InfoField({ label, children, className = '', mono, labelClassName }: InfoFieldProps) {
+export default function InfoField({ label, children, className = '', mono, labelClassName, icon: Icon }: InfoFieldProps) {
     return (
         <div className={className}>
-            <dt className={`text-sm font-medium ${labelClassName ?? 'text-gray-500'}`}>{label}</dt>
+            <dt className={`text-sm font-medium flex items-center gap-1.5 ${labelClassName ?? 'text-gray-500'}`}>
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {label}
+            </dt>
             <dd className={`mt-1 text-sm text-gray-900 ${mono ? 'font-mono font-semibold' : ''}`}>
                 {children}
             </dd>

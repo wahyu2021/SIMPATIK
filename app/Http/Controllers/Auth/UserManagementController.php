@@ -2,153 +2,119 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\DTOs\Auth\RegisterUserDTO;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Models\Department;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Services\Auth\AuthService;
+use App\Services\UserService;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class UserManagementController extends Controller
 {
     public function __construct(
-        private AuthService $authService,
-        private UserRepositoryInterface $userRepository
+        private UserService $userService,
     ) {}
 
     /**
-     * Display user list
+     * Daftar semua user dengan filter & pagination.
      */
     public function index(): Response
     {
-        $users = $this->userRepository->paginate(
-            perPage: 15,
-            filters: request()->only(['search', 'department_id', 'role', 'is_active', 'has_signature'])
-        );
+        $filters = request()->only(['search', 'department_id', 'role', 'is_active']);
 
         return Inertia::render('User/Index', [
-            'users' => $users,
-            'departments' => Department::all(),
+            'users' => $this->userService->getUsers($filters),
+            'departments' => Department::orderBy('name')->get(),
             'roles' => UserRole::toSelectArray(),
-            'filters' => request()->only(['search', 'department_id', 'role', 'is_active', 'has_signature']),
+            'filters' => $filters,
         ]);
     }
 
     /**
-     * Show create user form
+     * Form tambah user baru.
      */
     public function create(): Response
     {
-        return Inertia::render('User/Create', [
-            'departments' => Department::all(),
+        return Inertia::render('User/Form', [
+            'departments' => Department::orderBy('name')->get(),
             'roles' => UserRole::toSelectArray(),
         ]);
     }
 
     /**
-     * Store new user
+     * Simpan user baru.
      */
     public function store(RegisterUserRequest $request)
     {
-        $user = $this->authService->register(
-            RegisterUserDTO::fromRequest($request)
-        );
+        $this->userService->createUser($request->validated());
 
-        return redirect()->route('users.show', $user)
-            ->with('success', 'User berhasil dibuat.');
+        return redirect()->route('users.index')
+            ->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
-     * Show user detail
+     * Detail user.
      */
     public function show(int $id): Response
     {
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            abort(404, 'User tidak ditemukan.');
-        }
+        $user = $this->userService->findUser($id);
 
         return Inertia::render('User/Show', [
-            'user' => $user->load(['department', 'roles', 'permissions']),
+            'user' => $user->load(['department', 'roles']),
         ]);
     }
 
     /**
-     * Show edit user form
+     * Form edit user.
      */
     public function edit(int $id): Response
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->userService->findUser($id);
 
-        if (!$user) {
-            abort(404, 'User tidak ditemukan.');
-        }
-
-        return Inertia::render('User/Edit', [
-            'user' => $user,
-            'departments' => Department::all(),
+        return Inertia::render('User/Form', [
+            'user' => $user->load(['department', 'roles']),
+            'departments' => Department::orderBy('name')->get(),
             'roles' => UserRole::toSelectArray(),
         ]);
     }
 
     /**
-     * Update user
+     * Update user — handle password opsional + role sync.
      */
-    public function update(RegisterUserRequest $request, int $id)
+    public function update(UpdateUserRequest $request, int $id)
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->userService->findUser($id);
 
-        if (!$user) {
-            abort(404, 'User tidak ditemukan.');
-        }
+        $this->userService->updateUser($user, $request->validated());
 
-        $this->userRepository->update($user, $request->validated());
-
-        return redirect()->route('users.show', $user)
+        return redirect()->route('users.index')
             ->with('success', 'User berhasil diperbarui.');
     }
 
     /**
-     * Delete user
+     * Hapus user (soft delete).
      */
     public function destroy(int $id)
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->userService->findUser($id);
 
-        if (!$user) {
-            abort(404, 'User tidak ditemukan.');
-        }
-
-        // Prevent self-deletion
-        if ($user->id === auth()->id()) {
-            return redirect()->back()
-                ->with('error', 'Anda tidak dapat menghapus akun sendiri.');
-        }
-
-        $this->userRepository->delete($user);
+        $this->userService->deleteUser($user, auth()->id());
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil dihapus.');
     }
 
     /**
-     * Toggle user active status
+     * Toggle status aktif/nonaktif.
      */
     public function toggleStatus(int $id)
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->userService->findUser($id);
+        $updated = $this->userService->toggleStatus($user, auth()->id());
 
-        if (!$user) {
-            abort(404, 'User tidak ditemukan.');
-        }
-
-        $this->authService->toggleActiveStatus($user);
-
-        $status = $user->fresh()->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        $status = $updated->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
         return redirect()->back()
             ->with('success', "User berhasil {$status}.");
