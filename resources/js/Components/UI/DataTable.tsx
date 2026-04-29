@@ -42,7 +42,7 @@ interface DataTableProps<T> {
  * ];
  * <DataTable columns={columns} data={categories.data} striped />
  */
-export default function DataTable<T extends Record<string, unknown>>({
+export default function DataTable<T extends object>({
     columns,
     data,
     keyField = 'id',
@@ -77,7 +77,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                     ) : (
                         data.map((item, index) => (
                             <tr
-                                key={String(item[keyField] ?? index)}
+                                key={String((item as Record<string, unknown>)[keyField] ?? index)}
                                 className={`
                                     hover:bg-blue-50/50 transition-colors
                                     ${striped && index % 2 === 1 ? 'bg-gray-50/50' : ''}
@@ -87,7 +87,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                                     <td key={col.key} className={`px-6 py-4 text-sm ${col.className || ''}`}>
                                         {col.render
                                             ? col.render(item, index)
-                                            : String(item[col.key] ?? '-')
+                                            : String((item as Record<string, unknown>)[col.key] ?? '-')
                                         }
                                     </td>
                                 ))}
