@@ -1,3 +1,9 @@
+# Rancangan Database — SIMPATIK
+
+> Database: MySQL 8.4.3 | Engine: InnoDB | Charset: utf8mb4_unicode_ci
+
+---
+
 ### **1. Keamanan & Hak Akses (*Security & Access*)**
 
 **Tabel users** (Tabel Pengguna Utama)
