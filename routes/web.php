@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SignatureController;
 use App\Http\Controllers\Auth\UserManagementController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\InboundController;
@@ -86,7 +87,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);
         Route::get('/reports', fn () => Inertia::render('Reports/Index'))->name('reports.index');
-        Route::get('/settings', fn () => Inertia::render('Settings/Index'))->name('settings.index');
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });
 
