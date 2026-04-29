@@ -1,6 +1,7 @@
 import { Trash2 } from 'lucide-react';
 import { Item } from '../../../Types';
-import { Input, Select, Label } from '../../UI';
+import { Input, Combobox, Label } from '../../UI';
+import { ComboboxOption } from '../../UI/Combobox';
 import { formatCurrency } from '../../../Lib/formatters';
 
 /** Shape satu baris detail repeater. */
@@ -43,6 +44,13 @@ export default function InboundDetailRow({
         return qty * price;
     };
 
+    const itemOptions: ComboboxOption[] = items.map((item) => ({
+        value: item.id.toString(),
+        label: `${item.item_code} — ${item.name}`,
+        sublabel: `${item.unit_of_measure} • Stok: ${item.current_stock}`,
+        disabled: usedItemIds.includes(item.id.toString()),
+    }));
+
     return (
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-3">
@@ -64,23 +72,15 @@ export default function InboundDetailRow({
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-5">
                     <Label htmlFor={`detail_item_${index}`} required>Barang</Label>
-                    <Select
+                    <Combobox
                         id={`detail_item_${index}`}
+                        options={itemOptions}
                         value={detail.item_id}
-                        onChange={(e) => onUpdate(index, 'item_id', e.target.value)}
+                        onChange={(val) => onUpdate(index, 'item_id', val)}
+                        placeholder="— Cari barang —"
+                        searchPlaceholder="Ketik kode atau nama barang..."
                         error={errors[`details.${index}.item_id`]}
-                    >
-                        <option value="">— Pilih Barang —</option>
-                        {items.map((item) => (
-                            <option
-                                key={item.id}
-                                value={item.id}
-                                disabled={usedItemIds.includes(item.id.toString())}
-                            >
-                                {item.item_code} — {item.name} ({item.unit_of_measure})
-                            </option>
-                        ))}
-                    </Select>
+                    />
                     {selectedItem && (
                         <p className="text-xs text-gray-400 mt-1">
                             Stok saat ini: <span className="font-medium text-gray-600">{selectedItem.current_stock} {selectedItem.unit_of_measure}</span>

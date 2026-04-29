@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
-import { SearchInput, Select } from '../../UI';
+import { SearchInput, Combobox } from '../../UI';
+import { ComboboxOption } from '../../UI/Combobox';
 import { Category } from '../../../Types';
 import useDebounce from '../../../Hooks/useDebounce';
 
@@ -12,10 +13,11 @@ interface ItemFiltersProps {
     categories: Category[];
 }
 
-/**
- * Komponen ItemFilters — bar filter untuk halaman daftar barang.
- * Terdiri dari search (debounced), filter kategori, dan filter stok rendah.
- */
+const stockOptions: ComboboxOption[] = [
+    { value: '1', label: 'Stok Rendah' },
+];
+
+/** Komponen ItemFilters — bar filter untuk halaman daftar barang. */
 export default function ItemFilters({ filters, categories }: ItemFiltersProps) {
     const applyFilter = (key: string, value: string) => {
         router.get('/items', {
@@ -27,10 +29,14 @@ export default function ItemFilters({ filters, categories }: ItemFiltersProps) {
         });
     };
 
-    // Debounce search 400ms — supaya tidak kirim request setiap ketikan
     const debouncedSearch = useDebounce((value: string) => {
         applyFilter('search', value);
     }, 400);
+
+    const categoryOptions: ComboboxOption[] = categories.map((cat) => ({
+        value: cat.id.toString(),
+        label: cat.name,
+    }));
 
     return (
         <div className="flex flex-col sm:flex-row gap-3">
@@ -42,24 +48,23 @@ export default function ItemFilters({ filters, categories }: ItemFiltersProps) {
                 />
             </div>
             <div className="w-full sm:w-48">
-                <Select
+                <Combobox
+                    id="category_filter"
+                    options={categoryOptions}
                     value={filters.category_id || ''}
-                    onChange={(e) => applyFilter('category_id', e.target.value)}
-                >
-                    <option value="">Semua Kategori</option>
-                    {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                </Select>
+                    onChange={(val) => applyFilter('category_id', val)}
+                    placeholder="Semua Kategori"
+                    searchPlaceholder="Cari kategori..."
+                />
             </div>
             <div className="w-full sm:w-44">
-                <Select
+                <Combobox
+                    id="stock_filter"
+                    options={stockOptions}
                     value={filters.low_stock || ''}
-                    onChange={(e) => applyFilter('low_stock', e.target.value)}
-                >
-                    <option value="">Semua Stok</option>
-                    <option value="1">Stok Rendah</option>
-                </Select>
+                    onChange={(val) => applyFilter('low_stock', val)}
+                    placeholder="Semua Stok"
+                />
             </div>
         </div>
     );

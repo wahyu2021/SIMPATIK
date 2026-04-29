@@ -1,7 +1,8 @@
 import { Head, useForm } from '@inertiajs/react';
 import { PageProps, Item, Category } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Button, Input, Select, Label, Breadcrumbs } from '../../Components/UI';
+import { PageHeader, Button, Input, Combobox, Label, Breadcrumbs } from '../../Components/UI';
+import { ComboboxOption } from '../../Components/UI/Combobox';
 
 interface Props extends PageProps {
     item?: Item;
@@ -51,17 +52,18 @@ export default function ItemForm({ item, categories, nextCode }: Props) {
                         {/* Kategori */}
                         <div>
                             <Label htmlFor="category_id" required>Kategori</Label>
-                            <Select
+                            <Combobox
                                 id="category_id"
+                                options={categories.map((cat): ComboboxOption => ({
+                                    value: cat.id.toString(),
+                                    label: cat.name,
+                                }))}
                                 value={data.category_id}
-                                onChange={(e) => setData('category_id', e.target.value)}
+                                onChange={(val) => setData('category_id', val)}
+                                placeholder="— Cari kategori —"
+                                searchPlaceholder="Ketik nama kategori..."
                                 error={errors.category_id}
-                            >
-                                <option value="">— Pilih Kategori —</option>
-                                {categories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </Select>
+                            />
                         </div>
 
                         {/* Nama Barang */}
