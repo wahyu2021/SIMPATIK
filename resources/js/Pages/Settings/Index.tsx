@@ -2,7 +2,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { Building2, FileText, MessageSquare, BrainCircuit, Save } from 'lucide-react';
 import { PageProps } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Button, Input, Label, Alert, Breadcrumbs } from '../../Components/UI';
+import { PageHeader, Button, Input, Alert, Breadcrumbs } from '../../Components/UI';
 
 interface Props extends PageProps {
     settings: Record<string, string>;

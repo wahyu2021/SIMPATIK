@@ -59,4 +59,16 @@ interface DashboardRepositoryInterface
      * Ambil barang stok rendah teratas (Eloquent Collection)
      */
     public function getLowStockItems(int $limit = 5): Collection;
+
+    /**
+     * Ambil tren transaksi bulanan (6 bulan terakhir)
+     * @return array{month: string, inbound: int, outbound: int}[]
+     */
+    public function getMonthlyTransactionTrend(int $months = 6): array;
+
+    /**
+     * Distribusi status pengajuan outbound
+     * @return array{status: string, count: int}[]
+     */
+    public function getOutboundStatusDistribution(): array;
 }
