@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { SearchInput, Input } from '../../UI';
+import { SearchInput, DatePicker } from '../../UI';
 import useDebounce from '../../../Hooks/useDebounce';
 
 interface InboundFiltersProps {
@@ -36,23 +36,19 @@ export default function InboundFilters({ filters }: InboundFiltersProps) {
                 />
             </div>
             <div className="w-full sm:w-44">
-                <Input
+                <DatePicker
                     id="date_from"
-                    type="date"
-                    label=""
-                    placeholder="Dari tanggal"
                     value={filters.date_from || ''}
-                    onChange={(e) => applyFilter('date_from', e.target.value)}
+                    onChange={(val) => applyFilter('date_from', val)}
+                    placeholder="Dari tanggal"
                 />
             </div>
             <div className="w-full sm:w-44">
-                <Input
+                <DatePicker
                     id="date_to"
-                    type="date"
-                    label=""
-                    placeholder="Sampai tanggal"
                     value={filters.date_to || ''}
-                    onChange={(e) => applyFilter('date_to', e.target.value)}
+                    onChange={(val) => applyFilter('date_to', val)}
+                    placeholder="Sampai tanggal"
                 />
             </div>
         </div>
