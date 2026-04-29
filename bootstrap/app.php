@@ -21,5 +21,22 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->respond(function ($response, $exception, $request) {
+            $status = $response->getStatusCode();
+
+            if (in_array($status, [403, 404, 419, 500, 503]) && !app()->environment('local')) {
+                return \Inertia\Inertia::render('Error', ['status' => $status])
+                    ->toResponse($request)
+                    ->setStatusCode($status);
+            }
+
+            // Di local, tampilkan error page untuk 404 & 403 saja (sisanya debug)
+            if (in_array($status, [403, 404]) && app()->environment('local')) {
+                return \Inertia\Inertia::render('Error', ['status' => $status])
+                    ->toResponse($request)
+                    ->setStatusCode($status);
+            }
+
+            return $response;
+        });
     })->create();
