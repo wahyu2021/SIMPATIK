@@ -47,4 +47,19 @@ interface ReportRepositoryInterface
      * Ambil daftar item untuk pilihan dropdown (id, name, item_code).
      */
     public function getItemOptions(): Collection;
+
+    /**
+     * Cari rekonsiliasi berdasarkan bulan/tahun.
+     */
+    public function findReconciliation(int $month, int $year): ?object;
+
+    /**
+     * Simpan rekonsiliasi baru (header + details).
+     */
+    public function saveReconciliation(array $header, array $details): object;
+
+    /**
+     * Ambil semua item dengan current_stock untuk form rekonsiliasi.
+     */
+    public function getItemsWithStock(): Collection;
 }

@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Enums\OutboundStatus;
 use App\Models\Item;
 use App\Models\StockLedger;
+use App\Models\StockReconciliation;
 use App\Repositories\Contracts\ReportRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -128,6 +129,41 @@ class ReportRepository implements ReportRepositoryInterface
     public function getItemOptions(): Collection
     {
         return Item::select('id', 'name', 'item_code', 'unit_of_measure')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findReconciliation(int $month, int $year): ?object
+    {
+        return StockReconciliation::with(['details.item:id,name,item_code,unit_of_measure', 'creator:id,name'])
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function saveReconciliation(array $header, array $details): object
+    {
+        $recon = StockReconciliation::create($header);
+
+        foreach ($details as $detail) {
+            $recon->details()->create($detail);
+        }
+
+        return $recon->load('details.item:id,name,item_code,unit_of_measure');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getItemsWithStock(): Collection
+    {
+        return Item::select('id', 'name', 'item_code', 'unit_of_measure', 'current_stock')
             ->orderBy('name')
             ->get();
     }
