@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { StatusDistribution } from '../../../Types/dashboard';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
     Pending:  { label: 'Menunggu',  color: '#f59e0b' },
@@ -7,13 +8,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
     Rejected: { label: 'Ditolak',   color: '#ef4444' },
 };
 
-interface StatusData {
-    status: string;
-    count: number;
-}
-
 interface Props {
-    data: StatusData[];
+    data: StatusDistribution[];
 }
 
 /** Donut chart — distribusi status pengajuan barang. */
