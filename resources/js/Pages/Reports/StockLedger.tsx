@@ -59,15 +59,15 @@ export default function StockLedger({ entries, items, filters }: Props) {
                         <Label htmlFor="item">Barang</Label>
                         <Combobox id="item" options={itemOptions} value={filters.item_id?.toString() || ''} onChange={(v) => handleFilter('item_id', v)} placeholder="Pilih barang..." />
                     </div>
-                    <div className="w-36">
+                    <div className="w-40">
                         <Label htmlFor="month">Bulan</Label>
                         <Combobox id="month" options={MONTH_OPTIONS_ALL} value={filters.month?.toString() || ''} onChange={(v) => handleFilter('month', v)} placeholder="Semua" />
                     </div>
-                    <div className="w-28">
+                    <div className="w-36">
                         <Label htmlFor="year">Tahun</Label>
                         <Combobox id="year" options={getYearOptions(true)} value={filters.year?.toString() || ''} onChange={(v) => handleFilter('year', v)} placeholder="Semua" />
                     </div>
-                    <div className="w-36">
+                    <div className="w-40">
                         <Label htmlFor="type">Tipe</Label>
                         <Combobox id="type" options={MOVEMENT_TYPES} value={filters.movement_type || ''} onChange={(v) => handleFilter('movement_type', v)} placeholder="Semua" />
                     </div>

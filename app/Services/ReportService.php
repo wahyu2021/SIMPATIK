@@ -144,21 +144,32 @@ class ReportService
             ];
         }
 
-        // Belum ada — tampilkan form dengan semua item + current_stock
+        // Hitung saldo sistem untuk akhir periode yang dipilih
+        [$start, $end, $prevEnd] = $this->getPeriodDates($month, $year);
         $items = $this->reportRepository->getItemsWithStock();
+        $openings = $this->reportRepository->getOpeningBalances($prevEnd);
+        $inbounds = $this->reportRepository->getInboundTotals($start, $end);
+        $outbounds = $this->reportRepository->getOutboundTotals($start, $end);
 
         return [
             'status' => 'pending',
-            'items' => $items->map(fn ($item) => [
-                'item_id' => $item->id,
-                'name' => $item->name,
-                'item_code' => $item->item_code,
-                'unit' => $item->unit_of_measure,
-                'system_qty' => $item->current_stock,
-                'physical_qty' => $item->current_stock, // default sama
-                'difference' => 0,
-                'notes' => '',
-            ])->toArray(),
+            'items' => $items->map(function ($item) use ($openings, $inbounds, $outbounds) {
+                $openQty = $openings->get($item->id)?->ending_balance ?? 0;
+                $inQty = $inbounds->get($item->id)?->total_qty ?? 0;
+                $outQty = $outbounds->get($item->id)?->total_qty ?? 0;
+                $systemQty = $openQty + $inQty - $outQty;
+
+                return [
+                    'item_id' => $item->id,
+                    'name' => $item->name,
+                    'item_code' => $item->item_code,
+                    'unit' => $item->unit_of_measure,
+                    'system_qty' => $systemQty,
+                    'physical_qty' => $systemQty, // default sama
+                    'difference' => 0,
+                    'notes' => '',
+                ];
+            })->toArray(),
         ];
     }
 
