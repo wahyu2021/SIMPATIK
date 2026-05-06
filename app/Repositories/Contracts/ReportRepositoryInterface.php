@@ -37,4 +37,14 @@ interface ReportRepositoryInterface
      * Ambil breakdown pengeluaran per unit kerja untuk satu item dalam rentang tanggal.
      */
     public function getOutboundByDepartment(int $itemId, string $startDate, string $endDate): array;
+
+    /**
+     * Ambil kartu mutasi stok untuk satu item (opsional filter periode & tipe).
+     */
+    public function getStockLedger(int $itemId, ?string $startDate = null, ?string $endDate = null, ?string $movementType = null): Collection;
+
+    /**
+     * Ambil daftar item untuk pilihan dropdown (id, name, item_code).
+     */
+    public function getItemOptions(): Collection;
 }

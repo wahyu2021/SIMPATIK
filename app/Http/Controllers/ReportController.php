@@ -50,4 +50,30 @@ class ReportController extends Controller
             $this->reportService->getBreakdownByDepartment($itemId, $month, $year)
         );
     }
+
+    /**
+     * Halaman Kartu Mutasi Stok (Ledger).
+     */
+    public function stockLedger(Request $request): Response
+    {
+        $itemId = $request->get('item_id') ? (int) $request->get('item_id') : null;
+        $month = $request->get('month') ? (int) $request->get('month') : null;
+        $year = $request->get('year') ? (int) $request->get('year') : null;
+        $movementType = $request->get('movement_type');
+
+        $entries = $itemId
+            ? $this->reportService->getStockLedger($itemId, $month, $year, $movementType)
+            : [];
+
+        return Inertia::render('Reports/StockLedger', [
+            'entries' => $entries,
+            'items' => $this->reportService->getItemOptions(),
+            'filters' => [
+                'item_id' => $itemId,
+                'month' => $month,
+                'year' => $year,
+                'movement_type' => $movementType,
+            ],
+        ]);
+    }
 }

@@ -1,11 +1,10 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
 import { FileSpreadsheet, FileText, TrendingDown, TrendingUp, Wallet, Archive } from 'lucide-react';
-import { useState } from 'react';
 import { PageProps, Category } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Breadcrumbs, StatCard, Combobox, Label } from '../../Components/UI';
 import { ComboboxOption } from '../../Components/UI/Combobox';
-import { formatCurrency, formatNumber } from '../../Lib/formatters';
+import { formatCurrency } from '../../Lib/formatters';
 import SaldistatTable from '../../Components/Features/Reports/SaldistatTable';
 
 interface SaldistatItem {
@@ -99,6 +98,19 @@ export default function ReportsIndex({ saldistat, signatory, categories, filters
                 title="Laporan Saldistat ATK"
                 description={`Saldo, penerimaan, dan pengeluaran barang — ${period.label}`}
             />
+
+            {/* Tab Navigation */}
+            <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+                <span className="px-4 py-2 text-sm font-medium text-white bg-[#003366] rounded-md shadow-sm">
+                    Saldistat ATK
+                </span>
+                <Link
+                    href="/reports/stock-ledger"
+                    className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors"
+                >
+                    Kartu Mutasi
+                </Link>
+            </div>
 
             {/* ── Filters ── */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
