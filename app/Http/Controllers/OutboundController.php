@@ -85,8 +85,21 @@ class OutboundController extends Controller
      */
     public function approve(int $id): RedirectResponse
     {
+        $user = auth()->user();
+
+        // Hanya penyelia yang boleh approve
+        if (!$user->hasRole('division_head')) {
+            abort(403, 'Hanya Penyelia yang dapat menyetujui pengajuan.');
+        }
+
         $outbound = $this->outboundService->findOutbound($id);
-        $this->outboundService->approveRequest($outbound, auth()->id());
+
+        // Penyelia hanya bisa approve pengajuan dari unit kerjanya sendiri
+        if ($outbound->department_id !== $user->department_id) {
+            abort(403, 'Anda hanya dapat menyetujui pengajuan dari unit kerja Anda.');
+        }
+
+        $this->outboundService->approveRequest($outbound, $user->id);
 
         return redirect()
             ->route('outbound.show', $id)
@@ -98,8 +111,20 @@ class OutboundController extends Controller
      */
     public function reject(RejectOutboundRequest $request, int $id): RedirectResponse
     {
+        $user = auth()->user();
+
+        // Hanya penyelia yang boleh reject
+        if (!$user->hasRole('division_head')) {
+            abort(403, 'Hanya Penyelia yang dapat menolak pengajuan.');
+        }
+
         $outbound = $this->outboundService->findOutbound($id);
-        $this->outboundService->rejectRequest($outbound, auth()->id(), $request->validated('rejection_reason'));
+
+        if ($outbound->department_id !== $user->department_id) {
+            abort(403, 'Anda hanya dapat menolak pengajuan dari unit kerja Anda.');
+        }
+
+        $this->outboundService->rejectRequest($outbound, $user->id, $request->validated('rejection_reason'));
 
         return redirect()
             ->route('outbound.show', $id)
@@ -111,8 +136,15 @@ class OutboundController extends Controller
      */
     public function issue(int $id): RedirectResponse
     {
+        $user = auth()->user();
+
+        // Hanya admin gudang yang boleh issue
+        if (!$user->hasRole('warehouse_admin')) {
+            abort(403, 'Hanya Admin Gudang yang dapat menyerahkan barang.');
+        }
+
         $outbound = $this->outboundService->findOutbound($id);
-        $this->outboundService->issueItems($outbound, auth()->id());
+        $this->outboundService->issueItems($outbound, $user->id);
 
         return redirect()
             ->route('outbound.show', $id)

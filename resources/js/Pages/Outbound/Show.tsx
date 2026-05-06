@@ -20,7 +20,9 @@ export default function OutboundShow({ outbound }: Props) {
     const isAdmin = userRoles.includes('warehouse_admin');
     const isPenyelia = userRoles.includes('division_head');
 
-    const canApprove = (isPenyelia || isAdmin) && outbound.status === 'Pending';
+    // Hanya penyelia dari unit kerja yang sama yang boleh approve/reject
+    const isSameDepartment = auth.user.department_id === outbound.department_id;
+    const canApprove = isPenyelia && isSameDepartment && outbound.status === 'Pending';
     const canIssue = isAdmin && outbound.status === 'Approved';
 
     return (
