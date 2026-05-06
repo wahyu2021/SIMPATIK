@@ -1,11 +1,10 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
 import { FileSpreadsheet, FileText, TrendingDown, TrendingUp, Wallet, Archive } from 'lucide-react';
-import { useState } from 'react';
 import { PageProps, Category } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Breadcrumbs, StatCard, Combobox, Label } from '../../Components/UI';
 import { ComboboxOption } from '../../Components/UI/Combobox';
-import { formatCurrency, formatNumber } from '../../Lib/formatters';
+import { formatCurrency } from '../../Lib/formatters';
 import SaldistatTable from '../../Components/Features/Reports/SaldistatTable';
 
 interface SaldistatItem {
