@@ -98,6 +98,39 @@ class ReportService
         ];
     }
 
+    /**
+     * Ambil kartu mutasi stok untuk satu item.
+     */
+    public function getStockLedger(int $itemId, ?int $month = null, ?int $year = null, ?string $movementType = null): array
+    {
+        $startDate = null;
+        $endDate = null;
+
+        if ($month && $year) {
+            [$startDate, $endDate] = $this->getPeriodDates($month, $year);
+        }
+
+        $entries = $this->reportRepository->getStockLedger($itemId, $startDate, $endDate, $movementType);
+
+        return $entries->map(fn ($e) => [
+            'id' => $e->id,
+            'date' => $e->transaction_date->format('Y-m-d'),
+            'type' => $e->movement_type,
+            'reference' => $e->document_reference,
+            'qty_in' => $e->qty_in,
+            'qty_out' => $e->qty_out,
+            'balance' => $e->ending_balance,
+        ])->toArray();
+    }
+
+    /**
+     * Ambil daftar item untuk dropdown.
+     */
+    public function getItemOptions(): array
+    {
+        return $this->reportRepository->getItemOptions()->toArray();
+    }
+
     // ─── Private Helpers ───
 
     /**

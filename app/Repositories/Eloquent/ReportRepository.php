@@ -101,4 +101,34 @@ class ReportRepository implements ReportRepositoryInterface
             ->get()
             ->toArray();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStockLedger(int $itemId, ?string $startDate = null, ?string $endDate = null, ?string $movementType = null): Collection
+    {
+        $query = StockLedger::where('item_id', $itemId)
+            ->orderBy('transaction_date', 'asc')
+            ->orderBy('id', 'asc');
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('transaction_date', [$startDate, $endDate]);
+        }
+
+        if ($movementType) {
+            $query->where('movement_type', $movementType);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getItemOptions(): Collection
+    {
+        return Item::select('id', 'name', 'item_code', 'unit_of_measure')
+            ->orderBy('name')
+            ->get();
+    }
 }
