@@ -21,7 +21,7 @@ export default function StatsGrid({ stats }: { stats: DashboardStats }) {
     return (
         <>
             {/* Baris 1: Data Utama */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-6">
                 <StatCard
                     title="Total Barang"
                     value={stats.total_items}
@@ -49,7 +49,7 @@ export default function StatsGrid({ stats }: { stats: DashboardStats }) {
             </div>
 
             {/* Baris 2: Aktivitas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
                 <StatCard
                     title="Stok Rendah"
                     value={stats.low_stock_count}
