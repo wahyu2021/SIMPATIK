@@ -35,11 +35,11 @@ export default function Reconciliation({ reconData, filters }: Props) {
             {/* Filters */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
                 <div className="flex flex-wrap items-end gap-3">
-                    <div className="w-36">
+                    <div className="w-40">
                         <Label htmlFor="month">Bulan</Label>
                         <Combobox id="month" options={MONTH_OPTIONS} value={filters.month.toString()} onChange={(v) => handleFilter('month', v)} placeholder="Bulan" />
                     </div>
-                    <div className="w-28">
+                    <div className="w-36">
                         <Label htmlFor="year">Tahun</Label>
                         <Combobox id="year" options={getYearOptions()} value={filters.year.toString()} onChange={(v) => handleFilter('year', v)} placeholder="Tahun" />
                     </div>
