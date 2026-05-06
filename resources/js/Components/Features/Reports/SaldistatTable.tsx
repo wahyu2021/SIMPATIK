@@ -1,38 +1,13 @@
+import { SaldistatCategory, SaldistatSummary, SaldistatPeriod, Signatory, SaldistatFilters } from '../../../Types/saldistat';
 import { formatCurrency, formatNumber } from '../../../Lib/formatters';
-
-interface SaldistatItem {
-    no: number;
-    item_id: number;
-    name: string;
-    unit: string;
-    unit_price: number;
-    opening_qty: number;
-    opening_value: number;
-    inbound_qty: number;
-    inbound_value: number;
-    outbound_qty: number;
-    outbound_value: number;
-    closing_qty: number;
-    closing_value: number;
-}
-
-interface SaldistatCategory {
-    id: number;
-    name: string;
-    items: SaldistatItem[];
-    subtotal_opening: number;
-    subtotal_inbound: number;
-    subtotal_outbound: number;
-    subtotal_closing: number;
-}
 
 interface Props {
     categories: SaldistatCategory[];
-    summary: { opening_value: number; inbound_value: number; outbound_value: number; closing_value: number };
-    period: { month: number; year: number; label: string; prev_label: string; end_label: string };
-    signatory: { company_name: string; company_branch: string; company_address: string };
+    summary: SaldistatSummary;
+    period: SaldistatPeriod;
+    signatory: Signatory;
     signerName: string;
-    filters: { month: number; year: number; category_id: number | null };
+    filters: SaldistatFilters;
 }
 
 /** Tabel Saldistat ATK — grouped by kategori, subtotal, grand total, footer TTD. */
@@ -112,7 +87,7 @@ export default function SaldistatTable({ categories, summary, period, signatory,
     );
 }
 
-// ── Sub-component: Category Group ──
+// ── Sub-component ──
 
 function CategoryGroup({ category, fmtQty, fmtVal, fmtPrice }: {
     category: SaldistatCategory;
@@ -122,14 +97,9 @@ function CategoryGroup({ category, fmtQty, fmtVal, fmtPrice }: {
 }) {
     return (
         <>
-            {/* Category header */}
             <tr className="bg-blue-50">
-                <td colSpan={14} className="px-3 py-1.5 font-bold text-xs text-[#003366] uppercase tracking-wide">
-                    {category.name}
-                </td>
+                <td colSpan={14} className="px-3 py-1.5 font-bold text-xs text-[#003366] uppercase tracking-wide">{category.name}</td>
             </tr>
-
-            {/* Item rows */}
             {category.items.map((item) => (
                 <tr key={item.item_id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-2 py-1.5 text-center text-gray-500">{item.no}</td>
@@ -148,8 +118,6 @@ function CategoryGroup({ category, fmtQty, fmtVal, fmtPrice }: {
                     <td className="px-2 py-1.5 text-right text-gray-900 font-medium">{fmtVal(item.closing_value)}</td>
                 </tr>
             ))}
-
-            {/* Subtotal */}
             <tr className="bg-gray-50 font-semibold text-xs border-t border-gray-200">
                 <td colSpan={4} className="px-3 py-1.5 text-right text-gray-700">Subtotal {category.name}</td>
                 <td className="px-2 py-1.5 text-right text-gray-900">{fmtVal(category.subtotal_opening)}</td>
