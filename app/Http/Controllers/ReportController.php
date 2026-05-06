@@ -20,9 +20,9 @@ class ReportController extends Controller
      */
     public function index(Request $request): Response
     {
-        $month = (int) $request->get('month', now()->month);
-        $year = (int) $request->get('year', now()->year);
-        $categoryId = $request->get('category_id') ? (int) $request->get('category_id') : null;
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
+        $categoryId = $request->input('category_id') ? (int) $request->input('category_id') : null;
 
         $saldistat = $this->reportService->getSaldistat($month, $year, $categoryId);
         $signatory = $this->reportService->getSignatory();
@@ -44,8 +44,8 @@ class ReportController extends Controller
      */
     public function breakdown(Request $request, int $itemId)
     {
-        $month = (int) $request->get('month', now()->month);
-        $year = (int) $request->get('year', now()->year);
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
 
         return response()->json(
             $this->reportService->getBreakdownByDepartment($itemId, $month, $year)
@@ -57,10 +57,10 @@ class ReportController extends Controller
      */
     public function stockLedger(Request $request): Response
     {
-        $itemId = $request->get('item_id') ? (int) $request->get('item_id') : null;
-        $month = $request->get('month') ? (int) $request->get('month') : null;
-        $year = $request->get('year') ? (int) $request->get('year') : null;
-        $movementType = $request->get('movement_type');
+        $itemId = $request->input('item_id') ? (int) $request->input('item_id') : null;
+        $month = $request->input('month') ? (int) $request->input('month') : null;
+        $year = $request->input('year') ? (int) $request->input('year') : null;
+        $movementType = $request->input('movement_type');
 
         $entries = $itemId
             ? $this->reportService->getStockLedger($itemId, $month, $year, $movementType)
@@ -83,8 +83,8 @@ class ReportController extends Controller
      */
     public function reconciliation(Request $request): Response
     {
-        $month = (int) $request->get('month', now()->month);
-        $year = (int) $request->get('year', now()->year);
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
 
         $data = $this->reportService->getReconciliationData($month, $year);
 
