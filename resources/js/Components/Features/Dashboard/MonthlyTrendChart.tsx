@@ -1,15 +1,10 @@
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-
-interface MonthlyTrendData {
-    month: string;
-    inbound: number;
-    outbound: number;
-}
+import { MonthlyTrend } from '../../../Types/dashboard';
 
 interface Props {
-    data: MonthlyTrendData[];
+    data: MonthlyTrend[];
 }
 
 /** Bar chart — tren barang masuk vs keluar per bulan (6 bulan terakhir). */

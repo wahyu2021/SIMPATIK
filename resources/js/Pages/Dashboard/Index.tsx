@@ -1,4 +1,5 @@
 import { PageProps, DashboardStats, RecentRequest, LowStockItemData } from '../../Types';
+import { MonthlyTrend, StatusDistribution } from '../../Types/dashboard';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import StatsGrid from '../../Components/Features/Dashboard/StatsGrid';
 import RecentRequests from '../../Components/Features/Dashboard/RecentRequests';
@@ -6,23 +7,12 @@ import LowStockAlerts from '../../Components/Features/Dashboard/LowStockAlerts';
 import MonthlyTrendChart from '../../Components/Features/Dashboard/MonthlyTrendChart';
 import StatusDistributionChart from '../../Components/Features/Dashboard/StatusDistributionChart';
 
-interface MonthlyTrend {
-    month: string;
-    inbound: number;
-    outbound: number;
-}
-
-interface StatusDist {
-    status: string;
-    count: number;
-}
-
 interface DashboardProps extends PageProps {
     stats: DashboardStats;
     recentRequests: RecentRequest[];
     lowStockItems: LowStockItemData[];
     monthlyTrend: MonthlyTrend[];
-    statusDistribution: StatusDist[];
+    statusDistribution: StatusDistribution[];
 }
 
 export default function Dashboard({ auth, stats, recentRequests, lowStockItems, monthlyTrend, statusDistribution }: DashboardProps) {
