@@ -104,15 +104,15 @@ export default function StockLedger({ entries, items, filters }: Props) {
 
             {/* Tab Navigation */}
             <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-                <Link
-                    href="/reports"
-                    className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors"
-                >
+                <Link href="/reports" className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors">
                     Saldistat ATK
                 </Link>
                 <span className="px-4 py-2 text-sm font-medium text-white bg-[#003366] rounded-md shadow-sm">
                     Kartu Mutasi
                 </span>
+                <Link href="/reports/reconciliation" className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors">
+                    Rekonsiliasi
+                </Link>
             </div>
 
             {/* Filters */}

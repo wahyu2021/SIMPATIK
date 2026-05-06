@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Services\ReportService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -75,5 +76,50 @@ class ReportController extends Controller
                 'movement_type' => $movementType,
             ],
         ]);
+    }
+
+    /**
+     * Halaman Rekonsiliasi Bulanan.
+     */
+    public function reconciliation(Request $request): Response
+    {
+        $month = (int) $request->get('month', now()->month);
+        $year = (int) $request->get('year', now()->year);
+
+        $data = $this->reportService->getReconciliationData($month, $year);
+
+        return Inertia::render('Reports/Reconciliation', [
+            'reconData' => $data,
+            'filters' => ['month' => $month, 'year' => $year],
+        ]);
+    }
+
+    /**
+     * Simpan rekonsiliasi bulanan.
+     */
+    public function storeReconciliation(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2024',
+            'notes' => 'nullable|string|max:500',
+            'details' => 'required|array|min:1',
+            'details.*.item_id' => 'required|integer|exists:items,id',
+            'details.*.system_qty' => 'required|integer',
+            'details.*.physical_qty' => 'required|integer|min:0',
+            'details.*.notes' => 'nullable|string|max:255',
+        ]);
+
+        $this->reportService->saveReconciliation(
+            (int) $request->month,
+            (int) $request->year,
+            auth()->id(),
+            $request->details,
+            $request->notes,
+        );
+
+        return redirect()
+            ->route('reports.reconciliation', ['month' => $request->month, 'year' => $request->year])
+            ->with('success', 'Rekonsiliasi berhasil disimpan.');
     }
 }

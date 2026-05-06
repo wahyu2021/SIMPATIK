@@ -90,6 +90,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/breakdown/{itemId}', [ReportController::class, 'breakdown'])->name('reports.breakdown');
         Route::get('/reports/stock-ledger', [ReportController::class, 'stockLedger'])->name('reports.stock-ledger');
+        Route::get('/reports/reconciliation', [ReportController::class, 'reconciliation'])->name('reports.reconciliation');
+        Route::post('/reports/reconciliation', [ReportController::class, 'storeReconciliation'])->name('reports.reconciliation.store');
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
             Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     });

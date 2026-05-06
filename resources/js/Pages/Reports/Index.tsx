@@ -104,11 +104,11 @@ export default function ReportsIndex({ saldistat, signatory, categories, filters
                 <span className="px-4 py-2 text-sm font-medium text-white bg-[#003366] rounded-md shadow-sm">
                     Saldistat ATK
                 </span>
-                <Link
-                    href="/reports/stock-ledger"
-                    className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors"
-                >
+                <Link href="/reports/stock-ledger" className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors">
                     Kartu Mutasi
+                </Link>
+                <Link href="/reports/reconciliation" className="px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors">
+                    Rekonsiliasi
                 </Link>
             </div>
 

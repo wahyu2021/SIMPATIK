@@ -130,6 +130,60 @@ class ReportService
     {
         return $this->reportRepository->getItemOptions()->toArray();
     }
+    /**
+     * Ambil data untuk halaman rekonsiliasi.
+     */
+    public function getReconciliationData(int $month, int $year): array
+    {
+        $existing = $this->reportRepository->findReconciliation($month, $year);
+
+        if ($existing) {
+            return [
+                'status' => 'completed',
+                'reconciliation' => $existing,
+            ];
+        }
+
+        // Belum ada — tampilkan form dengan semua item + current_stock
+        $items = $this->reportRepository->getItemsWithStock();
+
+        return [
+            'status' => 'pending',
+            'items' => $items->map(fn ($item) => [
+                'item_id' => $item->id,
+                'name' => $item->name,
+                'item_code' => $item->item_code,
+                'unit' => $item->unit_of_measure,
+                'system_qty' => $item->current_stock,
+                'physical_qty' => $item->current_stock, // default sama
+                'difference' => 0,
+                'notes' => '',
+            ])->toArray(),
+        ];
+    }
+
+    /**
+     * Simpan rekonsiliasi bulanan.
+     */
+    public function saveReconciliation(int $month, int $year, int $userId, array $details, ?string $notes = null): object
+    {
+        return $this->reportRepository->saveReconciliation(
+            [
+                'month' => $month,
+                'year' => $year,
+                'reconciliation_date' => now(),
+                'created_by' => $userId,
+                'notes' => $notes,
+            ],
+            collect($details)->map(fn ($d) => [
+                'item_id' => $d['item_id'],
+                'system_qty' => $d['system_qty'],
+                'physical_qty' => $d['physical_qty'],
+                'difference' => $d['physical_qty'] - $d['system_qty'],
+                'notes' => $d['notes'] ?? null,
+            ])->toArray()
+        );
+    }
 
     // ─── Private Helpers ───
 
