@@ -121,13 +121,14 @@ class OutboundService
     }
 
     /**
-     * Admin serahkan barang (Approved → Issued).
+     * Admin Gudang menyetujui pengeluaran barang (Approved → Issued / Siap Diambil).
      * Kurangi stok dengan pessimistic lock, catat ledger OUT.
+     * Barang siap diambil oleh karyawan pemohon.
      */
     public function issueItems(OutboundTransaction $outbound, int $issuedById): OutboundTransaction
     {
         if (!$outbound->isApproved()) {
-            abort(422, 'Hanya pengajuan berstatus "Disetujui" yang dapat diserahkan.');
+            abort(422, 'Hanya pengajuan berstatus "Disetujui" yang dapat diproses.');
         }
 
         return DB::transaction(function () use ($outbound, $issuedById) {
@@ -165,6 +166,25 @@ class OutboundService
 
             return $outbound->refresh()->load('details.item');
         });
+    }
+
+    /**
+     * Karyawan mengambil barang (Issued → Completed).
+     * Konfirmasi bahwa barang sudah diambil dari gudang.
+     */
+    public function pickupItems(OutboundTransaction $outbound, int $pickedUpById): OutboundTransaction
+    {
+        if (!$outbound->isIssued()) {
+            abort(422, 'Hanya pengajuan berstatus "Siap Diambil" yang dapat dikonfirmasi pengambilannya.');
+        }
+
+        $this->outboundRepository->update($outbound, [
+            'status'       => OutboundStatus::Completed,
+            'picked_up_by' => $pickedUpById,
+            'picked_up_at' => now(),
+        ]);
+
+        return $outbound->refresh()->load('details.item');
     }
 
     /**

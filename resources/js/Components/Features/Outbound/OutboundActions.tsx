@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { CheckCircle, XCircle, PackageCheck } from 'lucide-react';
+import { CheckCircle, XCircle, PackageCheck, PackageOpen } from 'lucide-react';
 import { OutboundTransaction } from '../../../Types';
 import { Button, ConfirmDialog, Textarea } from '../../UI';
 
@@ -8,14 +8,16 @@ interface OutboundActionsProps {
     outbound: OutboundTransaction;
     canApprove: boolean;
     canIssue: boolean;
+    canPickup: boolean;
 }
 
-/** Panel tindakan pengajuan — approve/reject (Penyelia), issue (Admin Gudang). */
-export default function OutboundActions({ outbound, canApprove, canIssue }: OutboundActionsProps) {
+/** Panel tindakan pengajuan — approve/reject (Penyelia), issue (Admin Gudang), pickup (Pemohon). */
+export default function OutboundActions({ outbound, canApprove, canIssue, canPickup }: OutboundActionsProps) {
     const [showRejectForm, setShowRejectForm] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [processing, setProcessing] = useState(false);
     const [showIssueConfirm, setShowIssueConfirm] = useState(false);
+    const [showPickupConfirm, setShowPickupConfirm] = useState(false);
 
     const handleApprove = () => {
         setProcessing(true);
@@ -47,7 +49,17 @@ export default function OutboundActions({ outbound, canApprove, canIssue }: Outb
         });
     };
 
-    if (!canApprove && !canIssue) return null;
+    const handlePickup = () => {
+        setProcessing(true);
+        router.post(`/outbound/${outbound.id}/pickup`, {}, {
+            onFinish: () => {
+                setProcessing(false);
+                setShowPickupConfirm(false);
+            },
+        });
+    };
+
+    if (!canApprove && !canIssue && !canPickup) return null;
 
     return (
         <>
@@ -111,8 +123,26 @@ export default function OutboundActions({ outbound, canApprove, canIssue }: Outb
                         className="flex items-center gap-2"
                     >
                         <PackageCheck className="w-4 h-4" />
-                        Serahkan Barang
+                        Setujui Pengeluaran Barang
                     </Button>
+                )}
+
+                {canPickup && (
+                    <div className="space-y-3">
+                        <div className="p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                            <p className="text-sm text-cyan-800">
+                                <strong>Barang sudah siap!</strong> Silakan ambil barang Anda di gudang, lalu konfirmasi pengambilan di bawah.
+                            </p>
+                        </div>
+                        <Button
+                            onClick={() => setShowPickupConfirm(true)}
+                            disabled={processing}
+                            className="flex items-center gap-2 !bg-emerald-600 hover:!bg-emerald-700"
+                        >
+                            <PackageOpen className="w-4 h-4" />
+                            Konfirmasi Pengambilan Barang
+                        </Button>
+                    </div>
                 )}
             </div>
 
@@ -120,8 +150,17 @@ export default function OutboundActions({ outbound, canApprove, canIssue }: Outb
                 open={showIssueConfirm}
                 onClose={() => setShowIssueConfirm(false)}
                 onConfirm={handleIssue}
-                title="Serahkan Barang?"
-                message={`Barang akan diserahkan untuk pengajuan "${outbound.document_number}". Stok akan berkurang sesuai jumlah yang disetujui. Tindakan ini tidak dapat dibatalkan.`}
+                title="Setujui Pengeluaran Barang?"
+                message={`Pengeluaran barang untuk pengajuan "${outbound.document_number}" akan disetujui. Stok akan berkurang sesuai jumlah yang disetujui dan barang akan menunggu diambil oleh pemohon.`}
+                processing={processing}
+            />
+
+            <ConfirmDialog
+                open={showPickupConfirm}
+                onClose={() => setShowPickupConfirm(false)}
+                onConfirm={handlePickup}
+                title="Konfirmasi Pengambilan Barang?"
+                message={`Anda mengkonfirmasi bahwa barang untuk pengajuan "${outbound.document_number}" sudah diambil. Transaksi akan dianggap selesai.`}
                 processing={processing}
             />
         </>

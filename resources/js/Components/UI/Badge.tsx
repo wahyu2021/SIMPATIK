@@ -1,11 +1,11 @@
 /**
  * Props untuk komponen Badge.
- * @property variant - Varian warna: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued'
+ * @property variant - Varian warna: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued' | 'ready' | 'completed'
  * @property size - Ukuran badge: 'sm' (kecil) | 'md' (sedang)
  * @property children - Teks yang ditampilkan
  */
 interface BadgeProps {
-    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued';
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending' | 'issued' | 'ready' | 'completed';
     size?: 'sm' | 'md';
     children: React.ReactNode;
     className?: string;
@@ -28,6 +28,8 @@ export default function Badge({ variant = 'default', size = 'sm', children, clas
         info: 'bg-blue-50 text-blue-700 border border-blue-200',
         pending: 'bg-orange-50 text-orange-600 border border-orange-200',
         issued: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+        ready: 'bg-cyan-50 text-cyan-700 border border-cyan-200',
+        completed: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     };
 
     const sizes = {

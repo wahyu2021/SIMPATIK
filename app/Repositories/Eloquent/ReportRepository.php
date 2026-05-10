@@ -74,7 +74,7 @@ class ReportRepository implements ReportRepositoryInterface
     {
         return DB::table('outbound_transaction_details')
             ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
-            ->where('outbound_transactions.status', OutboundStatus::Issued->value)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
             ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
             ->select(
                 'outbound_transaction_details.item_id',
@@ -94,7 +94,7 @@ class ReportRepository implements ReportRepositoryInterface
             ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
             ->join('departments', 'departments.id', '=', 'outbound_transactions.department_id')
             ->where('outbound_transaction_details.item_id', $itemId)
-            ->where('outbound_transactions.status', OutboundStatus::Issued->value)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
             ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
             ->select('departments.name as department', DB::raw('SUM(outbound_transaction_details.quantity_approved) as qty'))
             ->groupBy('departments.id', 'departments.name')

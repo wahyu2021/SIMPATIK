@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('outbound/{id}/approve', [OutboundController::class, 'approve'])->name('outbound.approve');
         Route::post('outbound/{id}/reject', [OutboundController::class, 'reject'])->name('outbound.reject');
         Route::post('outbound/{id}/issue', [OutboundController::class, 'issue'])->name('outbound.issue');
+        Route::post('outbound/{id}/pickup', [OutboundController::class, 'pickup'])->name('outbound.pickup');
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

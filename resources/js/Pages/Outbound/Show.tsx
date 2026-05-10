@@ -19,11 +19,13 @@ export default function OutboundShow({ outbound }: Props) {
     const userRoles = auth.user.roles?.map(r => r.name) ?? [];
     const isAdmin = userRoles.includes('warehouse_admin');
     const isPenyelia = userRoles.includes('division_head');
+    const isRequester = auth.user.id === outbound.requester_id;
 
     // Hanya penyelia dari unit kerja yang sama yang boleh approve/reject
     const isSameDepartment = auth.user.department_id === outbound.department_id;
     const canApprove = isPenyelia && isSameDepartment && outbound.status === 'Pending';
     const canIssue = isAdmin && outbound.status === 'Approved';
+    const canPickup = (isRequester || isAdmin) && outbound.status === 'Issued';
 
     return (
         <AuthenticatedLayout title="Detail Pengajuan">
@@ -76,10 +78,18 @@ export default function OutboundShow({ outbound }: Props) {
                         </InfoField>
                     )}
                     {outbound.issued_by_user && (
-                        <InfoField label="Diserahkan Oleh">
+                        <InfoField label="Disetujui Admin Gudang">
                             {outbound.issued_by_user.name}
                             {outbound.issued_at && (
                                 <span className="text-gray-400 ml-1">({formatDateLong(outbound.issued_at)})</span>
+                            )}
+                        </InfoField>
+                    )}
+                    {outbound.picked_up_by_user && (
+                        <InfoField label="Diambil Oleh">
+                            {outbound.picked_up_by_user.name}
+                            {outbound.picked_up_at && (
+                                <span className="text-gray-400 ml-1">({formatDateLong(outbound.picked_up_at)})</span>
                             )}
                         </InfoField>
                     )}
@@ -100,11 +110,92 @@ export default function OutboundShow({ outbound }: Props) {
                 )}
             </div>
 
+            {/* Progress Tracker */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Progres Pengajuan</h2>
+                <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                    <StepIndicator
+                        step={1}
+                        label="Pengajuan"
+                        active={outbound.status === 'Pending'}
+                        completed={['Approved', 'Issued', 'Completed', 'Rejected'].includes(outbound.status)}
+                        rejected={outbound.status === 'Rejected'}
+                    />
+                    <StepConnector active={['Approved', 'Issued', 'Completed'].includes(outbound.status)} />
+                    <StepIndicator
+                        step={2}
+                        label="Penyelia"
+                        active={outbound.status === 'Approved'}
+                        completed={['Issued', 'Completed'].includes(outbound.status)}
+                    />
+                    <StepConnector active={['Issued', 'Completed'].includes(outbound.status)} />
+                    <StepIndicator
+                        step={3}
+                        label="Admin Gudang"
+                        active={outbound.status === 'Issued'}
+                        completed={outbound.status === 'Completed'}
+                    />
+                    <StepConnector active={outbound.status === 'Completed'} />
+                    <StepIndicator
+                        step={4}
+                        label="Diambil"
+                        active={false}
+                        completed={outbound.status === 'Completed'}
+                    />
+                </div>
+            </div>
+
             <div className="mb-6">
                 <OutboundDetailTable details={details} />
             </div>
 
-            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} />
+            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} canPickup={canPickup} />
         </AuthenticatedLayout>
+    );
+}
+
+/** Step indicator untuk progress tracker */
+function StepIndicator({ step, label, active, completed, rejected }: {
+    step: number;
+    label: string;
+    active: boolean;
+    completed: boolean;
+    rejected?: boolean;
+}) {
+    const base = 'flex flex-col items-center min-w-[72px]';
+
+    let circleClass = 'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ';
+    let labelClass = 'text-xs mt-1.5 font-medium text-center ';
+
+    if (rejected) {
+        circleClass += 'bg-red-100 text-red-600 border-2 border-red-300';
+        labelClass += 'text-red-500';
+    } else if (completed) {
+        circleClass += 'bg-emerald-500 text-white shadow-sm';
+        labelClass += 'text-emerald-600';
+    } else if (active) {
+        circleClass += 'bg-blue-500 text-white shadow-sm ring-4 ring-blue-100';
+        labelClass += 'text-blue-600';
+    } else {
+        circleClass += 'bg-gray-100 text-gray-400 border-2 border-gray-200';
+        labelClass += 'text-gray-400';
+    }
+
+    return (
+        <div className={base}>
+            <div className={circleClass}>
+                {completed ? '✓' : rejected ? '✕' : step}
+            </div>
+            <span className={labelClass}>{label}</span>
+        </div>
+    );
+}
+
+/** Connector line between steps */
+function StepConnector({ active }: { active: boolean }) {
+    return (
+        <div className={`flex-1 h-0.5 min-w-[24px] mt-[-16px] rounded-full transition-colors ${
+            active ? 'bg-emerald-400' : 'bg-gray-200'
+        }`} />
     );
 }

@@ -64,7 +64,7 @@ export interface Item extends Timestamps {
 }
 
 // --- Transactions ---
-export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Rejected';
+export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Rejected' | 'Completed';
 
 export interface InboundTransaction extends Timestamps {
     id: number;
@@ -90,18 +90,21 @@ export interface OutboundTransaction extends Timestamps {
     requester_id: number;
     approver_id?: number;
     issued_by?: number;
+    picked_up_by?: number;
     department_id: number;
     document_number: string;
     transaction_date: string;
     status: OutboundStatus;
     approved_at?: string;
     issued_at?: string;
+    picked_up_at?: string;
     is_special_request: boolean;
     rejection_reason?: string;
     notes?: string;
     requester?: User;
     approver?: User;
     issued_by_user?: User;
+    picked_up_by_user?: User;
     department?: Department;
     details?: OutboundTransactionDetail[];
 }

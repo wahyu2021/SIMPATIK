@@ -18,7 +18,8 @@ interface OutboundFiltersProps {
 const statusOptions: ComboboxOption[] = [
     { value: 'Pending', label: 'Menunggu' },
     { value: 'Approved', label: 'Disetujui' },
-    { value: 'Issued', label: 'Diserahkan' },
+    { value: 'Issued', label: 'Siap Diambil' },
+    { value: 'Completed', label: 'Selesai' },
     { value: 'Rejected', label: 'Ditolak' },
 ];
 

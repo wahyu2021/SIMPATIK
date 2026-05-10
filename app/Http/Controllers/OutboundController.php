@@ -132,7 +132,8 @@ class OutboundController extends Controller
     }
 
     /**
-     * Admin serahkan barang (Approved → Issued, stok berkurang).
+     * Admin Gudang menyetujui pengeluaran barang (Approved → Issued / Siap Diambil).
+     * Stok berkurang, barang menunggu diambil oleh pemohon.
      */
     public function issue(int $id): RedirectResponse
     {
@@ -140,7 +141,7 @@ class OutboundController extends Controller
 
         // Hanya admin gudang yang boleh issue
         if (!$user->hasRole('warehouse_admin')) {
-            abort(403, 'Hanya Admin Gudang yang dapat menyerahkan barang.');
+            abort(403, 'Hanya Admin Gudang yang dapat menyetujui pengeluaran barang.');
         }
 
         $outbound = $this->outboundService->findOutbound($id);
@@ -148,7 +149,31 @@ class OutboundController extends Controller
 
         return redirect()
             ->route('outbound.show', $id)
-            ->with('success', 'Barang berhasil diserahkan dan stok telah diperbarui.');
+            ->with('success', 'Pengeluaran barang disetujui. Barang siap diambil oleh pemohon.');
+    }
+
+    /**
+     * Karyawan mengambil barang (Issued → Completed).
+     * Pemohon atau Admin Gudang mengkonfirmasi pengambilan barang.
+     */
+    public function pickup(int $id): RedirectResponse
+    {
+        $user = auth()->user();
+        $outbound = $this->outboundService->findOutbound($id);
+
+        // Hanya pemohon sendiri atau admin gudang yang boleh konfirmasi pickup
+        $isRequester = $outbound->requester_id === $user->id;
+        $isAdmin = $user->hasRole('warehouse_admin');
+
+        if (!$isRequester && !$isAdmin) {
+            abort(403, 'Hanya pemohon atau Admin Gudang yang dapat mengkonfirmasi pengambilan barang.');
+        }
+
+        $this->outboundService->pickupItems($outbound, $user->id);
+
+        return redirect()
+            ->route('outbound.show', $id)
+            ->with('success', 'Pengambilan barang berhasil dikonfirmasi. Transaksi selesai.');
     }
 
     /**

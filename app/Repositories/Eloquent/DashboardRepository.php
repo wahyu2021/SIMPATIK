@@ -91,7 +91,7 @@ class DashboardRepository implements DashboardRepositoryInterface
 
             $outbound = OutboundTransaction::whereMonth('transaction_date', $month)
                 ->whereYear('transaction_date', $year)
-                ->where('status', OutboundStatus::Issued)
+                ->whereIn('status', [OutboundStatus::Issued, OutboundStatus::Completed])
                 ->count();
 
             $result[] = [
