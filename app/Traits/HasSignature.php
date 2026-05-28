@@ -25,7 +25,7 @@ trait HasSignature
             return null;
         }
 
-        return Storage::disk('public')->url($this->signature_path);
+        return '/storage/' . $this->signature_path;
     }
 
     /**

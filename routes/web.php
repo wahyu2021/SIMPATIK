@@ -80,11 +80,12 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware(['role:warehouse_admin'])->group(function () {
             Route::resource('inbound', InboundController::class);
         });
-        // Pengajuan Barang (Outbound) — semua role bisa akses (filter di controller)
-        Route::resource('outbound', OutboundController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+        // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
+        Route::resource('outbound', OutboundController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
         Route::post('outbound/{id}/approve', [OutboundController::class, 'approve'])->name('outbound.approve');
         Route::post('outbound/{id}/reject', [OutboundController::class, 'reject'])->name('outbound.reject');
         Route::post('outbound/{id}/issue', [OutboundController::class, 'issue'])->name('outbound.issue');
+        Route::post('outbound/{id}/handover', [OutboundController::class, 'handover'])->name('outbound.handover');
         Route::post('outbound/{id}/pickup', [OutboundController::class, 'pickup'])->name('outbound.pickup');
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);

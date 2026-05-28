@@ -63,7 +63,7 @@ class OutboundRepository implements OutboundRepositoryInterface
     public function findById(int $id): ?OutboundTransaction
     {
         return OutboundTransaction::with([
-            'requester', 'approver', 'issuedByUser', 'pickedUpByUser',
+            'requester', 'approver', 'issuedByUser', 'handedOverByUser', 'pickedUpByUser',
             'department', 'details.item',
         ])->find($id);
     }

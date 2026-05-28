@@ -42,3 +42,19 @@ export function normalizeDate(dateStr?: string): string {
     if (!dateStr) return new Date().toISOString().split('T')[0];
     return dateStr.split('T')[0];
 }
+
+/** Format tanggal + waktu lengkap: "2026-04-29T14:30:00" → "Selasa, 29 Apr 2026 14.30" */
+export function formatDateTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const datePart = date.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    });
+    const timePart = date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+    return `${datePart} ${timePart}`;
+}

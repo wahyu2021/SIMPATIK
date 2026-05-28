@@ -16,6 +16,7 @@ export interface User extends Timestamps {
     email: string;
     email_verified_at?: string;
     signature_path?: string;
+    signature_url?: string;
     is_active: boolean;
     department_id?: number;
     department?: Department;
@@ -64,7 +65,7 @@ export interface Item extends Timestamps {
 }
 
 // --- Transactions ---
-export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Rejected' | 'Completed';
+export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Handed Over' | 'Rejected' | 'Completed';
 
 export interface InboundTransaction extends Timestamps {
     id: number;
@@ -90,6 +91,7 @@ export interface OutboundTransaction extends Timestamps {
     requester_id: number;
     approver_id?: number;
     issued_by?: number;
+    handed_over_by?: number;
     picked_up_by?: number;
     department_id: number;
     document_number: string;
@@ -97,6 +99,7 @@ export interface OutboundTransaction extends Timestamps {
     status: OutboundStatus;
     approved_at?: string;
     issued_at?: string;
+    handed_over_at?: string;
     picked_up_at?: string;
     is_special_request: boolean;
     rejection_reason?: string;
@@ -104,6 +107,7 @@ export interface OutboundTransaction extends Timestamps {
     requester?: User;
     approver?: User;
     issued_by_user?: User;
+    handed_over_by_user?: User;
     picked_up_by_user?: User;
     department?: Department;
     details?: OutboundTransactionDetail[];

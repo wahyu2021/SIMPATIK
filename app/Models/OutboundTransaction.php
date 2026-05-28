@@ -7,15 +7,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OutboundTransaction extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'requester_id',
         'approver_id',
         'issued_by',
+        'handed_over_by',
         'picked_up_by',
         'department_id',
         'document_number',
@@ -23,6 +25,7 @@ class OutboundTransaction extends Model
         'status',
         'approved_at',
         'issued_at',
+        'handed_over_at',
         'picked_up_at',
         'is_special_request',
         'rejection_reason',
@@ -35,6 +38,7 @@ class OutboundTransaction extends Model
             'transaction_date'  => 'date',
             'approved_at'       => 'datetime',
             'issued_at'         => 'datetime',
+            'handed_over_at'    => 'datetime',
             'picked_up_at'      => 'datetime',
             'is_special_request'=> 'boolean',
             'status'            => OutboundStatus::class,
@@ -56,6 +60,11 @@ class OutboundTransaction extends Model
     public function issuedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'issued_by');
+    }
+
+    public function handedOverByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'handed_over_by');
     }
 
     public function pickedUpByUser(): BelongsTo
@@ -88,6 +97,11 @@ class OutboundTransaction extends Model
     public function isIssued(): bool
     {
         return $this->status === OutboundStatus::Issued;
+    }
+
+    public function isHandedOver(): bool
+    {
+        return $this->status === OutboundStatus::HandedOver;
     }
 
     public function isCompleted(): bool

@@ -1,15 +1,25 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Pencil, Info, Clock, Package, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { PageProps, OutboundTransaction } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { Breadcrumbs, StatusBadge, Alert, InfoField } from '../../Components/UI';
 import { formatDateLong } from '../../Lib/formatters';
+import { getOverdueDays, OVERDUE_THRESHOLD_DAYS } from '../../Lib/outbound';
+import OutboundProgressTracker from '../../Components/Features/Outbound/OutboundProgressTracker';
+import OutboundTimeline from '../../Components/Features/Outbound/OutboundTimeline';
 import OutboundDetailTable from '../../Components/Features/Outbound/OutboundDetailTable';
 import OutboundActions from '../../Components/Features/Outbound/OutboundActions';
+import OutboundSignatures from '../../Components/Features/Outbound/OutboundSignatures';
 
 interface Props extends PageProps {
     outbound: OutboundTransaction;
 }
+
+const STATUS_LABEL: Record<string, string> = {
+    Pending: 'Menunggu',
+    Approved: 'Disetujui Penyelia',
+    'Handed Over': 'Diserahkan',
+};
 
 /** Halaman detail pengajuan barang dengan aksi approval sesuai role. */
 export default function OutboundShow({ outbound }: Props) {
@@ -20,12 +30,15 @@ export default function OutboundShow({ outbound }: Props) {
     const isAdmin = userRoles.includes('warehouse_admin');
     const isPenyelia = userRoles.includes('division_head');
     const isRequester = auth.user.id === outbound.requester_id;
-
-    // Hanya penyelia dari unit kerja yang sama yang boleh approve/reject
     const isSameDepartment = auth.user.department_id === outbound.department_id;
+
     const canApprove = isPenyelia && isSameDepartment && outbound.status === 'Pending';
     const canIssue = isAdmin && outbound.status === 'Approved';
-    const canPickup = (isRequester || isAdmin) && outbound.status === 'Issued';
+    const canHandover = isAdmin && outbound.status === 'Issued';
+    const canPickup = isRequester && outbound.status === 'Handed Over';
+    const canEdit = isRequester && outbound.status === 'Pending';
+
+    const overdueDays = getOverdueDays(outbound);
 
     return (
         <AuthenticatedLayout title="Detail Pengajuan">
@@ -36,11 +49,23 @@ export default function OutboundShow({ outbound }: Props) {
                 { label: outbound.document_number },
             ]} />
 
-            {flash?.success && (
-                <Alert type="success" className="mb-4">{flash.success}</Alert>
-            )}
-            {flash?.error && (
-                <Alert type="error" className="mb-4">{flash.error}</Alert>
+            {flash?.success && <Alert type="success" className="mb-4">{flash.success}</Alert>}
+            {flash?.error && <Alert type="error" className="mb-4">{flash.error}</Alert>}
+
+            {overdueDays !== null && overdueDays > OVERDUE_THRESHOLD_DAYS && (
+                <div className="mb-4 flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-amber-800">
+                            Pengajuan Terlambat — {overdueDays} hari
+                        </p>
+                        <p className="text-xs text-amber-600 mt-0.5">
+                            Pengajuan ini sudah {overdueDays} hari di status "{STATUS_LABEL[outbound.status] ?? outbound.status}" tanpa tindak lanjut.
+                        </p>
+                    </div>
+                </div>
             )}
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -58,144 +83,168 @@ export default function OutboundShow({ outbound }: Props) {
                         </p>
                     </div>
                 </div>
-                <StatusBadge status={outbound.status} />
+                <div className="flex items-center gap-2">
+                    {canEdit && (
+                        <Link
+                            href={`/outbound/${outbound.id}/edit`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                        >
+                            <Pencil className="w-3.5 h-3.5" />
+                            Edit
+                        </Link>
+                    )}
+                    <StatusBadge status={outbound.status} />
+                </div>
             </div>
 
+            <OutboundInfoCard outbound={outbound} />
+            <OutboundProgressTracker status={outbound.status} />
+
+            <StatusContextBanner outbound={outbound} isAdmin={isAdmin} isPenyelia={isPenyelia} isRequester={isRequester} />
+
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pengajuan</h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <InfoField label="No. Dokumen" mono>{outbound.document_number}</InfoField>
-                    <InfoField label="Tanggal Pengajuan">{formatDateLong(outbound.transaction_date)}</InfoField>
-                    <InfoField label="Unit Kerja">{outbound.department?.name ?? '-'}</InfoField>
-                    <InfoField label="Pemohon">{outbound.requester?.name ?? '-'}</InfoField>
-                    {outbound.approver && (
-                        <InfoField label={outbound.status === 'Rejected' ? 'Ditolak Oleh' : 'Disetujui Oleh'}>
-                            {outbound.approver.name}
-                            {outbound.approved_at && (
-                                <span className="text-gray-400 ml-1">({formatDateLong(outbound.approved_at)})</span>
-                            )}
-                        </InfoField>
-                    )}
-                    {outbound.issued_by_user && (
-                        <InfoField label="Disetujui Admin Gudang">
-                            {outbound.issued_by_user.name}
-                            {outbound.issued_at && (
-                                <span className="text-gray-400 ml-1">({formatDateLong(outbound.issued_at)})</span>
-                            )}
-                        </InfoField>
-                    )}
-                    {outbound.picked_up_by_user && (
-                        <InfoField label="Diambil Oleh">
-                            {outbound.picked_up_by_user.name}
-                            {outbound.picked_up_at && (
-                                <span className="text-gray-400 ml-1">({formatDateLong(outbound.picked_up_at)})</span>
-                            )}
-                        </InfoField>
-                    )}
-                </div>
-
-                {outbound.notes && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <InfoField label="Catatan">{outbound.notes}</InfoField>
-                    </div>
-                )}
-
-                {outbound.rejection_reason && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <InfoField label="Alasan Penolakan" labelClassName="text-red-500">
-                            <span className="text-red-700 bg-red-50 p-3 rounded-lg block">{outbound.rejection_reason}</span>
-                        </InfoField>
-                    </div>
-                )}
-            </div>
-
-            {/* Progress Tracker */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Progres Pengajuan</h2>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                    <StepIndicator
-                        step={1}
-                        label="Pengajuan"
-                        active={outbound.status === 'Pending'}
-                        completed={['Approved', 'Issued', 'Completed', 'Rejected'].includes(outbound.status)}
-                        rejected={outbound.status === 'Rejected'}
-                    />
-                    <StepConnector active={['Approved', 'Issued', 'Completed'].includes(outbound.status)} />
-                    <StepIndicator
-                        step={2}
-                        label="Penyelia"
-                        active={outbound.status === 'Approved'}
-                        completed={['Issued', 'Completed'].includes(outbound.status)}
-                    />
-                    <StepConnector active={['Issued', 'Completed'].includes(outbound.status)} />
-                    <StepIndicator
-                        step={3}
-                        label="Admin Gudang"
-                        active={outbound.status === 'Issued'}
-                        completed={outbound.status === 'Completed'}
-                    />
-                    <StepConnector active={outbound.status === 'Completed'} />
-                    <StepIndicator
-                        step={4}
-                        label="Diambil"
-                        active={false}
-                        completed={outbound.status === 'Completed'}
-                    />
-                </div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Riwayat Aktivitas</h2>
+                <OutboundTimeline outbound={outbound} />
             </div>
 
             <div className="mb-6">
-                <OutboundDetailTable details={details} />
+                <OutboundDetailTable details={details} status={outbound.status} />
             </div>
 
-            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} canPickup={canPickup} />
+            <OutboundSignatures outbound={outbound} />
+
+            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} canHandover={canHandover} canPickup={canPickup} />
         </AuthenticatedLayout>
     );
 }
 
-/** Step indicator untuk progress tracker */
-function StepIndicator({ step, label, active, completed, rejected }: {
-    step: number;
-    label: string;
-    active: boolean;
-    completed: boolean;
-    rejected?: boolean;
-}) {
-    const base = 'flex flex-col items-center min-w-[72px]';
-
-    let circleClass = 'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ';
-    let labelClass = 'text-xs mt-1.5 font-medium text-center ';
-
-    if (rejected) {
-        circleClass += 'bg-red-100 text-red-600 border-2 border-red-300';
-        labelClass += 'text-red-500';
-    } else if (completed) {
-        circleClass += 'bg-emerald-500 text-white shadow-sm';
-        labelClass += 'text-emerald-600';
-    } else if (active) {
-        circleClass += 'bg-blue-500 text-white shadow-sm ring-4 ring-blue-100';
-        labelClass += 'text-blue-600';
-    } else {
-        circleClass += 'bg-gray-100 text-gray-400 border-2 border-gray-200';
-        labelClass += 'text-gray-400';
-    }
-
+/** Card informasi utama pengajuan (dokumen, tanggal, pelaku per tahap). */
+function OutboundInfoCard({ outbound }: { outbound: OutboundTransaction }) {
     return (
-        <div className={base}>
-            <div className={circleClass}>
-                {completed ? '✓' : rejected ? '✕' : step}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Informasi Pengajuan</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <InfoField label="No. Dokumen" mono>{outbound.document_number}</InfoField>
+                <InfoField label="Tanggal Pengajuan">{formatDateLong(outbound.transaction_date)}</InfoField>
+                <InfoField label="Unit Kerja">{outbound.department?.name ?? '-'}</InfoField>
+                <InfoField label="Pemohon">{outbound.requester?.name ?? '-'}</InfoField>
+                {outbound.approver && (
+                    <InfoField label={outbound.status === 'Rejected' ? 'Ditolak Oleh' : 'Disetujui Oleh'}>
+                        {outbound.approver.name}
+                        {outbound.approved_at && (
+                            <span className="text-gray-400 ml-1">({formatDateLong(outbound.approved_at)})</span>
+                        )}
+                    </InfoField>
+                )}
+                {outbound.issued_by_user && (
+                    <InfoField label="Disetujui Admin Gudang">
+                        {outbound.issued_by_user.name}
+                        {outbound.issued_at && (
+                            <span className="text-gray-400 ml-1">({formatDateLong(outbound.issued_at)})</span>
+                        )}
+                    </InfoField>
+                )}
+                {outbound.picked_up_by_user && (
+                    <InfoField label="Diambil Oleh">
+                        {outbound.picked_up_by_user.name}
+                        {outbound.picked_up_at && (
+                            <span className="text-gray-400 ml-1">({formatDateLong(outbound.picked_up_at)})</span>
+                        )}
+                    </InfoField>
+                )}
             </div>
-            <span className={labelClass}>{label}</span>
+
+            {outbound.notes && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                    <InfoField label="Catatan">{outbound.notes}</InfoField>
+                </div>
+            )}
+
+            {outbound.rejection_reason && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                    <InfoField label="Alasan Penolakan" labelClassName="text-red-500">
+                        <span className="text-red-700 bg-red-50 p-3 rounded-lg block">{outbound.rejection_reason}</span>
+                    </InfoField>
+                </div>
+            )}
         </div>
     );
 }
 
-/** Connector line between steps */
-function StepConnector({ active }: { active: boolean }) {
+/** Banner kontekstual — info langkah selanjutnya berdasarkan role & status. */
+function StatusContextBanner({ outbound, isAdmin, isPenyelia, isRequester }: {
+    outbound: OutboundTransaction;
+    isAdmin: boolean;
+    isPenyelia: boolean;
+    isRequester: boolean;
+}) {
+    let message: string | null = null;
+    let bgColor = 'bg-blue-50 border-blue-200';
+    let textColor = 'text-blue-800';
+    let iconColor = 'text-blue-500';
+    let IconComponent = Info;
+
+    const requesterName = outbound.requester?.name ?? 'pemohon';
+
+    if (outbound.status === 'Pending') {
+        if (isRequester) {
+            message = 'Pengajuan Anda sedang menunggu persetujuan penyelia.';
+            IconComponent = Info;
+            iconColor = 'text-blue-500';
+        } else if (isPenyelia) {
+            message = `Pengajuan dari ${requesterName} membutuhkan persetujuan Anda.`;
+            bgColor = 'bg-amber-50 border-amber-200';
+            textColor = 'text-amber-800';
+            IconComponent = Clock;
+            iconColor = 'text-amber-500';
+        }
+    } else if (outbound.status === 'Approved') {
+        if (isAdmin) {
+            message = `Pengajuan sudah disetujui penyelia. Menunggu Anda mengeluarkan barang.`;
+            bgColor = 'bg-amber-50 border-amber-200';
+            textColor = 'text-amber-800';
+            IconComponent = Clock;
+            iconColor = 'text-amber-500';
+        } else if (isRequester) {
+            message = 'Pengajuan sudah disetujui penyelia. Menunggu admin gudang mengeluarkan barang.';
+            IconComponent = Info;
+            iconColor = 'text-blue-500';
+        }
+    } else if (outbound.status === 'Issued') {
+        if (isAdmin) {
+            message = `Barang sudah dikeluarkan. Silakan serahkan barang ke ${requesterName}.`;
+            bgColor = 'bg-violet-50 border-violet-200';
+            textColor = 'text-violet-800';
+            IconComponent = Package;
+            iconColor = 'text-violet-500';
+        } else if (isRequester) {
+            message = 'Barang sudah dikeluarkan dari gudang. Menunggu admin gudang menyerahkan ke Anda.';
+            IconComponent = Info;
+            iconColor = 'text-blue-500';
+        }
+    } else if (outbound.status === 'Handed Over') {
+        if (isAdmin) {
+            message = `Barang sudah diserahkan. Menunggu ${requesterName} mengkonfirmasi penerimaan.`;
+            bgColor = 'bg-violet-50 border-violet-200';
+            textColor = 'text-violet-800';
+            IconComponent = RefreshCw;
+            iconColor = 'text-violet-500';
+        } else if (isRequester) {
+            message = 'Barang sudah diserahkan ke Anda. Silakan konfirmasi penerimaan di bawah.';
+            bgColor = 'bg-emerald-50 border-emerald-200';
+            textColor = 'text-emerald-800';
+            IconComponent = CheckCircle2;
+            iconColor = 'text-emerald-500';
+        }
+    }
+
+    if (!message) return null;
+
     return (
-        <div className={`flex-1 h-0.5 min-w-[24px] mt-[-16px] rounded-full transition-colors ${
-            active ? 'bg-emerald-400' : 'bg-gray-200'
-        }`} />
+        <div className={`flex items-start gap-3 p-4 rounded-xl border ${bgColor} mb-6`}>
+            <IconComponent className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColor}`} />
+            <p className={`text-sm font-medium ${textColor}`}>{message}</p>
+        </div>
     );
 }

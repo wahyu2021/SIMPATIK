@@ -1,10 +1,10 @@
-import { Clock, CheckCircle, PackageSearch, XCircle, PackageOpen, CircleCheckBig, LucideIcon } from 'lucide-react';
+import { Clock, CheckCircle, PackageSearch, XCircle, PackageOpen, CircleCheckBig, Send, LucideIcon } from 'lucide-react';
 import Badge from './Badge';
 import { OutboundStatus } from '../../Types';
 
 /**
  * Props untuk komponen StatusBadge.
- * @property status - Status pengajuan: 'Pending' | 'Approved' | 'Issued' | 'Rejected' | 'Completed'
+ * @property status - Status pengajuan: 'Pending' | 'Approved' | 'Issued' | 'Handed Over' | 'Rejected' | 'Completed'
  */
 interface StatusBadgeProps {
     status: OutboundStatus;
@@ -13,14 +13,15 @@ interface StatusBadgeProps {
 /** Mapping status → label Indonesia, warna, dan icon */
 const statusConfig: Record<OutboundStatus, {
     label: string;
-    variant: 'pending' | 'success' | 'ready' | 'danger' | 'completed';
+    variant: 'pending' | 'success' | 'ready' | 'issued' | 'danger' | 'completed';
     icon: LucideIcon;
 }> = {
-    Pending:   { label: 'Menunggu',     variant: 'pending',   icon: Clock },
-    Approved:  { label: 'Disetujui',    variant: 'success',   icon: CheckCircle },
-    Issued:    { label: 'Siap Diambil', variant: 'ready',     icon: PackageOpen },
-    Rejected:  { label: 'Ditolak',      variant: 'danger',    icon: XCircle },
-    Completed: { label: 'Selesai',      variant: 'completed', icon: CircleCheckBig },
+    Pending:        { label: 'Menunggu',            variant: 'pending',   icon: Clock },
+    Approved:       { label: 'Disetujui Penyelia', variant: 'success',   icon: CheckCircle },
+    Issued:         { label: 'Disetujui Gudang',   variant: 'ready',     icon: PackageOpen },
+    'Handed Over':  { label: 'Diserahkan',         variant: 'issued',    icon: Send },
+    Rejected:       { label: 'Ditolak',            variant: 'danger',    icon: XCircle },
+    Completed:      { label: 'Selesai',            variant: 'completed', icon: CircleCheckBig },
 };
 
 /**

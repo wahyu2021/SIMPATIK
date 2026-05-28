@@ -30,6 +30,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = ['signature_url'];
+
     protected function casts(): array
     {
         return [
@@ -37,6 +39,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * URL publik tanda tangan user (null jika belum ada).
+     */
+    public function getSignatureUrlAttribute(): ?string
+    {
+        return $this->getSignatureUrl();
     }
 
     /**

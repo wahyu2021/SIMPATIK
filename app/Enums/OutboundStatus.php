@@ -6,16 +6,17 @@ namespace App\Enums;
  * Enum untuk status pengajuan barang keluar (Outbound Transaction).
  * Digunakan di Model, Repository, dan Service agar konsisten.
  *
- * Alur: Pending → Approved → Issued (Siap Diambil) → Completed (Sudah Diambil)
+ * Alur: Pending → Approved → Issued (Stok Dikurangi) → Handed Over (Admin Serahkan) → Completed (Pemohon Terima)
  *       Pending → Rejected (Ditolak)
  */
 enum OutboundStatus: string
 {
-    case Pending   = 'Pending';
-    case Approved  = 'Approved';
-    case Issued    = 'Issued';
-    case Rejected  = 'Rejected';
-    case Completed = 'Completed';
+    case Pending    = 'Pending';
+    case Approved   = 'Approved';
+    case Issued     = 'Issued';
+    case HandedOver = 'Handed Over';
+    case Rejected   = 'Rejected';
+    case Completed  = 'Completed';
 
     /**
      * Label bahasa Indonesia untuk tampilan frontend.
@@ -23,11 +24,12 @@ enum OutboundStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending   => 'Menunggu',
-            self::Approved  => 'Disetujui',
-            self::Issued    => 'Siap Diambil',
-            self::Rejected  => 'Ditolak',
-            self::Completed => 'Selesai',
+            self::Pending    => 'Menunggu',
+            self::Approved   => 'Disetujui Penyelia',
+            self::Issued     => 'Disetujui Gudang',
+            self::HandedOver => 'Diserahkan',
+            self::Rejected   => 'Ditolak',
+            self::Completed  => 'Selesai',
         };
     }
 }
