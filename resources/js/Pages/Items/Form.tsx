@@ -90,7 +90,7 @@ export default function ItemForm({ item, categories, nextCode }: Props) {
                             />
                             <Input
                                 id="unit_price"
-                                label="Harga Satuan (Rp)"
+                                label="Harga Satuan (Opsional)"
                                 type="number"
                                 min="0"
                                 step="100"
@@ -98,7 +98,6 @@ export default function ItemForm({ item, categories, nextCode }: Props) {
                                 value={data.unit_price}
                                 onChange={(e) => setData('unit_price', e.target.value)}
                                 error={errors.unit_price}
-                                required
                             />
                         </div>
 

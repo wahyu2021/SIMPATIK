@@ -82,11 +82,15 @@ Route::middleware(['auth'])->group(function () {
         });
         // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
         Route::resource('outbound', OutboundController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+        Route::get('outbound-direct/create', [OutboundController::class, 'createDirect'])->name('outbound.create-direct');
+        Route::post('outbound-direct', [OutboundController::class, 'storeDirect'])->name('outbound.store-direct');
         Route::post('outbound/{id}/approve', [OutboundController::class, 'approve'])->name('outbound.approve');
         Route::post('outbound/{id}/reject', [OutboundController::class, 'reject'])->name('outbound.reject');
         Route::post('outbound/{id}/issue', [OutboundController::class, 'issue'])->name('outbound.issue');
         Route::post('outbound/{id}/handover', [OutboundController::class, 'handover'])->name('outbound.handover');
         Route::post('outbound/{id}/pickup', [OutboundController::class, 'pickup'])->name('outbound.pickup');
+        Route::get('outbound/{id}/pdf/spb', [OutboundController::class, 'downloadSpb'])->name('outbound.pdf.spb');
+        Route::get('outbound/{id}/pdf/bast', [OutboundController::class, 'downloadBast'])->name('outbound.pdf.bast');
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

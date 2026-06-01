@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, AlertTriangle, Pencil, Info, Clock, Package, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Pencil, Info, Clock, Package, RefreshCw, CheckCircle2, FileText, Printer } from 'lucide-react';
 import { PageProps, OutboundTransaction } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { Breadcrumbs, StatusBadge, Alert, InfoField } from '../../Components/UI';
@@ -84,6 +84,27 @@ export default function OutboundShow({ outbound }: Props) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    {/* PDF Buttons */}
+                    <a
+                        href={route('outbound.pdf.spb', outbound.id)}
+                        target="_blank"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
+                    >
+                        <FileText className="w-3.5 h-3.5" />
+                        Cetak SPB
+                    </a>
+
+                    {(outbound.status === 'Handed Over' || outbound.status === 'Completed') && (
+                        <a
+                            href={route('outbound.pdf.bast', outbound.id)}
+                            target="_blank"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200"
+                        >
+                            <Printer className="w-3.5 h-3.5" />
+                            Cetak BAST
+                        </a>
+                    )}
+
                     {canEdit && (
                         <Link
                             href={`/outbound/${outbound.id}/edit`}

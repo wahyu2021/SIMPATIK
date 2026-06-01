@@ -16,7 +16,7 @@ class ReportController extends Controller
     ) {}
 
     /**
-     * Halaman Laporan Saldistat ATK.
+     * Halaman Rekapitulasi Mutasi Barang.
      */
     public function index(Request $request): Response
     {
@@ -24,11 +24,11 @@ class ReportController extends Controller
         $year = (int) $request->input('year', now()->year);
         $categoryId = $request->input('category_id') ? (int) $request->input('category_id') : null;
 
-        $saldistat = $this->reportService->getSaldistat($month, $year, $categoryId);
+        $reportData = $this->reportService->getMutationReport($month, $year, $categoryId);
         $signatory = $this->reportService->getSignatory();
 
         return Inertia::render('Reports/Index', [
-            'saldistat' => $saldistat,
+            'reportData' => $reportData,
             'signatory' => $signatory,
             'categories' => Category::select('id', 'name')->orderBy('name')->get(),
             'filters' => [

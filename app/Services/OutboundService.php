@@ -74,6 +74,67 @@ class OutboundService
     }
 
     /**
+     * Buat pengajuan barang langsung (Direct Request - Bypass Approval).
+     * Status langsung menjadi Issued dan stok dipotong.
+     */
+    public function createDirectRequest(array $data, int $adminId): OutboundTransaction
+    {
+        return DB::transaction(function () use ($data, $adminId) {
+            if (empty($data['document_number'])) {
+                $data['document_number'] = $this->outboundRepository->generateDocumentNumber();
+            }
+
+            $outbound = $this->outboundRepository->create([
+                'requester_id'     => $data['requester_id'],
+                'department_id'    => $data['department_id'],
+                'document_number'  => $data['document_number'],
+                'transaction_date' => $data['transaction_date'],
+                'status'           => OutboundStatus::Issued, // Langsung Issued
+                'is_special_request' => $data['is_special_request'] ?? false,
+                'is_direct_request'  => true,
+                'issued_by'        => $adminId,
+                'issued_at'        => now(),
+                'notes'            => $data['notes'] ?? 'Input langsung oleh Admin Gudang.',
+            ]);
+
+            foreach ($data['details'] as $detail) {
+                $qty = $detail['quantity'];
+                
+                // 1. Simpan detail
+                $outbound->details()->create([
+                    'item_id'            => $detail['item_id'],
+                    'quantity_requested' => $qty,
+                    'quantity_approved'  => $qty,
+                    'notes'              => $detail['notes'] ?? null,
+                ]);
+
+                // 2. Potong Stok (Pessimistic Locking)
+                $item = Item::lockForUpdate()->findOrFail($detail['item_id']);
+
+                if ($item->current_stock < $qty) {
+                    abort(422, "Stok \"{$item->name}\" tidak mencukupi. Tersedia: {$item->current_stock}, dibutuhkan: {$qty}.");
+                }
+
+                $newStock = $item->current_stock - $qty;
+                $item->update(['current_stock' => $newStock]);
+
+                // 3. Catat Ledger
+                StockLedger::create([
+                    'item_id'            => $detail['item_id'],
+                    'transaction_date'   => $data['transaction_date'],
+                    'movement_type'      => 'out',
+                    'document_reference' => $data['document_number'],
+                    'qty_in'             => 0,
+                    'qty_out'            => $qty,
+                    'ending_balance'     => $newStock,
+                ]);
+            }
+
+            return $outbound->load('details.item');
+        });
+    }
+
+    /**
      * Edit pengajuan yang masih Pending.
      * Header data diperbarui, detail lama dihapus dan diganti detail baru.
      */

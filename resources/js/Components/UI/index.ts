@@ -16,6 +16,7 @@ export { default as InfoField } from './InfoField';
 export { default as Input } from './Input';
 export { default as Label } from './Label';
 export { default as Loading } from './Loading';
+export { default as Logo } from './Logo';
 export { default as Modal } from './Modal';
 export { default as PageHeader } from './PageHeader';
 export { default as Pagination } from './Pagination';

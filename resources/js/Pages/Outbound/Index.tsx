@@ -47,14 +47,26 @@ export default function OutboundIndex({ outbounds, filters, departments }: Props
             <PageHeader
                 title="Pengajuan Barang"
                 description="Pengajuan kebutuhan ATK oleh unit kerja"
-                action={canCreate ? (
-                    <Link href="/outbound/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Buat Pengajuan
-                        </Button>
-                    </Link>
-                ) : undefined}
+                action={
+                    <div className="flex gap-2">
+                        {isAdmin && (
+                            <Link href={route('outbound.create-direct')}>
+                                <Button variant="outline" className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+                                    <PackagePlus className="w-4 h-4" />
+                                    Input Langsung
+                                </Button>
+                            </Link>
+                        )}
+                        {canCreate && (
+                            <Link href="/outbound/create">
+                                <Button className="flex items-center gap-2">
+                                    <Plus className="w-4 h-4" />
+                                    Buat Pengajuan
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
+                }
             />
 
             {flash?.success && <Alert type="success" className="mb-4">{flash.success}</Alert>}

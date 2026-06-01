@@ -59,8 +59,7 @@ class ReportRepository implements ReportRepositoryInterface
             ->whereBetween('inbound_transactions.transaction_date', [$startDate, $endDate])
             ->select(
                 'inbound_transaction_details.item_id',
-                DB::raw('SUM(inbound_transaction_details.quantity) as total_qty'),
-                DB::raw('SUM(inbound_transaction_details.quantity * inbound_transaction_details.unit_price) as total_value')
+                DB::raw('SUM(inbound_transaction_details.quantity) as total_qty')
             )
             ->groupBy('inbound_transaction_details.item_id')
             ->get()

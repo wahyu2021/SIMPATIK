@@ -28,6 +28,7 @@ class OutboundTransaction extends Model
         'handed_over_at',
         'picked_up_at',
         'is_special_request',
+        'is_direct_request',
         'rejection_reason',
         'notes',
     ];
@@ -41,6 +42,7 @@ class OutboundTransaction extends Model
             'handed_over_at'    => 'datetime',
             'picked_up_at'      => 'datetime',
             'is_special_request'=> 'boolean',
+            'is_direct_request' => 'boolean',
             'status'            => OutboundStatus::class,
         ];
     }

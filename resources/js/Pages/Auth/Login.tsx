@@ -21,9 +21,8 @@ export default function Login({ errors = {} }: LoginPageProps) {
                             {/* Header Form */}
                             <div className="px-8 py-8 text-center bg-linear-to-br from-[#003366] to-[#0052A3]">
                                 <div className="flex justify-center mb-4">
-                                    <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-                                        {/* Logo atau yang lainnya */}
-                                        <LogIn className="w-8 h-8 text-white" />
+                                    <div className="bg-white p-3 rounded-lg shadow-inner">
+                                        <img src="/images/logo.webp" alt="Logo" className="w-10 h-10 object-contain" />
                                     </div>
                                 </div>
                                 <h1 className="text-3xl font-bold text-white">SIMPATIK</h1>

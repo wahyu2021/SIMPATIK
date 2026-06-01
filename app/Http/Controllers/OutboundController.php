@@ -14,11 +14,59 @@ use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use App\Services\ReportService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 class OutboundController extends Controller
 {
     public function __construct(
-        private OutboundService $outboundService
+        private OutboundService $outboundService,
+        private ReportService $reportService
     ) {}
+
+    /**
+     * Generate PDF Surat Permintaan Barang (SPB).
+     */
+    public function downloadSpb(int $id)
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        $outbound->load(['requester', 'approver', 'issuedByUser', 'department', 'details.item']);
+
+        $signatory = $this->reportService->getSignatory();
+        
+        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+            route('outbound.show', $id)
+        ));
+
+        $pdf = Pdf::loadView('pdf.spb', compact('outbound', 'signatory', 'qrCode'));
+
+        return $pdf->stream("SPB-{$outbound->document_number}.pdf");
+    }
+
+    /**
+     * Generate PDF Berita Acara Serah Terima (BAST).
+     */
+    public function downloadBast(int $id)
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        
+        if (!$outbound->isHandedOver() && !$outbound->isCompleted()) {
+            abort(403, 'BAST hanya dapat dicetak setelah barang diserahkan.');
+        }
+
+        $outbound->load(['requester', 'handedOverByUser', 'pickedUpByUser', 'department', 'details.item']);
+
+        $signatory = $this->reportService->getSignatory();
+        
+        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+            route('outbound.show', $id)
+        ));
+
+        $pdf = Pdf::loadView('pdf.bast', compact('outbound', 'signatory', 'qrCode'));
+
+        return $pdf->stream("BAST-{$outbound->document_number}.pdf");
+    }
 
     /**
      * Tampilkan daftar pengajuan barang (filter sesuai role user).
@@ -76,6 +124,51 @@ class OutboundController extends Controller
         return redirect()
             ->route('outbound.index')
             ->with('success', 'Pengajuan barang berhasil dibuat.');
+    }
+
+    /**
+     * Form pengajuan langsung oleh Admin Gudang.
+     */
+    public function createDirect(): Response
+    {
+        Gate::authorize('create', OutboundTransaction::class);
+        if (!auth()->user()->hasRole('warehouse_admin')) {
+            abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
+        }
+
+        return Inertia::render('Outbound/DirectForm', [
+            'items'       => Item::select('id', 'name', 'item_code', 'unit_of_measure', 'current_stock')->orderBy('name')->get(),
+            'departments' => Department::select('id', 'name')->orderBy('name')->get(),
+            'users'       => User::select('id', 'name', 'department_id')->with('roles:id,name')->get(),
+        ]);
+    }
+
+    /**
+     * Simpan pengajuan langsung oleh Admin Gudang.
+     */
+    public function storeDirect(Request $request): RedirectResponse
+    {
+        Gate::authorize('create', OutboundTransaction::class);
+        if (!auth()->user()->hasRole('warehouse_admin')) {
+            abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
+        }
+
+        $validated = $request->validate([
+            'requester_id'     => ['required', 'exists:users,id'],
+            'department_id'    => ['required', 'exists:departments,id'],
+            'transaction_date' => ['required', 'date', 'before_or_equal:today'],
+            'is_special_request' => ['nullable', 'boolean'],
+            'notes'            => ['nullable', 'string', 'max:500'],
+            'details'          => ['required', 'array', 'min:1'],
+            'details.*.item_id' => ['required', 'exists:items,id'],
+            'details.*.quantity'=> ['required', 'integer', 'min:1'],
+        ]);
+
+        $outbound = $this->outboundService->createDirectRequest($validated, auth()->id());
+
+        return redirect()
+            ->route('outbound.show', $outbound->id)
+            ->with('success', 'Pengambilan langsung berhasil dicatat. Stok otomatis terpotong.');
     }
 
     /**
