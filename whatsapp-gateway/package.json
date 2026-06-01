@@ -1,0 +1,16 @@
+{
+  "name": "simpatik-wa-gateway",
+  "version": "1.0.0",
+  "description": "WhatsApp Gateway Service for SIMPATIK using Baileys",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.5.0",
+    "express": "^4.18.2",
+    "qrcode-terminal": "^0.12.0",
+    "pino": "^8.16.1"
+  }
+}

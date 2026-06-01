@@ -6,9 +6,14 @@ use App\Enums\OutboundStatus;
 use App\Models\Item;
 use App\Models\OutboundTransaction;
 use App\Models\StockLedger;
+use App\Models\User;
+use App\Notifications\LowStockAlertNotification;
+use App\Notifications\NewOutboundRequestNotification;
+use App\Notifications\OutboundStatusUpdatedNotification;
 use App\Repositories\Contracts\OutboundRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class OutboundService
 {
@@ -69,7 +74,16 @@ class OutboundService
                 ]);
             }
 
-            return $outbound->load('details.item');
+            $outbound->load(['requester', 'department', 'details.item']);
+
+            // Notifikasi ke Penyelia di departemen yang sama
+            $supervisors = User::role('division_head')
+                ->where('department_id', $outbound->department_id)
+                ->get();
+            
+            Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+
+            return $outbound;
         });
     }
 
@@ -193,7 +207,12 @@ class OutboundService
                 ]);
             }
 
-            return $outbound->refresh()->load('details.item');
+            $outbound->refresh()->load(['requester', 'details.item']);
+
+            // Notifikasi ke Pemohon
+            $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+            return $outbound;
         });
     }
 
@@ -214,7 +233,12 @@ class OutboundService
             'rejection_reason' => $reason,
         ]);
 
-        return $outbound->refresh()->load('details.item');
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
     }
 
     /**
@@ -253,6 +277,12 @@ class OutboundService
                     'qty_out'            => $qtyOut,
                     'ending_balance'     => $newStock,
                 ]);
+
+                // Notifikasi Stok Rendah ke Admin Gudang jika threshold tercapai
+                if ($item->current_stock <= $item->minimum_stock_level) {
+                    $admins = User::role('warehouse_admin')->get();
+                    Notification::send($admins, new LowStockAlertNotification($item));
+                }
             }
 
             $this->outboundRepository->update($outbound, [
@@ -261,7 +291,12 @@ class OutboundService
                 'issued_at' => now(),
             ]);
 
-            return $outbound->refresh()->load('details.item');
+            $outbound->refresh()->load(['requester', 'details.item']);
+            
+            // Notifikasi ke Pemohon
+            $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+            return $outbound;
         });
     }
 
@@ -281,7 +316,12 @@ class OutboundService
             'handed_over_at'  => now(),
         ]);
 
-        return $outbound->refresh()->load('details.item');
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
     }
 
     /**
@@ -300,7 +340,12 @@ class OutboundService
             'picked_up_at' => now(),
         ]);
 
-        return $outbound->refresh()->load('details.item');
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon (konfirmasi selesai)
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
     }
 
     /**

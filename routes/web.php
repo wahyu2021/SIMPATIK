@@ -12,6 +12,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OutboundController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -99,7 +100,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reports/reconciliation', [ReportController::class, 'reconciliation'])->name('reports.reconciliation');
         Route::post('/reports/reconciliation', [ReportController::class, 'storeReconciliation'])->name('reports.reconciliation.store');
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Notifikasi
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     });
 });
 

@@ -126,6 +126,21 @@ export interface OutboundTransactionDetail {
 // --- Reporting ---
 export type MovementType = 'IN' | 'OUT' | 'ADJUSTMENT';
 
+// --- Notifications ---
+export interface NotificationData {
+    id: string;
+    type: string;
+    data: {
+        title: string;
+        message: string;
+        action_url?: string;
+        type?: string;
+        [key: string]: any;
+    };
+    read_at: string | null;
+    created_at: string;
+}
+
 export interface StockLedger extends Timestamps {
     id: number;
     item_id: number;
@@ -192,6 +207,10 @@ export interface LowStockItemData {
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User;
+        notifications?: {
+            unread_count: number;
+            latest: NotificationData[];
+        };
     };
     flash?: {
         success?: string;
