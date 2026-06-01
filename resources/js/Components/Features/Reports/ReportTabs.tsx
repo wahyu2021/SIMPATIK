@@ -1,9 +1,10 @@
 import { Link } from '@inertiajs/react';
 
-type TabKey = 'saldistat' | 'ledger' | 'reconciliation';
+type TabKey = 'mutation' | 'department' | 'ledger' | 'reconciliation';
 
 const TABS: { key: TabKey; label: string; href: string }[] = [
-    { key: 'saldistat', label: 'Saldistat ATK', href: '/reports' },
+    { key: 'mutation', label: 'Rekapitulasi Mutasi', href: '/reports' },
+    { key: 'department', label: 'Laporan Unit Kerja', href: '/reports/department' },
     { key: 'ledger', label: 'Kartu Mutasi', href: '/reports/stock-ledger' },
     { key: 'reconciliation', label: 'Rekonsiliasi', href: '/reports/reconciliation' },
 ];

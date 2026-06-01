@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 /**
@@ -36,14 +37,14 @@ interface DashboardRepositoryInterface
     public function countLowStockItems(): int;
 
     /**
-     * Hitung pengajuan berstatus Pending
+     * Hitung pengajuan berstatus Pending (dapat difilter per user/unit)
      */
-    public function countPendingRequests(): int;
+    public function countPendingRequests(?User $user = null): int;
 
     /**
-     * Hitung pengajuan yang di-approve hari ini
+     * Hitung pengajuan yang di-approve hari ini (dapat difilter per user/unit)
      */
-    public function countApprovedToday(): int;
+    public function countApprovedToday(?User $user = null): int;
 
     /**
      * Hitung transaksi barang masuk bulan ini
@@ -53,7 +54,7 @@ interface DashboardRepositoryInterface
     /**
      * Ambil pengajuan terbaru (Eloquent Collection)
      */
-    public function getRecentRequests(int $limit = 5): Collection;
+    public function getRecentRequests(?User $user = null, int $limit = 5): Collection;
 
     /**
      * Ambil barang stok rendah teratas (Eloquent Collection)
@@ -64,11 +65,11 @@ interface DashboardRepositoryInterface
      * Ambil tren transaksi bulanan (6 bulan terakhir)
      * @return array{month: string, inbound: int, outbound: int}[]
      */
-    public function getMonthlyTransactionTrend(int $months = 6): array;
+    public function getMonthlyTransactionTrend(?User $user = null, int $months = 6): array;
 
     /**
      * Distribusi status pengajuan outbound
      * @return array{status: string, count: int}[]
      */
-    public function getOutboundStatusDistribution(): array;
+    public function getOutboundStatusDistribution(?User $user = null): array;
 }

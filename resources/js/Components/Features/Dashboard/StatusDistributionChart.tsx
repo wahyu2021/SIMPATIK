@@ -2,10 +2,11 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 import { StatusDistribution } from '../../../Types/dashboard';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-    Pending:  { label: 'Menunggu',  color: '#f59e0b' },
-    Approved: { label: 'Disetujui', color: '#3b82f6' },
-    Issued:   { label: 'Diserahkan', color: '#10b981' },
-    Rejected: { label: 'Ditolak',   color: '#ef4444' },
+    Pending:   { label: 'Menunggu',     color: '#f59e0b' },
+    Approved:  { label: 'Disetujui',    color: '#3b82f6' },
+    Issued:    { label: 'Siap Diambil', color: '#06b6d4' },
+    Completed: { label: 'Selesai',      color: '#10b981' },
+    Rejected:  { label: 'Ditolak',      color: '#ef4444' },
 };
 
 interface Props {

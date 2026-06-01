@@ -20,7 +20,7 @@ class StoreInboundRequest extends FormRequest
             'details'              => ['required', 'array', 'min:1', 'max:50'],
             'details.*.item_id'    => ['required', 'integer', 'exists:items,id', 'distinct'],
             'details.*.quantity'   => ['required', 'integer', 'min:1', 'max:999999'],
-            'details.*.unit_price' => ['required', 'numeric', 'min:0', 'max:99999999999'],
+            'details.*.unit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999999'],
         ];
     }
 

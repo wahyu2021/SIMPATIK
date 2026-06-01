@@ -1,41 +1,36 @@
 /**
- * Types untuk halaman Saldistat ATK.
+ * Types untuk halaman Rekapitulasi Mutasi Barang.
  */
 
-export interface SaldistatItem {
+export interface MutationItem {
     no: number;
     item_id: number;
     name: string;
     unit: string;
-    unit_price: number;
     opening_qty: number;
-    opening_value: number;
     inbound_qty: number;
-    inbound_value: number;
     outbound_qty: number;
-    outbound_value: number;
     closing_qty: number;
-    closing_value: number;
 }
 
-export interface SaldistatCategory {
+export interface MutationCategory {
     id: number;
     name: string;
-    items: SaldistatItem[];
+    items: MutationItem[];
     subtotal_opening: number;
     subtotal_inbound: number;
     subtotal_outbound: number;
     subtotal_closing: number;
 }
 
-export interface SaldistatSummary {
-    opening_value: number;
-    inbound_value: number;
-    outbound_value: number;
-    closing_value: number;
+export interface MutationSummary {
+    opening_qty: number;
+    inbound_qty: number;
+    outbound_qty: number;
+    closing_qty: number;
 }
 
-export interface SaldistatPeriod {
+export interface MutationPeriod {
     month: number;
     year: number;
     label: string;
@@ -43,10 +38,10 @@ export interface SaldistatPeriod {
     end_label: string;
 }
 
-export interface SaldistatData {
-    categories: SaldistatCategory[];
-    summary: SaldistatSummary;
-    period: SaldistatPeriod;
+export interface MutationReportData {
+    categories: MutationCategory[];
+    summary: MutationSummary;
+    period: MutationPeriod;
 }
 
 export interface Signatory {
@@ -55,7 +50,7 @@ export interface Signatory {
     company_address: string;
 }
 
-export interface SaldistatFilters {
+export interface MutationFilters {
     month: number;
     year: number;
     category_id: number | null;

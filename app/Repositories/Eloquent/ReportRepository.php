@@ -59,8 +59,7 @@ class ReportRepository implements ReportRepositoryInterface
             ->whereBetween('inbound_transactions.transaction_date', [$startDate, $endDate])
             ->select(
                 'inbound_transaction_details.item_id',
-                DB::raw('SUM(inbound_transaction_details.quantity) as total_qty'),
-                DB::raw('SUM(inbound_transaction_details.quantity * inbound_transaction_details.unit_price) as total_value')
+                DB::raw('SUM(inbound_transaction_details.quantity) as total_qty')
             )
             ->groupBy('inbound_transaction_details.item_id')
             ->get()
@@ -74,7 +73,7 @@ class ReportRepository implements ReportRepositoryInterface
     {
         return DB::table('outbound_transaction_details')
             ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
-            ->where('outbound_transactions.status', OutboundStatus::Issued->value)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
             ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
             ->select(
                 'outbound_transaction_details.item_id',
@@ -94,13 +93,36 @@ class ReportRepository implements ReportRepositoryInterface
             ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
             ->join('departments', 'departments.id', '=', 'outbound_transactions.department_id')
             ->where('outbound_transaction_details.item_id', $itemId)
-            ->where('outbound_transactions.status', OutboundStatus::Issued->value)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
             ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
             ->select('departments.name as department', DB::raw('SUM(outbound_transaction_details.quantity_approved) as qty'))
             ->groupBy('departments.id', 'departments.name')
             ->orderBy('departments.name')
             ->get()
             ->toArray();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDepartmentTotals(int $departmentId, string $startDate, string $endDate): Collection
+    {
+        return DB::table('outbound_transaction_details')
+            ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
+            ->join('items', 'items.id', '=', 'outbound_transaction_details.item_id')
+            ->where('outbound_transactions.department_id', $departmentId)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
+            ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
+            ->select(
+                'items.id',
+                'items.name',
+                'items.item_code',
+                'items.unit_of_measure',
+                DB::raw('SUM(outbound_transaction_details.quantity_approved) as total_qty')
+            )
+            ->groupBy('items.id', 'items.name', 'items.item_code', 'items.unit_of_measure')
+            ->orderBy('items.name')
+            ->get();
     }
 
     /**

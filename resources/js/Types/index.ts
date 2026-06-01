@@ -16,6 +16,7 @@ export interface User extends Timestamps {
     email: string;
     email_verified_at?: string;
     signature_path?: string;
+    signature_url?: string;
     is_active: boolean;
     department_id?: number;
     department?: Department;
@@ -64,7 +65,7 @@ export interface Item extends Timestamps {
 }
 
 // --- Transactions ---
-export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Rejected';
+export type OutboundStatus = 'Pending' | 'Approved' | 'Issued' | 'Handed Over' | 'Rejected' | 'Completed';
 
 export interface InboundTransaction extends Timestamps {
     id: number;
@@ -90,18 +91,24 @@ export interface OutboundTransaction extends Timestamps {
     requester_id: number;
     approver_id?: number;
     issued_by?: number;
+    handed_over_by?: number;
+    picked_up_by?: number;
     department_id: number;
     document_number: string;
     transaction_date: string;
     status: OutboundStatus;
     approved_at?: string;
     issued_at?: string;
+    handed_over_at?: string;
+    picked_up_at?: string;
     is_special_request: boolean;
     rejection_reason?: string;
     notes?: string;
     requester?: User;
     approver?: User;
     issued_by_user?: User;
+    handed_over_by_user?: User;
+    picked_up_by_user?: User;
     department?: Department;
     details?: OutboundTransactionDetail[];
 }
@@ -118,6 +125,21 @@ export interface OutboundTransactionDetail {
 
 // --- Reporting ---
 export type MovementType = 'IN' | 'OUT' | 'ADJUSTMENT';
+
+// --- Notifications ---
+export interface NotificationData {
+    id: string;
+    type: string;
+    data: {
+        title: string;
+        message: string;
+        action_url?: string;
+        type?: string;
+        [key: string]: any;
+    };
+    read_at: string | null;
+    created_at: string;
+}
 
 export interface StockLedger extends Timestamps {
     id: number;
@@ -185,6 +207,10 @@ export interface LowStockItemData {
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     auth: {
         user: User;
+        notifications?: {
+            unread_count: number;
+            latest: NotificationData[];
+        };
     };
     flash?: {
         success?: string;

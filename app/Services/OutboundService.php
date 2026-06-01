@@ -6,9 +6,15 @@ use App\Enums\OutboundStatus;
 use App\Models\Item;
 use App\Models\OutboundTransaction;
 use App\Models\StockLedger;
+use App\Models\User;
+use App\Notifications\LowStockAlertNotification;
+use App\Notifications\NewOutboundRequestNotification;
+use App\Notifications\OutboundReadyForIssueNotification;
+use App\Notifications\OutboundStatusUpdatedNotification;
 use App\Repositories\Contracts\OutboundRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class OutboundService
 {
@@ -69,31 +75,106 @@ class OutboundService
                 ]);
             }
 
+            $outbound->load(['requester', 'department', 'details.item']);
+
+            // Notifikasi ke Penyelia di departemen yang sama
+            $supervisors = User::role('division_head')
+                ->where('department_id', $outbound->department_id)
+                ->get();
+            
+            Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+
+            return $outbound;
+        });
+    }
+
+    /**
+     * Buat pengajuan barang langsung (Direct Request - Bypass Approval).
+     * Status langsung menjadi Issued dan stok dipotong.
+     */
+    public function createDirectRequest(array $data, int $adminId): OutboundTransaction
+    {
+        return DB::transaction(function () use ($data, $adminId) {
+            if (empty($data['document_number'])) {
+                $data['document_number'] = $this->outboundRepository->generateDocumentNumber();
+            }
+
+            $outbound = $this->outboundRepository->create([
+                'requester_id'     => $data['requester_id'],
+                'department_id'    => $data['department_id'],
+                'document_number'  => $data['document_number'],
+                'transaction_date' => $data['transaction_date'],
+                'status'           => OutboundStatus::Issued, // Langsung Issued
+                'is_special_request' => $data['is_special_request'] ?? false,
+                'is_direct_request'  => true,
+                'issued_by'        => $adminId,
+                'issued_at'        => now(),
+                'notes'            => $data['notes'] ?? 'Input langsung oleh Admin Gudang.',
+            ]);
+
+            foreach ($data['details'] as $detail) {
+                $qty = $detail['quantity'];
+                
+                // 1. Simpan detail
+                $outbound->details()->create([
+                    'item_id'            => $detail['item_id'],
+                    'quantity_requested' => $qty,
+                    'quantity_approved'  => $qty,
+                    'notes'              => $detail['notes'] ?? null,
+                ]);
+
+                // 2. Potong Stok (Pessimistic Locking)
+                $item = Item::lockForUpdate()->findOrFail($detail['item_id']);
+
+                if ($item->current_stock < $qty) {
+                    abort(422, "Stok \"{$item->name}\" tidak mencukupi. Tersedia: {$item->current_stock}, dibutuhkan: {$qty}.");
+                }
+
+                $newStock = $item->current_stock - $qty;
+                $item->update(['current_stock' => $newStock]);
+
+                // 3. Catat Ledger
+                StockLedger::create([
+                    'item_id'            => $detail['item_id'],
+                    'transaction_date'   => $data['transaction_date'],
+                    'movement_type'      => 'out',
+                    'document_reference' => $data['document_number'],
+                    'qty_in'             => 0,
+                    'qty_out'            => $qty,
+                    'ending_balance'     => $newStock,
+                ]);
+            }
+
             return $outbound->load('details.item');
         });
     }
 
     /**
-     * Penyelia setujui pengajuan (Pending → Approved).
-     * quantity_approved otomatis diisi sama dengan quantity_requested.
+     * Edit pengajuan yang masih Pending.
+     * Header data diperbarui, detail lama dihapus dan diganti detail baru.
      */
-    public function approveRequest(OutboundTransaction $outbound, int $approverId): OutboundTransaction
+    public function updateRequest(OutboundTransaction $outbound, array $data): OutboundTransaction
     {
         if (!$outbound->isPending()) {
-            abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat disetujui.');
+            abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat diedit.');
         }
 
-        return DB::transaction(function () use ($outbound, $approverId) {
+        return DB::transaction(function () use ($outbound, $data) {
             $this->outboundRepository->update($outbound, [
-                'status'      => OutboundStatus::Approved,
-                'approver_id' => $approverId,
-                'approved_at' => now(),
+                'department_id'    => $data['department_id'],
+                'transaction_date' => $data['transaction_date'],
+                'is_special_request' => $data['is_special_request'] ?? false,
+                'notes'            => $data['notes'] ?? null,
             ]);
 
-            // Set quantity_approved = quantity_requested untuk semua detail
-            foreach ($outbound->details as $detail) {
-                $detail->update([
-                    'quantity_approved' => $detail->quantity_requested,
+            $outbound->details()->delete();
+
+            foreach ($data['details'] as $detail) {
+                $outbound->details()->create([
+                    'item_id'            => $detail['item_id'],
+                    'quantity_requested' => $detail['quantity_requested'],
+                    'quantity_approved'  => 0,
+                    'notes'              => $detail['notes'] ?? null,
                 ]);
             }
 
@@ -102,39 +183,94 @@ class OutboundService
     }
 
     /**
-     * Penyelia tolak pengajuan (Pending → Rejected).
+     * Penyelia setujui pengajuan (Pending → Approved).
+     *
+     * @param array<int,int>|null $quantities  Mapping [detail_id => quantity_approved].
+     *                                         Jika null, quantity_approved = quantity_requested.
      */
-    public function rejectRequest(OutboundTransaction $outbound, int $approverId, string $reason): OutboundTransaction
+    public function approveRequest(OutboundTransaction $outbound, int $approverId, ?array $quantities = null): OutboundTransaction
     {
         if (!$outbound->isPending()) {
-            abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat ditolak.');
+            abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat disetujui.');
+        }
+
+        return DB::transaction(function () use ($outbound, $approverId, $quantities) {
+            $this->outboundRepository->update($outbound, [
+                'status'      => OutboundStatus::Approved,
+                'approver_id' => $approverId,
+                'approved_at' => now(),
+            ]);
+
+            foreach ($outbound->details as $detail) {
+                $qty = $quantities[$detail->id] ?? $detail->quantity_requested;
+                $detail->update([
+                    'quantity_approved' => min($qty, $detail->quantity_requested),
+                ]);
+            }
+
+            $outbound->refresh()->load(['requester', 'details.item']);
+
+            // Notifikasi ke Pemohon
+            $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+            // Notifikasi ke Admin Gudang agar tahu ada barang yang harus disiapkan
+            $admins = User::role('warehouse_admin')->get();
+            Notification::send($admins, new OutboundReadyForIssueNotification($outbound));
+
+            return $outbound;
+        });
+    }
+
+
+    /**
+     * Tolak pengajuan (Pending / Approved → Rejected).
+     */
+    public function rejectRequest(OutboundTransaction $outbound, int $rejectorId, string $reason): OutboundTransaction
+    {
+        if (!$outbound->isPending() && !$outbound->isApproved()) {
+            abort(422, 'Hanya pengajuan berstatus "Menunggu" atau "Disetujui" yang dapat ditolak.');
         }
 
         $this->outboundRepository->update($outbound, [
             'status'           => OutboundStatus::Rejected,
-            'approver_id'      => $approverId,
+            'approver_id'      => $rejectorId, // Dicatat siapa yang menolak (bisa penyelia atau admin)
             'approved_at'      => now(),
             'rejection_reason' => $reason,
         ]);
 
-        return $outbound->refresh()->load('details.item');
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
     }
 
     /**
-     * Admin serahkan barang (Approved → Issued).
+     * Admin Gudang menyetujui pengeluaran barang (Approved → Issued / Siap Diambil).
      * Kurangi stok dengan pessimistic lock, catat ledger OUT.
+     * Barang siap diambil oleh karyawan pemohon.
+     *
+     * @param array<int,int>|null $quantities Mapping [detail_id => final_quantity_issued].
      */
-    public function issueItems(OutboundTransaction $outbound, int $issuedById): OutboundTransaction
+    public function issueItems(OutboundTransaction $outbound, int $issuedById, ?array $quantities = null): OutboundTransaction
     {
         if (!$outbound->isApproved()) {
-            abort(422, 'Hanya pengajuan berstatus "Disetujui" yang dapat diserahkan.');
+            abort(422, 'Hanya pengajuan berstatus "Disetujui" yang dapat diproses.');
         }
 
-        return DB::transaction(function () use ($outbound, $issuedById) {
+        return DB::transaction(function () use ($outbound, $issuedById, $quantities) {
             $outbound->load('details');
 
             foreach ($outbound->details as $detail) {
-                $qtyOut = $detail->quantity_approved;
+                // Admin bisa menyesuaikan lagi jumlah yang dikeluarkan (tidak boleh melebihi yang diapprove penyelia)
+                $qtyOut = $quantities[$detail->id] ?? $detail->quantity_approved;
+                $qtyOut = min($qtyOut, $detail->quantity_approved); // Pastikan admin tidak mengeluarkan melebihi persetujuan
+
+                if ($qtyOut != $detail->quantity_approved) {
+                    $detail->update(['quantity_approved' => $qtyOut]);
+                }
+
                 if ($qtyOut <= 0) continue;
 
                 $item = Item::lockForUpdate()->findOrFail($detail->item_id);
@@ -155,6 +291,12 @@ class OutboundService
                     'qty_out'            => $qtyOut,
                     'ending_balance'     => $newStock,
                 ]);
+
+                // Notifikasi Stok Rendah ke Admin Gudang jika threshold tercapai
+                if ($item->current_stock <= $item->minimum_stock_level) {
+                    $admins = User::role('warehouse_admin')->get();
+                    Notification::send($admins, new LowStockAlertNotification($item));
+                }
             }
 
             $this->outboundRepository->update($outbound, [
@@ -163,12 +305,66 @@ class OutboundService
                 'issued_at' => now(),
             ]);
 
-            return $outbound->refresh()->load('details.item');
+            $outbound->refresh()->load(['requester', 'details.item']);
+            
+            // Notifikasi ke Pemohon
+            $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+            return $outbound;
         });
     }
 
     /**
+     * Admin Gudang serahkan barang (Issued → Handed Over).
+     * Tahap pertama dari dual confirmation.
+     */
+    public function handoverItems(OutboundTransaction $outbound, int $handedOverById): OutboundTransaction
+    {
+        if (!$outbound->isIssued()) {
+            abort(422, 'Hanya pengajuan berstatus "Siap Diambil" yang dapat diserahkan.');
+        }
+
+        $this->outboundRepository->update($outbound, [
+            'status'          => OutboundStatus::HandedOver,
+            'handed_over_by'  => $handedOverById,
+            'handed_over_at'  => now(),
+        ]);
+
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
+    }
+
+    /**
+     * Pemohon konfirmasi penerimaan barang (Handed Over → Completed).
+     * Tahap kedua dari dual confirmation — hanya pemohon yang bisa.
+     */
+    public function pickupItems(OutboundTransaction $outbound, int $pickedUpById): OutboundTransaction
+    {
+        if (!$outbound->isHandedOver()) {
+            abort(422, 'Hanya pengajuan berstatus "Diserahkan" yang dapat dikonfirmasi penerimaannya.');
+        }
+
+        $this->outboundRepository->update($outbound, [
+            'status'       => OutboundStatus::Completed,
+            'picked_up_by' => $pickedUpById,
+            'picked_up_at' => now(),
+        ]);
+
+        $outbound->refresh()->load(['requester', 'details.item']);
+        
+        // Notifikasi ke Pemohon (konfirmasi selesai)
+        $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
+
+        return $outbound;
+    }
+
+    /**
      * Batalkan pengajuan (hanya jika Pending dan oleh pemiliknya).
+     * Menggunakan soft delete agar data tetap tersedia untuk audit.
      */
     public function cancelRequest(OutboundTransaction $outbound): bool
     {
@@ -176,8 +372,7 @@ class OutboundService
             abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat dibatalkan.');
         }
 
-        $outbound->details()->delete();
-        return $this->outboundRepository->delete($outbound);
+        return $outbound->delete();
     }
 
     /**

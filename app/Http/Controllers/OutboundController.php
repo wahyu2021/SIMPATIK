@@ -6,23 +6,75 @@ use App\Http\Requests\Outbound\RejectOutboundRequest;
 use App\Http\Requests\Outbound\StoreOutboundRequest;
 use App\Models\Department;
 use App\Models\Item;
+use App\Models\OutboundTransaction;
 use App\Services\OutboundService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+
+use App\Services\ReportService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OutboundController extends Controller
 {
     public function __construct(
-        private OutboundService $outboundService
+        private OutboundService $outboundService,
+        private ReportService $reportService
     ) {}
+
+    /**
+     * Generate PDF Surat Permintaan Barang (SPB).
+     */
+    public function downloadSpb(int $id)
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        $outbound->load(['requester', 'approver', 'issuedByUser', 'department', 'details.item']);
+
+        $signatory = $this->reportService->getSignatory();
+        
+        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+            route('outbound.show', $id)
+        ));
+
+        $pdf = Pdf::loadView('pdf.spb', compact('outbound', 'signatory', 'qrCode'));
+
+        return $pdf->stream("SPB-{$outbound->document_number}.pdf");
+    }
+
+    /**
+     * Generate PDF Berita Acara Serah Terima (BAST).
+     */
+    public function downloadBast(int $id)
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        
+        if (!$outbound->isHandedOver() && !$outbound->isCompleted()) {
+            abort(403, 'BAST hanya dapat dicetak setelah barang diserahkan.');
+        }
+
+        $outbound->load(['requester', 'handedOverByUser', 'pickedUpByUser', 'department', 'details.item']);
+
+        $signatory = $this->reportService->getSignatory();
+        
+        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+            route('outbound.show', $id)
+        ));
+
+        $pdf = Pdf::loadView('pdf.bast', compact('outbound', 'signatory', 'qrCode'));
+
+        return $pdf->stream("BAST-{$outbound->document_number}.pdf");
+    }
 
     /**
      * Tampilkan daftar pengajuan barang (filter sesuai role user).
      */
     public function index(Request $request): Response
     {
+        Gate::authorize('viewAny', OutboundTransaction::class);
+
         $user = $request->user();
         $filters = $request->only(['search', 'status', 'department_id', 'date_from', 'date_to', 'sort_by', 'sort_dir']);
 
@@ -48,6 +100,8 @@ class OutboundController extends Controller
      */
     public function create(): Response
     {
+        Gate::authorize('create', OutboundTransaction::class);
+
         return Inertia::render('Outbound/Form', [
             'items'          => Item::select('id', 'name', 'item_code', 'unit_of_measure', 'current_stock')->orderBy('name')->get(),
             'departments'    => Department::select('id', 'name')->orderBy('name')->get(),
@@ -60,8 +114,11 @@ class OutboundController extends Controller
      */
     public function store(StoreOutboundRequest $request): RedirectResponse
     {
+        Gate::authorize('create', OutboundTransaction::class);
+
         $data = $request->validated();
         $data['requester_id'] = auth()->id();
+        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
 
         $this->outboundService->createRequest($data);
 
@@ -71,35 +128,108 @@ class OutboundController extends Controller
     }
 
     /**
-     * Tampilkan detail pengajuan barang.
+     * Form pengajuan langsung oleh Admin Gudang.
      */
-    public function show(int $id): Response
+    public function createDirect(): Response
     {
-        return Inertia::render('Outbound/Show', [
-            'outbound' => $this->outboundService->findOutbound($id),
+        Gate::authorize('create', OutboundTransaction::class);
+        if (!auth()->user()->hasRole('warehouse_admin')) {
+            abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
+        }
+
+        return Inertia::render('Outbound/DirectForm', [
+            'items'       => Item::select('id', 'name', 'item_code', 'unit_of_measure', 'current_stock')->orderBy('name')->get(),
+            'departments' => Department::select('id', 'name')->orderBy('name')->get(),
+            'users'       => User::select('id', 'name', 'department_id')->with('roles:id,name')->get(),
         ]);
     }
 
     /**
-     * Penyelia setujui pengajuan (Pending → Approved).
+     * Simpan pengajuan langsung oleh Admin Gudang.
      */
-    public function approve(int $id): RedirectResponse
+    public function storeDirect(Request $request): RedirectResponse
     {
-        $user = auth()->user();
-
-        // Hanya penyelia yang boleh approve
-        if (!$user->hasRole('division_head')) {
-            abort(403, 'Hanya Penyelia yang dapat menyetujui pengajuan.');
+        Gate::authorize('create', OutboundTransaction::class);
+        if (!auth()->user()->hasRole('warehouse_admin')) {
+            abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
         }
 
+        $validated = $request->validate([
+            'requester_id'     => ['required', 'exists:users,id'],
+            'department_id'    => ['required', 'exists:departments,id'],
+            'transaction_date' => ['required', 'date', 'before_or_equal:today'],
+            'is_special_request' => ['nullable', 'boolean'],
+            'notes'            => ['nullable', 'string', 'max:500'],
+            'details'          => ['required', 'array', 'min:1'],
+            'details.*.item_id' => ['required', 'exists:items,id'],
+            'details.*.quantity'=> ['required', 'integer', 'min:1'],
+        ]);
+
+        $outbound = $this->outboundService->createDirectRequest($validated, auth()->id());
+
+        return redirect()
+            ->route('outbound.show', $outbound->id)
+            ->with('success', 'Pengambilan langsung berhasil dicatat. Stok otomatis terpotong.');
+    }
+
+    /**
+     * Tampilkan detail pengajuan barang.
+     */
+    public function show(int $id): Response
+    {
         $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('view', $outbound);
 
-        // Penyelia hanya bisa approve pengajuan dari unit kerjanya sendiri
-        if ($outbound->department_id !== $user->department_id) {
-            abort(403, 'Anda hanya dapat menyetujui pengajuan dari unit kerja Anda.');
-        }
+        return Inertia::render('Outbound/Show', [
+            'outbound' => $outbound,
+        ]);
+    }
 
-        $this->outboundService->approveRequest($outbound, $user->id);
+    /**
+     * Tampilkan form edit pengajuan (hanya Pending, hanya pemilik).
+     */
+    public function edit(int $id): Response
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('update', $outbound);
+
+        return Inertia::render('Outbound/Form', [
+            'outbound'       => $outbound,
+            'items'          => Item::select('id', 'name', 'item_code', 'unit_of_measure', 'current_stock')->orderBy('name')->get(),
+            'departments'    => Department::select('id', 'name')->orderBy('name')->get(),
+        ]);
+    }
+
+    /**
+     * Update pengajuan barang (hanya Pending, hanya pemilik).
+     */
+    public function update(StoreOutboundRequest $request, int $id): RedirectResponse
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('update', $outbound);
+
+        $data = $request->validated();
+        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+
+        $this->outboundService->updateRequest($outbound, $data);
+
+        return redirect()
+            ->route('outbound.show', $id)
+            ->with('success', 'Pengajuan berhasil diperbarui.');
+    }
+
+    /**
+     * Penyelia setujui pengajuan (Pending → Approved).
+     * Opsional: kirim quantities per detail untuk partial approve.
+     */
+    public function approve(Request $request, int $id): RedirectResponse
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('approve', $outbound);
+
+        $quantities = $request->input('quantities');
+
+        $this->outboundService->approveRequest($outbound, auth()->id(), $quantities);
 
         return redirect()
             ->route('outbound.show', $id)
@@ -111,20 +241,10 @@ class OutboundController extends Controller
      */
     public function reject(RejectOutboundRequest $request, int $id): RedirectResponse
     {
-        $user = auth()->user();
-
-        // Hanya penyelia yang boleh reject
-        if (!$user->hasRole('division_head')) {
-            abort(403, 'Hanya Penyelia yang dapat menolak pengajuan.');
-        }
-
         $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('reject', $outbound);
 
-        if ($outbound->department_id !== $user->department_id) {
-            abort(403, 'Anda hanya dapat menolak pengajuan dari unit kerja Anda.');
-        }
-
-        $this->outboundService->rejectRequest($outbound, $user->id, $request->validated('rejection_reason'));
+        $this->outboundService->rejectRequest($outbound, auth()->id(), $request->validated('rejection_reason'));
 
         return redirect()
             ->route('outbound.show', $id)
@@ -132,23 +252,50 @@ class OutboundController extends Controller
     }
 
     /**
-     * Admin serahkan barang (Approved → Issued, stok berkurang).
+     * Admin Gudang menyetujui pengeluaran barang (Approved → Issued).
      */
-    public function issue(int $id): RedirectResponse
+    public function issue(Request $request, int $id): RedirectResponse
     {
-        $user = auth()->user();
-
-        // Hanya admin gudang yang boleh issue
-        if (!$user->hasRole('warehouse_admin')) {
-            abort(403, 'Hanya Admin Gudang yang dapat menyerahkan barang.');
-        }
-
         $outbound = $this->outboundService->findOutbound($id);
-        $this->outboundService->issueItems($outbound, $user->id);
+        Gate::authorize('issue', $outbound);
+
+        $quantities = $request->input('quantities');
+
+        $this->outboundService->issueItems($outbound, auth()->id(), $quantities);
 
         return redirect()
             ->route('outbound.show', $id)
-            ->with('success', 'Barang berhasil diserahkan dan stok telah diperbarui.');
+            ->with('success', 'Pengeluaran barang disetujui. Barang siap diserahkan.');
+    }
+
+    /**
+     * Admin Gudang serahkan barang ke pemohon (Issued → Handed Over).
+     */
+    public function handover(int $id): RedirectResponse
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('handover', $outbound);
+
+        $this->outboundService->handoverItems($outbound, auth()->id());
+
+        return redirect()
+            ->route('outbound.show', $id)
+            ->with('success', 'Barang telah diserahkan. Menunggu konfirmasi penerimaan dari pemohon.');
+    }
+
+    /**
+     * Pemohon konfirmasi penerimaan barang (Handed Over → Completed).
+     */
+    public function pickup(int $id): RedirectResponse
+    {
+        $outbound = $this->outboundService->findOutbound($id);
+        Gate::authorize('pickup', $outbound);
+
+        $this->outboundService->pickupItems($outbound, auth()->id());
+
+        return redirect()
+            ->route('outbound.show', $id)
+            ->with('success', 'Penerimaan barang berhasil dikonfirmasi. Transaksi selesai.');
     }
 
     /**
@@ -157,10 +304,7 @@ class OutboundController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $outbound = $this->outboundService->findOutbound($id);
-
-        if ($outbound->requester_id !== auth()->id()) {
-            abort(403, 'Anda hanya dapat membatalkan pengajuan milik sendiri.');
-        }
+        Gate::authorize('delete', $outbound);
 
         $this->outboundService->cancelRequest($outbound);
 

@@ -1,6 +1,6 @@
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { PageProps, Item, Department } from '../../Types';
+import { PageProps, Item, Department, OutboundTransaction } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Combobox, Breadcrumbs, Textarea, Label, DatePicker } from '../../Components/UI';
 import { ComboboxOption } from '../../Components/UI/Combobox';
@@ -11,18 +11,32 @@ interface Props extends PageProps {
     items: Item[];
     departments: Department[];
     nextDocument?: string;
+    outbound?: OutboundTransaction;
 }
 
-/** Halaman form pengajuan barang baru. */
-export default function OutboundForm({ items, departments, nextDocument }: Props) {
+/** Halaman form pengajuan barang — mendukung mode Buat dan Edit. */
+export default function OutboundForm({ items, departments, nextDocument, outbound }: Props) {
     const { auth } = usePage<PageProps>().props;
+    const isEdit = !!outbound;
 
-    const { data, setData, post, processing, errors } = useForm({
-        department_id: auth.user.department_id?.toString() || '',
-        transaction_date: normalizeDate(),
-        is_special_request: false,
-        notes: '',
-        details: [{ ...emptyDetail }],
+    const initialDetails: OutboundDetailRow[] = isEdit
+        ? (outbound.details ?? []).map(d => ({
+            item_id: d.item_id.toString(),
+            quantity_requested: d.quantity_requested.toString(),
+            notes: d.notes ?? '',
+        }))
+        : [{ ...emptyDetail }];
+
+    const { data, setData, post, put, processing, errors } = useForm({
+        department_id: isEdit
+            ? outbound.department_id.toString()
+            : (auth.user.department_id?.toString() || ''),
+        transaction_date: isEdit
+            ? normalizeDate(outbound.transaction_date)
+            : normalizeDate(),
+        is_special_request: isEdit ? outbound.is_special_request : false,
+        notes: isEdit ? (outbound.notes ?? '') : '',
+        details: initialDetails,
     });
 
     const addDetail = () => {
@@ -49,22 +63,32 @@ export default function OutboundForm({ items, departments, nextDocument }: Props
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/outbound');
+        if (isEdit) {
+            put(`/outbound/${outbound.id}`);
+        } else {
+            post('/outbound');
+        }
     };
 
+    const pageTitle = isEdit ? 'Edit Pengajuan Barang' : 'Buat Pengajuan Barang';
+    const documentNumber = isEdit ? outbound.document_number : nextDocument;
+
     return (
-        <AuthenticatedLayout title="Buat Pengajuan Barang">
-            <Head title="Buat Pengajuan Barang" />
+        <AuthenticatedLayout title={pageTitle}>
+            <Head title={pageTitle} />
 
             <Breadcrumbs items={[
                 { label: 'Pengajuan Barang', href: '/outbound' },
-                { label: 'Buat Pengajuan' },
+                { label: isEdit ? 'Edit Pengajuan' : 'Buat Pengajuan' },
             ]} />
 
             <PageHeader
-                title="Buat Pengajuan Barang"
-                description="Ajukan kebutuhan ATK untuk unit kerja Anda"
-                backUrl="/outbound"
+                title={pageTitle}
+                description={isEdit
+                    ? `Edit pengajuan ${outbound.document_number}`
+                    : 'Ajukan kebutuhan ATK untuk unit kerja Anda'
+                }
+                backUrl={isEdit ? `/outbound/${outbound.id}` : '/outbound'}
             />
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -75,7 +99,7 @@ export default function OutboundForm({ items, departments, nextDocument }: Props
                         <div>
                             <Label htmlFor="document_number">No. Dokumen</Label>
                             <div className="mt-1 px-3 py-2 bg-gray-100 rounded-lg text-sm font-mono font-medium text-gray-700 border border-gray-200">
-                                {nextDocument || 'Auto-generated'}
+                                {documentNumber || 'Auto-generated'}
                             </div>
                         </div>
 
@@ -90,19 +114,10 @@ export default function OutboundForm({ items, departments, nextDocument }: Props
                         />
 
                         <div>
-                            <Label htmlFor="department_id" required>Unit Kerja</Label>
-                            <Combobox
-                                id="department_id"
-                                options={departments.map((dept): ComboboxOption => ({
-                                    value: dept.id.toString(),
-                                    label: dept.name,
-                                }))}
-                                value={data.department_id}
-                                onChange={(val) => setData('department_id', val)}
-                                placeholder="— Cari unit kerja —"
-                                searchPlaceholder="Ketik nama unit kerja..."
-                                error={errors.department_id}
-                            />
+                            <Label htmlFor="department_id">Unit Kerja</Label>
+                            <div className="mt-1 px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border border-gray-200">
+                                {auth.user.department?.name ?? 'Tidak ada unit'}
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3 mt-6">
@@ -167,10 +182,13 @@ export default function OutboundForm({ items, departments, nextDocument }: Props
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div className="flex items-center gap-3">
                         <Button type="submit" disabled={processing}>
-                            {processing ? 'Mengirim...' : 'Kirim Pengajuan'}
+                            {processing
+                                ? 'Menyimpan...'
+                                : isEdit ? 'Simpan Perubahan' : 'Kirim Pengajuan'
+                            }
                         </Button>
                         <Link
-                            href="/outbound"
+                            href={isEdit ? `/outbound/${outbound.id}` : '/outbound'}
                             className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
                         >
                             Batal

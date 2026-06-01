@@ -44,6 +44,11 @@ interface ReportRepositoryInterface
     public function getStockLedger(int $itemId, ?string $startDate = null, ?string $endDate = null, ?string $movementType = null): Collection;
 
     /**
+     * Ambil total pengeluaran per item untuk unit kerja tertentu dalam rentang tanggal.
+     */
+    public function getDepartmentTotals(int $departmentId, string $startDate, string $endDate): Collection;
+
+    /**
      * Ambil daftar item untuk pilihan dropdown (id, name, item_code).
      */
     public function getItemOptions(): Collection;

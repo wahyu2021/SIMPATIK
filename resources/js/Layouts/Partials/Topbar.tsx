@@ -2,6 +2,7 @@ import { Link, usePage, router } from '@inertiajs/react';
 import { Menu, LogOut, UserCircle, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { PageProps } from '../../Types';
+import NotificationDropdown from './NotificationDropdown';
 
 /**
  * Props untuk komponen Topbar.
@@ -67,7 +68,10 @@ export default function Topbar({ onMenuToggle }: TopbarProps) {
                 </div>
 
                 {/* ── Right: User Profile ── */}
-                <div className="flex items-center gap-3" ref={dropdownRef}>
+                <div className="flex items-center gap-4" ref={dropdownRef}>
+                    {/* Notifikasi Lonceng */}
+                    <NotificationDropdown />
+
                     <div className="relative">
                         <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}

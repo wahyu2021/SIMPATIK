@@ -17,7 +17,7 @@ class UpdateItemRequest extends FormRequest
             'category_id'        => ['required', 'exists:categories,id'],
             'name'               => ['required', 'string', 'max:255'],
             'unit_of_measure'    => ['required', 'string', 'max:50'],
-            'unit_price'         => ['required', 'numeric', 'min:0'],
+            'unit_price'         => ['nullable', 'numeric', 'min:0'],
             'minimum_stock_level'=> ['required', 'integer', 'min:0'],
         ];
     }

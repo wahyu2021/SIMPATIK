@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, PackageSearch } from 'lucide-react';
+import { Plus, PackageSearch, PackagePlus } from 'lucide-react';
 import { PageProps, PaginatedData, OutboundTransaction, Department } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Alert, Pagination, ConfirmDialog, Breadcrumbs, EmptyState } from '../../Components/UI';
 import OutboundFilters from '../../Components/Features/Outbound/OutboundFilters';
 import OutboundTable from '../../Components/Features/Outbound/OutboundTable';
+import OutboundWorkflowGuide from '../../Components/Features/Outbound/OutboundWorkflowGuide';
 
 interface Props extends PageProps {
     outbounds: PaginatedData<OutboundTransaction>;
@@ -18,9 +19,10 @@ export default function OutboundIndex({ outbounds, filters, departments }: Props
     const [deleteTarget, setDeleteTarget] = useState<OutboundTransaction | null>(null);
     const [deleting, setDeleting] = useState(false);
 
-    const canCreate = auth.user.roles?.some(r =>
-        ['warehouse_admin', 'staff'].includes(r.name)
-    );
+    const userRoles = auth.user.roles?.map(r => r.name) ?? [];
+    const isAdmin = userRoles.includes('warehouse_admin');
+    const isPenyelia = userRoles.includes('division_head');
+    const canCreate = isAdmin || userRoles.includes('staff');
 
     const handleDelete = () => {
         if (!deleteTarget) return;
@@ -45,22 +47,32 @@ export default function OutboundIndex({ outbounds, filters, departments }: Props
             <PageHeader
                 title="Pengajuan Barang"
                 description="Pengajuan kebutuhan ATK oleh unit kerja"
-                action={canCreate ? (
-                    <Link href="/outbound/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Buat Pengajuan
-                        </Button>
-                    </Link>
-                ) : undefined}
+                action={
+                    <div className="flex gap-2">
+                        {isAdmin && (
+                            <Link href={route('outbound.create-direct')}>
+                                <Button variant="outline" className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+                                    <PackagePlus className="w-4 h-4" />
+                                    Input Langsung
+                                </Button>
+                            </Link>
+                        )}
+                        {canCreate && (
+                            <Link href="/outbound/create">
+                                <Button className="flex items-center gap-2">
+                                    <Plus className="w-4 h-4" />
+                                    Buat Pengajuan
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
+                }
             />
 
-            {flash?.success && (
-                <Alert type="success" className="mb-4">{flash.success}</Alert>
-            )}
-            {flash?.error && (
-                <Alert type="error" className="mb-4">{flash.error}</Alert>
-            )}
+            {flash?.success && <Alert type="success" className="mb-4">{flash.success}</Alert>}
+            {flash?.error && <Alert type="error" className="mb-4">{flash.error}</Alert>}
+
+            <OutboundWorkflowGuide isAdmin={isAdmin} isPenyelia={isPenyelia} canCreate={canCreate} />
 
             <div className="mb-4">
                 <OutboundFilters filters={filters} departments={departments} />

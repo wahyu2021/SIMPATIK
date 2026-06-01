@@ -42,3 +42,61 @@ export function normalizeDate(dateStr?: string): string {
     if (!dateStr) return new Date().toISOString().split('T')[0];
     return dateStr.split('T')[0];
 }
+
+/** Format tanggal + waktu lengkap: "2026-04-29T14:30:00" → "Selasa, 29 Apr 2026 14.30" */
+export function formatDateTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const datePart = date.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    });
+    const timePart = date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+    return `${datePart} ${timePart}`;
+}
+
+/**
+ * Format timestamp ke waktu relatif dalam Bahasa Indonesia.
+ * Contoh: "2 menit lalu", "1 jam lalu", "3 hari lalu"
+ */
+export function formatTimeAgo(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+        return 'Baru saja';
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+        return `${diffInMinutes} menit lalu`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+        return `${diffInHours} jam lalu`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+        return `${diffInDays} hari lalu`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+        return `${diffInWeeks} minggu lalu`;
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+        return `${diffInMonths} bulan lalu`;
+    }
+
+    const diffInYears = Math.floor(diffInDays / 365);
+    return `${diffInYears} tahun lalu`;
+}

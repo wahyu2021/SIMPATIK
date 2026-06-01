@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasAuditLog;
 use App\Traits\HasSignature;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,11 +15,12 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, HasSignature, Notifiable, SoftDeletes;
+    use HasAuditLog, HasFactory, HasRoles, HasSignature, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
         'email',
+        'phone_number',
         'password',
         'signature_path',
         'is_active',
@@ -30,6 +32,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = ['signature_url'];
+
     protected function casts(): array
     {
         return [
@@ -37,6 +41,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * URL publik tanda tangan user (null jika belum ada).
+     */
+    public function getSignatureUrlAttribute(): ?string
+    {
+        return $this->getSignatureUrl();
     }
 
     /**

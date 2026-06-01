@@ -1,5 +1,7 @@
 /.phpunit.cache
 /node_modules
+/whatsapp-gateway/node_modules
+/whatsapp-gateway/auth_info
 /public/build
 /public/hot
 /public/storage

@@ -1,9 +1,9 @@
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertTriangle } from 'lucide-react';
 import { Item } from '../../../Types';
 import { Input, Combobox, Label } from '../../UI';
 import { ComboboxOption } from '../../UI/Combobox';
 
-/** Shape satu baris detail repeater pengajuan. */
+/** Shape satu baris detail pada form pengajuan. */
 export interface OutboundDetailRow {
     item_id: string;
     quantity_requested: string;
@@ -23,18 +23,12 @@ interface OutboundDetailRowProps {
     onRemove: (index: number) => void;
 }
 
-/** Satu baris repeater detail pengajuan barang (pilih barang, jumlah, catatan per item). */
+/** Satu baris repeater pada form pengajuan barang (pilih barang, jumlah, catatan). */
 export default function OutboundDetailRowComponent({
-    index,
-    detail,
-    items,
-    usedItemIds,
-    errors,
-    canRemove,
-    onUpdate,
-    onRemove,
+    index, detail, items, usedItemIds, errors, canRemove, onUpdate, onRemove,
 }: OutboundDetailRowProps) {
     const selectedItem = items.find(i => i.id.toString() === detail.item_id);
+    const qtyExceedsStock = selectedItem && Number(detail.quantity_requested) > selectedItem.current_stock;
 
     const itemOptions: ComboboxOption[] = items.map((item) => ({
         value: item.id.toString(),
@@ -93,6 +87,14 @@ export default function OutboundDetailRowComponent({
                         error={errors[`details.${index}.quantity_requested`]}
                         required
                     />
+                    {qtyExceedsStock && (
+                        <div className="flex items-start gap-1.5 mt-1.5 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-amber-700">
+                                Melebihi stok tersedia (<span className="font-semibold">{selectedItem.current_stock} {selectedItem.unit_of_measure}</span>). Pengajuan bisa ditolak saat pengeluaran barang.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="sm:col-span-4">

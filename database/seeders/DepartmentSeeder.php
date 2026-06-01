@@ -23,6 +23,8 @@ class DepartmentSeeder extends Seeder
             'Bagian Operasional',
             'Bagian Pemasaran',
             'Bagian Kredit',
+            'Satpam / Keamanan',
+            'Lainnya / Umum',
         ];
 
         foreach ($departments as $name) {

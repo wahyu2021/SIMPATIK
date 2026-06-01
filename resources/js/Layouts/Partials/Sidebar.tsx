@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronLeft } from 'lucide-react';
 import { menuGroups, type MenuGroup } from '../../Config/navigation';
 import { PageProps } from '../../Types';
+import { Logo } from '../../Components/UI';
 
 /**
  * Props untuk komponen Sidebar.
@@ -64,12 +65,10 @@ export default function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) 
                 ${collapsed ? 'justify-center px-2' : 'px-5'}
             `}>
                 {collapsed ? (
-                    <span className="text-xl font-bold text-white tracking-tight">S</span>
+                    <Logo size="md" />
                 ) : (
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur">
-                            <span className="text-sm font-bold text-white">S</span>
-                        </div>
+                        <Logo size="md" />
                         <div>
                             <h1 className="text-base font-bold tracking-tight leading-none">SIMPATIK</h1>
                             <p className="text-[10px] text-blue-200/70 leading-none mt-0.5">Bank Sumsel Babel</p>

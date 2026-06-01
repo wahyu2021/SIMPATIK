@@ -32,8 +32,7 @@ class SettingController extends Controller
             'company_address' => 'required|string|max:500',
             'document_prefix_inbound' => 'required|string|max:10',
             'document_prefix_outbound' => 'required|string|max:10',
-            'wa_api_url' => 'nullable|url|max:500',
-            'wa_api_token' => 'nullable|string|max:500',
+            'wa_api_url' => 'nullable|string|max:500',
             'wa_alert_numbers' => 'nullable|string|max:500',
             'ml_api_url' => 'nullable|url|max:500',
         ]);
@@ -41,7 +40,7 @@ class SettingController extends Controller
         $data = $request->only([
             'company_name', 'company_branch', 'company_address',
             'document_prefix_inbound', 'document_prefix_outbound',
-            'wa_api_url', 'wa_api_token', 'wa_alert_numbers', 'ml_api_url',
+            'wa_api_url', 'wa_alert_numbers', 'ml_api_url',
         ]);
 
         foreach ($data as $key => $value) {

@@ -2,9 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Item;
 use App\Models\Setting;
+use App\Models\StockLedger;
+use App\Models\User;
+use App\Notifications\LowStockAlertNotification;
 use App\Repositories\Contracts\ReportRepositoryInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class ReportService
 {
@@ -13,12 +19,12 @@ class ReportService
     ) {}
 
     /**
-     * Ambil data Saldistat ATK — saldo awal, penerimaan, pengeluaran, saldo akhir per item.
+     * Ambil data Rekapitulasi Mutasi Barang — saldo awal, penerimaan, pengeluaran, saldo akhir per item.
      * Grouped by kategori dengan subtotal.
      *
      * @return array{categories: array, summary: array, period: array}
      */
-    public function getSaldistat(int $month, int $year, ?int $categoryId = null): array
+    public function getMutationReport(int $month, int $year, ?int $categoryId = null): array
     {
         [$periodStart, $periodEnd, $prevEnd] = $this->getPeriodDates($month, $year);
 
@@ -30,7 +36,7 @@ class ReportService
 
         // Build grouped result
         $categories = [];
-        $summary = ['opening_value' => 0, 'inbound_value' => 0, 'outbound_value' => 0, 'closing_value' => 0];
+        $summary = ['opening_qty' => 0, 'inbound_qty' => 0, 'outbound_qty' => 0, 'closing_qty' => 0];
         $itemNumber = 0;
 
         foreach ($items as $item) {
@@ -52,15 +58,15 @@ class ReportService
             $row = $this->buildItemRow(++$itemNumber, $item, $openingData, $inboundData, $outboundData);
 
             $categories[$catId]['items'][] = $row;
-            $categories[$catId]['subtotal_opening'] += $row['opening_value'];
-            $categories[$catId]['subtotal_inbound'] += $row['inbound_value'];
-            $categories[$catId]['subtotal_outbound'] += $row['outbound_value'];
-            $categories[$catId]['subtotal_closing'] += $row['closing_value'];
+            $categories[$catId]['subtotal_opening'] += $row['opening_qty'];
+            $categories[$catId]['subtotal_inbound'] += $row['inbound_qty'];
+            $categories[$catId]['subtotal_outbound'] += $row['outbound_qty'];
+            $categories[$catId]['subtotal_closing'] += $row['closing_qty'];
 
-            $summary['opening_value'] += $row['opening_value'];
-            $summary['inbound_value'] += $row['inbound_value'];
-            $summary['outbound_value'] += $row['outbound_value'];
-            $summary['closing_value'] += $row['closing_value'];
+            $summary['opening_qty'] += $row['opening_qty'];
+            $summary['inbound_qty'] += $row['inbound_qty'];
+            $summary['outbound_qty'] += $row['outbound_qty'];
+            $summary['closing_qty'] += $row['closing_qty'];
         }
 
         return [
@@ -124,6 +130,31 @@ class ReportService
     }
 
     /**
+     * Ambil data laporan penggunaan barang per unit kerja.
+     */
+    public function getDepartmentReportData(int $departmentId, int $month, int $year): array
+    {
+        [$startDate, $endDate] = $this->getPeriodDates($month, $year);
+
+        $items = $this->reportRepository->getDepartmentTotals($departmentId, $startDate, $endDate);
+
+        return [
+            'items' => $items->map(fn($i) => [
+                'id' => $i->id,
+                'name' => $i->name,
+                'item_code' => $i->item_code,
+                'unit_of_measure' => $i->unit_of_measure,
+                'total_qty' => (int) $i->total_qty,
+            ])->toArray(),
+            'period' => [
+                'month' => $month,
+                'year' => $year,
+                'label' => Carbon::create($year, $month, 1)->translatedFormat('F Y'),
+            ],
+        ];
+    }
+
+    /**
      * Ambil daftar item untuk dropdown.
      */
     public function getItemOptions(): array
@@ -174,26 +205,60 @@ class ReportService
     }
 
     /**
-     * Simpan rekonsiliasi bulanan.
+     * Simpan rekonsiliasi bulanan dan lakukan penyesuaian stok jika ada selisih.
      */
     public function saveReconciliation(int $month, int $year, int $userId, array $details, ?string $notes = null): object
     {
-        return $this->reportRepository->saveReconciliation(
-            [
-                'month' => $month,
-                'year' => $year,
-                'reconciliation_date' => now(),
-                'created_by' => $userId,
-                'notes' => $notes,
-            ],
-            collect($details)->map(fn ($d) => [
-                'item_id' => $d['item_id'],
-                'system_qty' => $d['system_qty'],
-                'physical_qty' => $d['physical_qty'],
-                'difference' => $d['physical_qty'] - $d['system_qty'],
-                'notes' => $d['notes'] ?? null,
-            ])->toArray()
-        );
+        return DB::transaction(function () use ($month, $year, $userId, $details, $notes) {
+            // 1. Simpan Header & Detail Rekonsiliasi
+            $recon = $this->reportRepository->saveReconciliation(
+                [
+                    'month' => $month,
+                    'year' => $year,
+                    'reconciliation_date' => now(),
+                    'created_by' => $userId,
+                    'notes' => $notes,
+                ],
+                collect($details)->map(fn ($d) => [
+                    'item_id' => $d['item_id'],
+                    'system_qty' => $d['system_qty'],
+                    'physical_qty' => $d['physical_qty'],
+                    'difference' => $d['physical_qty'] - $d['system_qty'],
+                    'notes' => $d['notes'] ?? null,
+                ])->toArray()
+            );
+
+            // 2. Proses Adjustment Stok jika ada perbedaan
+            foreach ($details as $d) {
+                $diff = $d['physical_qty'] - $d['system_qty'];
+                
+                if ($diff != 0) {
+                    $item = Item::lockForUpdate()->findOrFail($d['item_id']);
+                    
+                    // Update stok aktual sistem ke angka fisik hasil audit
+                    $item->update(['current_stock' => $d['physical_qty']]);
+
+                    // Catat riwayat penyesuaian (Adjustment) di Kartu Stok
+                    StockLedger::create([
+                        'item_id'            => $d['item_id'],
+                        'transaction_date'   => now(),
+                        'movement_type'      => 'adjustment',
+                        'document_reference' => "RECON-{$month}-{$year}",
+                        'qty_in'             => $diff > 0 ? $diff : 0,
+                        'qty_out'            => $diff < 0 ? abs($diff) : 0,
+                        'ending_balance'     => $d['physical_qty'],
+                    ]);
+
+                    // Trigger Notifikasi jika stok hasil rekonsiliasi rendah
+                    if ($item->current_stock <= $item->minimum_stock_level) {
+                        $admins = User::role('warehouse_admin')->get();
+                        Notification::send($admins, new LowStockAlertNotification($item));
+                    }
+                }
+            }
+
+            return $recon;
+        });
     }
 
     // ─── Private Helpers ───
@@ -212,41 +277,24 @@ class ReportService
     }
 
     /**
-     * Build satu baris item dengan kalkulasi saldo.
+     * Build satu baris item dengan kalkulasi saldo (murni kuantitas).
      */
     private function buildItemRow(int $no, $item, $openingData, $inboundData, $outboundData): array
     {
-        $unitPrice = (float) $item->unit_price;
-
         $openingQty = isset($openingData[$item->id]) ? $openingData[$item->id]->ending_balance : 0;
-        $openingValue = $openingQty * $unitPrice;
-
         $inQty = isset($inboundData[$item->id]) ? (int) $inboundData[$item->id]->total_qty : 0;
-        $inValue = isset($inboundData[$item->id]) ? (float) $inboundData[$item->id]->total_value : 0;
-        if ($inQty > 0 && $inValue == 0) {
-            $inValue = $inQty * $unitPrice;
-        }
-
         $outQty = isset($outboundData[$item->id]) ? (int) $outboundData[$item->id]->total_qty : 0;
-        $outValue = $outQty * $unitPrice;
-
         $closingQty = $openingQty + $inQty - $outQty;
-        $closingValue = $closingQty * $unitPrice;
 
         return [
             'no' => $no,
             'item_id' => $item->id,
             'name' => $item->name,
             'unit' => $item->unit_of_measure,
-            'unit_price' => $unitPrice,
             'opening_qty' => $openingQty,
-            'opening_value' => $openingValue,
             'inbound_qty' => $inQty,
-            'inbound_value' => $inValue,
             'outbound_qty' => $outQty,
-            'outbound_value' => $outValue,
             'closing_qty' => $closingQty,
-            'closing_value' => $closingValue,
         ];
     }
 }
