@@ -118,6 +118,7 @@ class OutboundController extends Controller
 
         $data = $request->validated();
         $data['requester_id'] = auth()->id();
+        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
 
         $this->outboundService->createRequest($data);
 
@@ -207,7 +208,10 @@ class OutboundController extends Controller
         $outbound = $this->outboundService->findOutbound($id);
         Gate::authorize('update', $outbound);
 
-        $this->outboundService->updateRequest($outbound, $request->validated());
+        $data = $request->validated();
+        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+
+        $this->outboundService->updateRequest($outbound, $data);
 
         return redirect()
             ->route('outbound.show', $id)
@@ -250,12 +254,14 @@ class OutboundController extends Controller
     /**
      * Admin Gudang menyetujui pengeluaran barang (Approved → Issued).
      */
-    public function issue(int $id): RedirectResponse
+    public function issue(Request $request, int $id): RedirectResponse
     {
         $outbound = $this->outboundService->findOutbound($id);
         Gate::authorize('issue', $outbound);
 
-        $this->outboundService->issueItems($outbound, auth()->id());
+        $quantities = $request->input('quantities');
+
+        $this->outboundService->issueItems($outbound, auth()->id(), $quantities);
 
         return redirect()
             ->route('outbound.show', $id)

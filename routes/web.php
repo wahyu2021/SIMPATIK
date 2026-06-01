@@ -67,6 +67,9 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('users', UserManagementController::class);
             Route::post('users/{id}/toggle-status', [UserManagementController::class, 'toggleStatus'])
                 ->name('users.toggle-status');
+            
+            Route::get('audit-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('audit-logs.index');
+            Route::get('audit-logs/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('audit-logs.show');
         });
 
         // Profile
@@ -95,6 +98,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('departments', DepartmentController::class);
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/department', [ReportController::class, 'departmentReport'])->name('reports.department');
+        Route::get('/reports/export/mutation', [ReportController::class, 'exportMutationPdf'])->name('reports.export.mutation');
+        Route::get('/reports/export/mutation/excel', [ReportController::class, 'exportMutationExcel'])->name('reports.export.mutation.excel');
+        Route::get('/reports/export/department', [ReportController::class, 'exportDepartmentPdf'])->name('reports.export.department');
+        Route::get('/reports/export/department/excel', [ReportController::class, 'exportDepartmentExcel'])->name('reports.export.department.excel');
         Route::get('/reports/breakdown/{itemId}', [ReportController::class, 'breakdown'])->name('reports.breakdown');
         Route::get('/reports/stock-ledger', [ReportController::class, 'stockLedger'])->name('reports.stock-ledger');
         Route::get('/reports/reconciliation', [ReportController::class, 'reconciliation'])->name('reports.reconciliation');

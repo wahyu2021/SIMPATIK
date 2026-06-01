@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Models\Item;
 use App\Models\Setting;
 use App\Models\StockLedger;
+use App\Models\User;
+use App\Notifications\LowStockAlertNotification;
 use App\Repositories\Contracts\ReportRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class ReportService
 {
@@ -127,6 +130,31 @@ class ReportService
     }
 
     /**
+     * Ambil data laporan penggunaan barang per unit kerja.
+     */
+    public function getDepartmentReportData(int $departmentId, int $month, int $year): array
+    {
+        [$startDate, $endDate] = $this->getPeriodDates($month, $year);
+
+        $items = $this->reportRepository->getDepartmentTotals($departmentId, $startDate, $endDate);
+
+        return [
+            'items' => $items->map(fn($i) => [
+                'id' => $i->id,
+                'name' => $i->name,
+                'item_code' => $i->item_code,
+                'unit_of_measure' => $i->unit_of_measure,
+                'total_qty' => (int) $i->total_qty,
+            ])->toArray(),
+            'period' => [
+                'month' => $month,
+                'year' => $year,
+                'label' => Carbon::create($year, $month, 1)->translatedFormat('F Y'),
+            ],
+        ];
+    }
+
+    /**
      * Ambil daftar item untuk dropdown.
      */
     public function getItemOptions(): array
@@ -220,6 +248,12 @@ class ReportService
                         'qty_out'            => $diff < 0 ? abs($diff) : 0,
                         'ending_balance'     => $d['physical_qty'],
                     ]);
+
+                    // Trigger Notifikasi jika stok hasil rekonsiliasi rendah
+                    if ($item->current_stock <= $item->minimum_stock_level) {
+                        $admins = User::role('warehouse_admin')->get();
+                        Notification::send($admins, new LowStockAlertNotification($item));
+                    }
                 }
             }
 

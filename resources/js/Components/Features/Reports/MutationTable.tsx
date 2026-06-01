@@ -111,7 +111,8 @@ function CategoryGroup({ category, fmtQty, onShowBreakdown }: {
                             {item.outbound_qty > 0 && (
                                 <button 
                                     onClick={() => onShowBreakdown(item.item_id, item.name)}
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-blue-600 hover:bg-blue-50 rounded transition-all title=\"Lihat Detail Pengeluaran\""
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-blue-600 hover:bg-blue-50 rounded transition-all"
+                                    title="Lihat Detail Pengeluaran"
                                 >
                                     <Search className="w-3.5 h-3.5" />
                                 </button>

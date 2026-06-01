@@ -14,7 +14,7 @@ class StoreOutboundRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'department_id'    => 'required|exists:departments,id',
+            'department_id'    => 'nullable|exists:departments,id',
             'transaction_date' => 'required|date|before_or_equal:today',
             'is_special_request' => 'boolean',
             'notes'            => 'nullable|string|max:1000',

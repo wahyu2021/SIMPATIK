@@ -2,48 +2,57 @@
 
 namespace App\Traits;
 
+use App\Models\ActivityLog;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+
+/**
+ * Trait HasAuditLog
+ * Otomatis mencatat aktivitas CRUD ke tabel activity_logs.
+ */
 trait HasAuditLog
 {
-    /**
-     * Boot the trait
-     */
     protected static function bootHasAuditLog(): void
     {
-        static::creating(function ($model) {
-            $model->created_by = auth()->id();
-            $model->created_ip = request()->ip();
+        static::created(function (Model $model) {
+            static::logActivity($model, 'created', 'Dibuat');
         });
 
-        static::updating(function ($model) {
-            $model->updated_by = auth()->id();
-            $model->updated_ip = request()->ip();
+        static::updated(function (Model $model) {
+            $changes = $model->getChanges();
+            // Hapus updated_at dari tracking perubahan
+            unset($changes['updated_at']);
+
+            if (empty($changes)) return;
+
+            $properties = [
+                'old' => array_intersect_key($model->getOriginal(), $changes),
+                'new' => $changes,
+            ];
+
+            static::logActivity($model, 'updated', 'Diperbarui', $properties);
+        });
+
+        static::deleted(function (Model $model) {
+            static::logActivity($model, 'deleted', 'Dihapus');
         });
     }
 
     /**
-     * Get creator user
+     * Simpan log ke database.
      */
-    public function creator()
+    protected static function logActivity(Model $model, string $description, string $label, array $properties = []): void
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
-    }
-
-    /**
-     * Get updater user
-     */
-    public function updater()
-    {
-        return $this->belongsTo(\App\Models\User::class, 'updated_by');
-    }
-
-    /**
-     * Get audit trail text
-     */
-    public function getAuditTrail(): string
-    {
-        $creator = $this->creator?->name ?? 'System';
-        $createdAt = $this->created_at->format('d/m/Y H:i');
-        
-        return "Dibuat oleh {$creator} pada {$createdAt} dari IP {$this->created_ip}";
+        ActivityLog::create([
+            'user_id'      => Auth::id(),
+            'log_name'     => $model->getTable(),
+            'description'  => $label,
+            'subject_type' => get_class($model),
+            'subject_id'   => $model->getKey(),
+            'properties'   => !empty($properties) ? $properties : null,
+            'ip_address'   => Request::ip(),
+            'user_agent'   => Request::userAgent(),
+        ]);
     }
 }

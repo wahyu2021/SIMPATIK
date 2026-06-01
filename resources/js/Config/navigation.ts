@@ -8,6 +8,7 @@ import {
     Users,
     BarChart3,
     Settings,
+    History,
     type LucideIcon,
 } from 'lucide-react';
 
@@ -71,6 +72,7 @@ export const menuGroups: MenuGroup[] = [
         title: 'Sistem',
         items: [
             { label: 'Pengguna', href: '/users', icon: Users, routeMatch: '/users', roles: ['warehouse_admin'] },
+            { label: 'Audit Trail', href: '/audit-logs', icon: History, routeMatch: '/audit-logs', roles: ['warehouse_admin'] },
             { label: 'Laporan', href: '/reports', icon: BarChart3, routeMatch: '/reports', roles: ['warehouse_admin', 'general_affairs'] },
             { label: 'Pengaturan', href: '/settings', icon: Settings, routeMatch: '/settings', roles: ['warehouse_admin'] },
         ],

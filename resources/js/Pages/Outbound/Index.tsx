@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, PackageSearch } from 'lucide-react';
+import { Plus, PackageSearch, PackagePlus } from 'lucide-react';
 import { PageProps, PaginatedData, OutboundTransaction, Department } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Alert, Pagination, ConfirmDialog, Breadcrumbs, EmptyState } from '../../Components/UI';

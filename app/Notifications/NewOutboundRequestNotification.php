@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\WhatsAppChannel;
 use App\Models\OutboundTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -22,7 +23,7 @@ class NewOutboundRequestNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', WhatsAppChannel::class];
     }
 
     /**
@@ -38,6 +39,16 @@ class NewOutboundRequestNotification extends Notification
             'message' => "Staf {$this->outbound->requester->name} membuat pengajuan barang baru (#{$this->outbound->document_number}) yang perlu disetujui.",
             'action_url' => route('outbound.show', $this->outbound->id),
             'type' => 'new_request',
+        ];
+    }
+
+    /**
+     * Pesan untuk WhatsApp.
+     */
+    public function toWhatsApp(object $notifiable): array
+    {
+        return [
+            'message' => "📝 *PENGAJUAN BARU (SIMPATIK)*\n\nNo. Dokumen: *#{$this->outbound->document_number}*\nPengaju: *{$this->outbound->requester->name}*\nUnit: {$this->outbound->department->name}\n\nMohon segera lakukan peninjauan dan persetujuan di aplikasi SIMPATIK. 🏦",
         ];
     }
 }

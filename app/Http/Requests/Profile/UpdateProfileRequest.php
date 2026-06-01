@@ -22,6 +22,7 @@ class UpdateProfileRequest extends FormRequest
                 'max:255',
                 Rule::unique('users')->ignore($this->user()->id),
             ],
+            'phone_number' => ['nullable', 'string', 'max:20'],
         ];
     }
 
@@ -33,6 +34,7 @@ class UpdateProfileRequest extends FormRequest
             'email.required' => 'Email harus diisi.',
             'email.email'    => 'Format email tidak valid.',
             'email.unique'   => 'Email sudah digunakan.',
+            'phone_number.max' => 'Nomor HP maksimal 20 karakter.',
         ];
     }
 }

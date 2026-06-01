@@ -8,14 +8,16 @@ interface OutboundActionsProps {
     outbound: OutboundTransaction;
     canApprove: boolean;
     canIssue: boolean;
+    canReject: boolean;
     canHandover: boolean;
     canPickup: boolean;
 }
 
 /** Panel tindakan pengajuan — approve/reject (Penyelia), issue/handover (Admin Gudang), pickup (Pemohon). */
-export default function OutboundActions({ outbound, canApprove, canIssue, canHandover, canPickup }: OutboundActionsProps) {
+export default function OutboundActions({ outbound, canApprove, canIssue, canReject, canHandover, canPickup }: OutboundActionsProps) {
     const [showRejectForm, setShowRejectForm] = useState(false);
     const [showApproveForm, setShowApproveForm] = useState(false);
+    const [showIssueForm, setShowIssueForm] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [processing, setProcessing] = useState(false);
     const [showIssueConfirm, setShowIssueConfirm] = useState(false);
@@ -26,7 +28,7 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
 
     const [quantities, setQuantities] = useState<Record<number, number>>(() => {
         const initial: Record<number, number> = {};
-        details.forEach(d => { initial[d.id] = d.quantity_requested; });
+        details.forEach(d => { initial[d.id] = outbound.status === 'Approved' ? d.quantity_approved : d.quantity_requested; });
         return initial;
     });
 
@@ -47,6 +49,16 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
             onFinish: () => {
                 setProcessing(false);
                 setShowApproveForm(false);
+            },
+        });
+    };
+
+    const handleIssueWithQty = () => {
+        setProcessing(true);
+        router.post(`/outbound/${outbound.id}/issue`, { quantities }, {
+            onFinish: () => {
+                setProcessing(false);
+                setShowIssueForm(false);
             },
         });
     };
@@ -94,15 +106,16 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
         });
     };
 
-    if (!canApprove && !canIssue && !canHandover && !canPickup) return null;
+    if (!canApprove && !canIssue && !canReject && !canHandover && !canPickup) return null;
 
     return (
         <>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Tindakan</h2>
 
+                {/* --- Aksi Approve (Penyelia) --- */}
                 {canApprove && !showRejectForm && !showApproveForm && (
-                    <div className="space-y-3">
+                    <div className="space-y-3 mb-4">
                         <div className="flex items-center gap-3">
                             <Button
                                 onClick={handleApproveQuick}
@@ -119,13 +132,6 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
                                 <Edit3 className="w-4 h-4" />
                                 Sesuaikan Jumlah
                             </button>
-                            <button
-                                onClick={() => setShowRejectForm(true)}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                            >
-                                <XCircle className="w-4 h-4" />
-                                Tolak
-                            </button>
                         </div>
                     </div>
                 )}
@@ -141,7 +147,53 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
                     />
                 )}
 
-                {canApprove && showRejectForm && (
+                {/* --- Aksi Issue (Admin Gudang) --- */}
+                {canIssue && !showRejectForm && !showIssueForm && (
+                    <div className="space-y-3 mb-4">
+                        <div className="flex items-center gap-3">
+                            <Button
+                                onClick={() => setShowIssueConfirm(true)}
+                                disabled={processing}
+                                className="flex items-center gap-2"
+                            >
+                                <PackageCheck className="w-4 h-4" />
+                                Setujui Pengeluaran Barang
+                            </Button>
+                            <button
+                                onClick={() => setShowIssueForm(true)}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                                <Edit3 className="w-4 h-4" />
+                                Sesuaikan Jumlah
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {canIssue && showIssueForm && (
+                    <ApproveQuantityForm
+                        details={details}
+                        quantities={quantities}
+                        onUpdateQty={updateQty}
+                        onSubmit={handleIssueWithQty}
+                        onCancel={() => setShowIssueForm(false)}
+                        processing={processing}
+                    />
+                )}
+
+                {/* --- Tombol Buka Form Reject --- */}
+                {canReject && !showRejectForm && !showApproveForm && !showIssueForm && (
+                    <button
+                        onClick={() => setShowRejectForm(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                    >
+                        <XCircle className="w-4 h-4" />
+                        Tolak Pengajuan
+                    </button>
+                )}
+
+                {/* --- Form Reject --- */}
+                {canReject && showRejectForm && (
                     <div className="space-y-3">
                         <Textarea
                             id="rejection_reason"
@@ -169,17 +221,6 @@ export default function OutboundActions({ outbound, canApprove, canIssue, canHan
                             </button>
                         </div>
                     </div>
-                )}
-
-                {canIssue && (
-                    <Button
-                        onClick={() => setShowIssueConfirm(true)}
-                        disabled={processing}
-                        className="flex items-center gap-2"
-                    >
-                        <PackageCheck className="w-4 h-4" />
-                        Setujui Pengeluaran Barang
-                    </Button>
                 )}
 
                 {canHandover && (

@@ -105,6 +105,29 @@ class ReportRepository implements ReportRepositoryInterface
     /**
      * {@inheritDoc}
      */
+    public function getDepartmentTotals(int $departmentId, string $startDate, string $endDate): Collection
+    {
+        return DB::table('outbound_transaction_details')
+            ->join('outbound_transactions', 'outbound_transactions.id', '=', 'outbound_transaction_details.outbound_transaction_id')
+            ->join('items', 'items.id', '=', 'outbound_transaction_details.item_id')
+            ->where('outbound_transactions.department_id', $departmentId)
+            ->whereIn('outbound_transactions.status', [OutboundStatus::Issued->value, OutboundStatus::Completed->value])
+            ->whereBetween('outbound_transactions.transaction_date', [$startDate, $endDate])
+            ->select(
+                'items.id',
+                'items.name',
+                'items.item_code',
+                'items.unit_of_measure',
+                DB::raw('SUM(outbound_transaction_details.quantity_approved) as total_qty')
+            )
+            ->groupBy('items.id', 'items.name', 'items.item_code', 'items.unit_of_measure')
+            ->orderBy('items.name')
+            ->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStockLedger(int $itemId, ?string $startDate = null, ?string $endDate = null, ?string $movementType = null): Collection
     {
         $query = StockLedger::where('item_id', $itemId)

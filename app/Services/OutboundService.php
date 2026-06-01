@@ -9,6 +9,7 @@ use App\Models\StockLedger;
 use App\Models\User;
 use App\Notifications\LowStockAlertNotification;
 use App\Notifications\NewOutboundRequestNotification;
+use App\Notifications\OutboundReadyForIssueNotification;
 use App\Notifications\OutboundStatusUpdatedNotification;
 use App\Repositories\Contracts\OutboundRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -212,23 +213,27 @@ class OutboundService
             // Notifikasi ke Pemohon
             $outbound->requester->notify(new OutboundStatusUpdatedNotification($outbound));
 
+            // Notifikasi ke Admin Gudang agar tahu ada barang yang harus disiapkan
+            $admins = User::role('warehouse_admin')->get();
+            Notification::send($admins, new OutboundReadyForIssueNotification($outbound));
+
             return $outbound;
         });
     }
 
 
     /**
-     * Penyelia tolak pengajuan (Pending → Rejected).
+     * Tolak pengajuan (Pending / Approved → Rejected).
      */
-    public function rejectRequest(OutboundTransaction $outbound, int $approverId, string $reason): OutboundTransaction
+    public function rejectRequest(OutboundTransaction $outbound, int $rejectorId, string $reason): OutboundTransaction
     {
-        if (!$outbound->isPending()) {
-            abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat ditolak.');
+        if (!$outbound->isPending() && !$outbound->isApproved()) {
+            abort(422, 'Hanya pengajuan berstatus "Menunggu" atau "Disetujui" yang dapat ditolak.');
         }
 
         $this->outboundRepository->update($outbound, [
             'status'           => OutboundStatus::Rejected,
-            'approver_id'      => $approverId,
+            'approver_id'      => $rejectorId, // Dicatat siapa yang menolak (bisa penyelia atau admin)
             'approved_at'      => now(),
             'rejection_reason' => $reason,
         ]);
@@ -245,18 +250,27 @@ class OutboundService
      * Admin Gudang menyetujui pengeluaran barang (Approved → Issued / Siap Diambil).
      * Kurangi stok dengan pessimistic lock, catat ledger OUT.
      * Barang siap diambil oleh karyawan pemohon.
+     *
+     * @param array<int,int>|null $quantities Mapping [detail_id => final_quantity_issued].
      */
-    public function issueItems(OutboundTransaction $outbound, int $issuedById): OutboundTransaction
+    public function issueItems(OutboundTransaction $outbound, int $issuedById, ?array $quantities = null): OutboundTransaction
     {
         if (!$outbound->isApproved()) {
             abort(422, 'Hanya pengajuan berstatus "Disetujui" yang dapat diproses.');
         }
 
-        return DB::transaction(function () use ($outbound, $issuedById) {
+        return DB::transaction(function () use ($outbound, $issuedById, $quantities) {
             $outbound->load('details');
 
             foreach ($outbound->details as $detail) {
-                $qtyOut = $detail->quantity_approved;
+                // Admin bisa menyesuaikan lagi jumlah yang dikeluarkan (tidak boleh melebihi yang diapprove penyelia)
+                $qtyOut = $quantities[$detail->id] ?? $detail->quantity_approved;
+                $qtyOut = min($qtyOut, $detail->quantity_approved); // Pastikan admin tidak mengeluarkan melebihi persetujuan
+
+                if ($qtyOut != $detail->quantity_approved) {
+                    $detail->update(['quantity_approved' => $qtyOut]);
+                }
+
                 if ($qtyOut <= 0) continue;
 
                 $item = Item::lockForUpdate()->findOrFail($detail->item_id);

@@ -114,19 +114,10 @@ export default function OutboundForm({ items, departments, nextDocument, outboun
                         />
 
                         <div>
-                            <Label htmlFor="department_id" required>Unit Kerja</Label>
-                            <Combobox
-                                id="department_id"
-                                options={departments.map((dept): ComboboxOption => ({
-                                    value: dept.id.toString(),
-                                    label: dept.name,
-                                }))}
-                                value={data.department_id}
-                                onChange={(val) => setData('department_id', val)}
-                                placeholder="— Cari unit kerja —"
-                                searchPlaceholder="Ketik nama unit kerja..."
-                                error={errors.department_id}
-                            />
+                            <Label htmlFor="department_id">Unit Kerja</Label>
+                            <div className="mt-1 px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border border-gray-200">
+                                {auth.user.department?.name ?? 'Tidak ada unit'}
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3 mt-6">

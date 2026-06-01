@@ -53,11 +53,13 @@ export default function ReportsIndex({ reportData, signatory, categories, filter
                         <Combobox id="category" options={catOptions} value={filters.category_id?.toString() || ''} onChange={(v) => handleFilter('category_id', v)} placeholder="Semua" />
                     </div>
                     <div className="ml-auto flex gap-2">
-                        <a href={`/reports/export/excel?month=${filters.month}&year=${filters.year}&category_id=${filters.category_id || ''}`}
+                        <a href={route('reports.export.mutation.excel', { month: filters.month, year: filters.year, category_id: filters.category_id })}
+                            target="_blank"
                             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
                             <FileSpreadsheet className="w-4 h-4" /> Excel
                         </a>
-                        <a href={`/reports/export/pdf?month=${filters.month}&year=${filters.year}&category_id=${filters.category_id || ''}`}
+                        <a href={route('reports.export.mutation', { month: filters.month, year: filters.year, category_id: filters.category_id })}
+                            target="_blank"
                             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors">
                             <FileText className="w-4 h-4" /> PDF
                         </a>

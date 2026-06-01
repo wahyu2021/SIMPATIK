@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasAuditLog;
 use App\Traits\HasSignature;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, HasSignature, Notifiable, SoftDeletes;
+    use HasAuditLog, HasFactory, HasRoles, HasSignature, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',

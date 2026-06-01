@@ -51,9 +51,14 @@ class OutboundPolicy
 
     /**
      * Penyelia unit kerja yang sama boleh menolak pengajuan berstatus Pending.
+     * Admin Gudang juga boleh menolak jika status Pending atau Approved.
      */
     public function reject(User $user, OutboundTransaction $outbound): bool
     {
+        if ($user->hasRole('warehouse_admin') && ($outbound->isPending() || $outbound->isApproved())) {
+            return true;
+        }
+
         return $this->approve($user, $outbound);
     }
 

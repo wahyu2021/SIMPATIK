@@ -1,5 +1,5 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Building2, FileText, MessageSquare, BrainCircuit, Save } from 'lucide-react';
+import { Building2, FileText, MessageSquare, BrainCircuit, Save, Server } from 'lucide-react';
 import { PageProps } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Input, Alert, Breadcrumbs } from '../../Components/UI';
@@ -17,8 +17,7 @@ export default function SettingsIndex({ settings }: Props) {
         company_address: settings.company_address || '',
         document_prefix_inbound: settings.document_prefix_inbound || '',
         document_prefix_outbound: settings.document_prefix_outbound || '',
-        wa_api_url: settings.wa_api_url || '',
-        wa_api_token: settings.wa_api_token || '',
+        wa_api_url: settings.wa_api_url || 'http://127.0.0.1:3000/send-message',
         wa_alert_numbers: settings.wa_alert_numbers || '',
         ml_api_url: settings.ml_api_url || '',
     });
@@ -137,42 +136,42 @@ export default function SettingsIndex({ settings }: Props) {
                             <MessageSquare className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900">Integrasi WhatsApp</h2>
-                            <p className="text-xs text-gray-500">Notifikasi otomatis saat stok rendah atau pengajuan baru</p>
+                            <h2 className="text-lg font-semibold text-gray-900">Integrasi WhatsApp Gateway</h2>
+                            <p className="text-xs text-gray-500">Menggunakan layanan bot lokal untuk pengiriman pesan</p>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3 mb-2">
+                            <Server className="w-5 h-5 text-blue-600 mt-0.5" />
+                            <div className="text-xs text-blue-800 leading-relaxed">
+                                <strong>Info Gateway:</strong> Sistem menggunakan folder <code className="bg-blue-100 px-1 rounded">whatsapp-gateway</code> yang harus dijalankan secara terpisah (Node.js) di server lokal atau VPS Anda.
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
                             <Input
                                 id="wa_api_url"
-                                label="WA API URL"
-                                type="url"
-                                placeholder="https://api.example.com/send"
+                                label="Alamat API Gateway (Local)"
+                                type="text"
+                                placeholder="http://127.0.0.1:3000/send-message"
                                 value={data.wa_api_url}
                                 onChange={(e) => setData('wa_api_url', e.target.value)}
                                 error={errors.wa_api_url}
-                            />
-                            <Input
-                                id="wa_api_token"
-                                label="WA API Token"
-                                type="password"
-                                placeholder="Token autentikasi"
-                                value={data.wa_api_token}
-                                onChange={(e) => setData('wa_api_token', e.target.value)}
-                                error={errors.wa_api_token}
                             />
                         </div>
                         <div>
                             <Input
                                 id="wa_alert_numbers"
-                                label="Nomor Penerima Notifikasi"
+                                label="Nomor HP Admin (Penerima Alert Stok)"
                                 placeholder="628123456789, 628987654321"
                                 value={data.wa_alert_numbers}
                                 onChange={(e) => setData('wa_alert_numbers', e.target.value)}
                                 error={errors.wa_alert_numbers}
                             />
-                            <p className="text-xs text-gray-400 mt-1">Pisahkan dengan koma untuk beberapa nomor</p>
+                            <p className="text-xs text-gray-400 mt-1 italic">
+                                * Gunakan format internasional tanpa simbol (contoh: 62812...). Pisahkan dengan koma jika lebih dari satu.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -207,7 +206,7 @@ export default function SettingsIndex({ settings }: Props) {
                             <Save className="w-4 h-4" />
                             {processing ? 'Menyimpan...' : 'Simpan Pengaturan'}
                         </Button>
-                        <span className="text-sm text-gray-400">Perubahan akan langsung diterapkan</span>
+                        <span className="text-sm text-gray-400">Perubahan akan langsung diterapkan ke seluruh sistem</span>
                     </div>
                 </div>
             </form>

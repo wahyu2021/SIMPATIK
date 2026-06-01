@@ -34,6 +34,7 @@ export default function OutboundShow({ outbound }: Props) {
 
     const canApprove = isPenyelia && isSameDepartment && outbound.status === 'Pending';
     const canIssue = isAdmin && outbound.status === 'Approved';
+    const canReject = (isPenyelia && isSameDepartment && outbound.status === 'Pending') || (isAdmin && (outbound.status === 'Pending' || outbound.status === 'Approved'));
     const canHandover = isAdmin && outbound.status === 'Issued';
     const canPickup = isRequester && outbound.status === 'Handed Over';
     const canEdit = isRequester && outbound.status === 'Pending';
@@ -134,7 +135,7 @@ export default function OutboundShow({ outbound }: Props) {
 
             <OutboundSignatures outbound={outbound} />
 
-            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} canHandover={canHandover} canPickup={canPickup} />
+            <OutboundActions outbound={outbound} canApprove={canApprove} canIssue={canIssue} canReject={canReject} canHandover={canHandover} canPickup={canPickup} />
         </AuthenticatedLayout>
     );
 }

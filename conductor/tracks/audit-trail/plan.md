@@ -8,16 +8,16 @@ Membangun sistem pencatatan aktivitas pengguna untuk memenuhi standar keamanan p
 - Menyediakan antarmuka bagi Admin untuk meninjau log aktivitas.
 
 ## Task List
-- [ ] **Database & Model**:
-    - [ ] Buat migration `activity_logs`.
-    - [ ] Buat model `ActivityLog`.
-- [ ] **Core Logging Service**:
-    - [ ] Implementasi `ActivityLogger` service.
-    - [ ] Buat Trait `HasAuditLog` untuk otomatisasi log di model.
-- [ ] **Integration**:
-    - [ ] Pasang logging pada modul Auth, Items, Inbound, dan Outbound.
-- [ ] **Frontend**:
-    - [ ] Buat halaman `AuditLogs/Index.tsx` dengan filter modul, user, dan tanggal.
+- [x] **Database & Model**:
+    - [x] Buat migration `activity_logs`.
+    - [x] Buat model `ActivityLog`.
+- [x] **Core Logging Service**:
+    - [x] Implementasi logic logging otomatis di Trait.
+    - [x] Buat Trait `HasAuditLog` untuk otomatisasi log di model.
+- [x] **Integration**:
+    - [x] Pasang logging pada modul Auth, Items, Inbound, dan Outbound.
+- [x] **Frontend**:
+    - [x] Buat halaman `AuditLogs/Index.tsx` dengan filter modul, user, dan tanggal.
 
 ## Definition of Done
 - Setiap perubahan pada data barang atau transaksi terekam di database beserta informasi IP Address dan User Agent.

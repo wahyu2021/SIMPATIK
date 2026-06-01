@@ -36,8 +36,10 @@ class WhatsAppChannel
             if (!$phone) continue;
 
             try {
-                // Tembak API bot WA lokal yang berjalan di port 3000
-                $response = Http::timeout(5)->post('http://127.0.0.1:3000/send-message', [
+                // Tembak API bot WA (URL ditarik dari database settings)
+                $apiUrl = \App\Models\Setting::getValue('wa_api_url', 'http://127.0.0.1:3000/send-message');
+
+                $response = Http::timeout(5)->post($apiUrl, [
                     'phone' => $phone,
                     'message' => $message,
                 ]);
