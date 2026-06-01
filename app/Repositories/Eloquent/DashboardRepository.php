@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\OutboundTransaction;
 use App\Models\User;
 use App\Repositories\Contracts\DashboardRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -40,15 +41,18 @@ class DashboardRepository implements DashboardRepositoryInterface
         return Item::whereColumn('current_stock', '<=', 'minimum_stock_level')->count();
     }
 
-    public function countPendingRequests(): int
+    public function countPendingRequests(?User $user = null): int
     {
-        return OutboundTransaction::where('status', OutboundStatus::Pending)->count();
+        return OutboundTransaction::where('status', OutboundStatus::Pending)
+            ->when($user, fn($q) => $this->applyScope($q, $user))
+            ->count();
     }
 
-    public function countApprovedToday(): int
+    public function countApprovedToday(?User $user = null): int
     {
         return OutboundTransaction::where('status', OutboundStatus::Approved)
             ->whereDate('approved_at', Carbon::today())
+            ->when($user, fn($q) => $this->applyScope($q, $user))
             ->count();
     }
 
@@ -59,9 +63,10 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->count();
     }
 
-    public function getRecentRequests(int $limit = 5): Collection
+    public function getRecentRequests(?User $user = null, int $limit = 5): Collection
     {
         return OutboundTransaction::with(['requester:id,name', 'department:id,name'])
+            ->when($user, fn($q) => $this->applyScope($q, $user))
             ->latest()
             ->take($limit)
             ->get();
@@ -76,7 +81,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->get();
     }
 
-    public function getMonthlyTransactionTrend(int $months = 6): array
+    public function getMonthlyTransactionTrend(?User $user = null, int $months = 6): array
     {
         $result = [];
 
@@ -92,6 +97,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $outbound = OutboundTransaction::whereMonth('transaction_date', $month)
                 ->whereYear('transaction_date', $year)
                 ->whereIn('status', [OutboundStatus::Issued, OutboundStatus::Completed])
+                ->when($user, fn($q) => $this->applyScope($q, $user))
                 ->count();
 
             $result[] = [
@@ -104,9 +110,10 @@ class DashboardRepository implements DashboardRepositoryInterface
         return $result;
     }
 
-    public function getOutboundStatusDistribution(): array
+    public function getOutboundStatusDistribution(?User $user = null): array
     {
         return OutboundTransaction::selectRaw('status, COUNT(*) as count')
+            ->when($user, fn($q) => $this->applyScope($q, $user))
             ->groupBy('status')
             ->get()
             ->map(fn ($row) => [
@@ -114,5 +121,24 @@ class DashboardRepository implements DashboardRepositoryInterface
                 'count' => $row->count,
             ])
             ->toArray();
+    }
+
+    /**
+     * Terapkan scope filter berdasarkan role user.
+     */
+    private function applyScope(Builder $query, User $user): Builder
+    {
+        // Jika Admin, bisa lihat semua (jangan difilter)
+        if ($user->hasRole('warehouse_admin')) {
+            return $query;
+        }
+
+        // Jika Penyelia, lihat data unitnya sendiri
+        if ($user->hasRole('division_head')) {
+            return $query->where('department_id', $user->department_id);
+        }
+
+        // Jika Staff, hanya lihat datanya sendiri
+        return $query->where('requester_id', $user->id);
     }
 }

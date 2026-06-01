@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\DashboardRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardService
 {
@@ -11,25 +12,27 @@ class DashboardService
     ) {}
 
     /**
-     * Ambil semua data untuk halaman Dashboard.
+     * Ambil semua data untuk halaman Dashboard, terfilter sesuai role user login.
      *
      * @return array{stats: array, recentRequests: array, lowStockItems: array}
      */
     public function getDashboardData(): array
     {
+        $user = Auth::user();
+
         return [
-            'stats'          => $this->getStats(),
-            'recentRequests' => $this->mapRecentRequests(),
-            'lowStockItems'  => $this->mapLowStockItems(),
-            'monthlyTrend'   => $this->dashboardRepository->getMonthlyTransactionTrend(),
-            'statusDistribution' => $this->dashboardRepository->getOutboundStatusDistribution(),
+            'stats'          => $this->getStats($user),
+            'recentRequests' => $this->mapRecentRequests($user),
+            'lowStockItems'  => $this->mapLowStockItems(), // Stok rendah tetap global untuk visibility Admin
+            'monthlyTrend'   => $this->dashboardRepository->getMonthlyTransactionTrend($user),
+            'statusDistribution' => $this->dashboardRepository->getOutboundStatusDistribution($user),
         ];
     }
 
     /**
      * Kumpulkan semua angka statistik utama.
      */
-    private function getStats(): array
+    private function getStats($user): array
     {
         return [
             'total_items'        => $this->dashboardRepository->countItems(),
@@ -37,8 +40,8 @@ class DashboardService
             'total_departments'  => $this->dashboardRepository->countDepartments(),
             'total_users'        => $this->dashboardRepository->countActiveUsers(),
             'low_stock_count'    => $this->dashboardRepository->countLowStockItems(),
-            'pending_requests'   => $this->dashboardRepository->countPendingRequests(),
-            'approved_today'     => $this->dashboardRepository->countApprovedToday(),
+            'pending_requests'   => $this->dashboardRepository->countPendingRequests($user),
+            'approved_today'     => $this->dashboardRepository->countApprovedToday($user),
             'inbound_this_month' => $this->dashboardRepository->countInboundThisMonth(),
         ];
     }
@@ -46,10 +49,10 @@ class DashboardService
     /**
      * Transform Eloquent Collection pengajuan ke format frontend.
      */
-    private function mapRecentRequests(): array
+    private function mapRecentRequests($user): array
     {
         return $this->dashboardRepository
-            ->getRecentRequests()
+            ->getRecentRequests($user)
             ->map(fn ($trx) => [
                 'id'              => $trx->id,
                 'document_number' => $trx->document_number,

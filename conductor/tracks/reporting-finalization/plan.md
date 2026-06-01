@@ -8,13 +8,14 @@ Modul laporan saat ini sudah memiliki pondasi kode namun perlu penyelesaian akhi
 - Menampilkan breakdown mutasi per barang dengan benar di frontend.
 
 ## Task List
-- [ ] **Data Integrity Check**: Verifikasi trigger penambahan/pengurangan stok di `InboundService` dan `OutboundService` sudah mencatat ke `StockLedger`.
-- [ ] **Reconciliation Logic**: Implementasi `storeReconciliation` di `ReportService` untuk mencatat perbedaan stok fisik vs sistem.
-- [ ] **Frontend Reports**: 
-    - [ ] Selesaikan halaman `Reports/StockLedger.tsx`.
-    - [ ] Selesaikan halaman `Reports/Reconciliation.tsx`.
-    - [ ] Selesaikan halaman `Reports/Breakdown.tsx`.
-- [ ] **Validation**: Pastikan total nilai gudang di dashboard sesuai dengan akumulasi `unit_price * current_stock` di tabel items.
+- [x] **Data Integrity Check**: Verifikasi trigger penambahan/pengurangan stok di `InboundService` dan `OutboundService` sudah mencatat ke `StockLedger`.
+- [x] **Reconciliation Logic**: Implementasi `storeReconciliation` di `ReportService` untuk mencatat perbedaan stok fisik vs sistem dan melakukan **Stock Adjustment** otomatis.
+- [x] **Frontend Reports**: 
+    - [x] Selesaikan halaman `Reports/Index.tsx` (Rekapitulasi Mutasi).
+    - [x] Selesaikan halaman `Reports/StockLedger.tsx`.
+    - [x] Selesaikan halaman `Reports/Reconciliation.tsx`.
+    - [x] Selesaikan halaman breakdown per unit kerja (via `BreakdownModal`).
+- [x] **Validation**: Pastikan stok aktual di tabel `items` selalu sinkron dengan saldo akhir di `StockLedger` setelah berbagai transaksi dan rekonsiliasi.
 
 ## Definition of Done
 - Admin dapat melihat riwayat keluar-masuk barang secara kronologis tanpa selisih saldo.

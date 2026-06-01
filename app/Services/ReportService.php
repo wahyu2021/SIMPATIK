@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Item;
 use App\Models\Setting;
+use App\Models\StockLedger;
 use App\Repositories\Contracts\ReportRepositoryInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
@@ -174,26 +177,54 @@ class ReportService
     }
 
     /**
-     * Simpan rekonsiliasi bulanan.
+     * Simpan rekonsiliasi bulanan dan lakukan penyesuaian stok jika ada selisih.
      */
     public function saveReconciliation(int $month, int $year, int $userId, array $details, ?string $notes = null): object
     {
-        return $this->reportRepository->saveReconciliation(
-            [
-                'month' => $month,
-                'year' => $year,
-                'reconciliation_date' => now(),
-                'created_by' => $userId,
-                'notes' => $notes,
-            ],
-            collect($details)->map(fn ($d) => [
-                'item_id' => $d['item_id'],
-                'system_qty' => $d['system_qty'],
-                'physical_qty' => $d['physical_qty'],
-                'difference' => $d['physical_qty'] - $d['system_qty'],
-                'notes' => $d['notes'] ?? null,
-            ])->toArray()
-        );
+        return DB::transaction(function () use ($month, $year, $userId, $details, $notes) {
+            // 1. Simpan Header & Detail Rekonsiliasi
+            $recon = $this->reportRepository->saveReconciliation(
+                [
+                    'month' => $month,
+                    'year' => $year,
+                    'reconciliation_date' => now(),
+                    'created_by' => $userId,
+                    'notes' => $notes,
+                ],
+                collect($details)->map(fn ($d) => [
+                    'item_id' => $d['item_id'],
+                    'system_qty' => $d['system_qty'],
+                    'physical_qty' => $d['physical_qty'],
+                    'difference' => $d['physical_qty'] - $d['system_qty'],
+                    'notes' => $d['notes'] ?? null,
+                ])->toArray()
+            );
+
+            // 2. Proses Adjustment Stok jika ada perbedaan
+            foreach ($details as $d) {
+                $diff = $d['physical_qty'] - $d['system_qty'];
+                
+                if ($diff != 0) {
+                    $item = Item::lockForUpdate()->findOrFail($d['item_id']);
+                    
+                    // Update stok aktual sistem ke angka fisik hasil audit
+                    $item->update(['current_stock' => $d['physical_qty']]);
+
+                    // Catat riwayat penyesuaian (Adjustment) di Kartu Stok
+                    StockLedger::create([
+                        'item_id'            => $d['item_id'],
+                        'transaction_date'   => now(),
+                        'movement_type'      => 'adjustment',
+                        'document_reference' => "RECON-{$month}-{$year}",
+                        'qty_in'             => $diff > 0 ? $diff : 0,
+                        'qty_out'            => $diff < 0 ? abs($diff) : 0,
+                        'ending_balance'     => $d['physical_qty'],
+                    ]);
+                }
+            }
+
+            return $recon;
+        });
     }
 
     // ─── Private Helpers ───
