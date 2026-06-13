@@ -28,6 +28,7 @@ flowchart TD
         A(Buka Halaman Login)
         B(Input Email dan Password)
         C(Klik Tombol Login)
+        J(Input Tanda Tangan & Simpan)
     end
 
     subgraph Sistem [Sistem SIMPATIK]
@@ -36,6 +37,8 @@ flowchart TD
         F{Akun Aktif?}
         G(Tampilkan Pesan Error Akun Dinonaktifkan)
         H(Buat Session / Token Auth)
+        K{Sudah Set Tanda Tangan?}
+        L(Redirect ke Halaman Onboarding Signature)
         I(Redirect ke Halaman Dashboard sesuai Role)
     end
 
@@ -52,7 +55,13 @@ flowchart TD
     G --> B
     
     F -- Ya Aktif --> H
-    H --> I
+    H --> K
+    
+    K -- Belum --> L
+    L --> J
+    J --> K
+    
+    K -- Sudah --> I
     I --> End
 ```
 
@@ -138,6 +147,8 @@ flowchart TD
         M(Set Status: APPROVED)
         N(Notifikasi ke Admin Gudang)
         O(Potong Stok & Catat Ledger)
+        O2{Stok < Minimum?}
+        O3(Kirim Low Stock Alert)
         P(Set Status: ISSUED)
         Q(Set Status: HANDED_OVER)
         R(Set Status: COMPLETED)
@@ -186,7 +197,11 @@ flowchart TD
     %% Titik Temu Alur
     T --> O
     
-    O --> P
+    O --> O2
+    O2 -- Ya --> O3
+    O3 --> P
+    O2 -- Tidak --> P
+    
     P --> U
     U --> V
     V --> Q
@@ -317,6 +332,101 @@ flowchart TD
     G --> H
     H --> I
     I --> End
+```
+
+---
+
+### 2.7 Proses Pengaturan Profil & Tanda Tangan (*Profile & Signature Setup*)
+Proses di mana pengguna baru atau pengguna lama melakukan pembaruan profil dan wajib menggambar tanda tangan digital untuk keperluan pengesahan dokumen SPB/BAST.
+
+```mermaid
+flowchart TD
+    Start([Mulai])
+    End([Selesai])
+
+    subgraph User [Pengguna]
+        A(Masuk Menu Profil / Di-redirect ke Onboarding)
+        B(Ubah Data Profil / Password)
+        C(Gambar Tanda Tangan di Canvas)
+        D(Klik Simpan Profil)
+    end
+
+    subgraph Sistem [Sistem SIMPATIK]
+        E{Validasi Data Lengkap?}
+        F(Tampilkan Pesan Error Validasi)
+        G(Konversi Canvas ke File Gambar PNG)
+        H(Simpan Path Gambar ke Database User)
+        I(Perbarui Data Session User)
+        J(Tampilkan Pesan Sukses)
+    end
+
+    Start --> A
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    
+    E -- Tidak Valid --> F
+    F --> B
+    
+    E -- Valid --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> End
+```
+
+---
+
+### 2.8 Proses Pengelolaan Data Master (*Master Data Management*)
+Proses standar (*CRUD*) yang dilakukan oleh Admin Gudang untuk menjaga akurasi data referensi seperti Item, Kategori, Departemen, maupun User.
+
+```mermaid
+flowchart TD
+    Start([Mulai])
+    End([Selesai])
+
+    subgraph Admin [Admin Gudang]
+        A(Masuk Menu Data Master)
+        B(Pilih Modul: Barang / Kategori / User / Departemen)
+        C{Aksi?}
+        D(Input Data Baru)
+        E(Ubah Data Eksisting)
+        F(Konfirmasi Penghapusan)
+        G(Submit Form)
+    end
+
+    subgraph Sistem [Sistem SIMPATIK]
+        H{Validasi Data?}
+        I(Tampilkan Error)
+        J(Simpan / Perbarui Data di Database)
+        K(Soft Delete Data di Database)
+        L(Catat Perubahan di Activity Log)
+        M(Tampilkan Flash Message Sukses)
+    end
+
+    Start --> A
+    A --> B
+    B --> C
+    
+    C -- Tambah --> D
+    C -- Edit --> E
+    D --> G
+    E --> G
+    
+    C -- Hapus --> F
+    
+    G --> H
+    H -- Gagal --> I
+    I --> D
+    
+    H -- Lolos --> J
+    F --> K
+    
+    J --> L
+    K --> L
+    L --> M
+    M --> End
 ```
 
 ---
