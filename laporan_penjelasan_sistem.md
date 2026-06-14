@@ -320,28 +320,37 @@ Rincian pencatatan selisih antara angka pada stok sistem dibandingkan fisik per 
 
 ## 4.9 Event List
 
-Event list merupakan suatu kejadian yang dapat terjadi pada lingkungan sistem dan mempunyai suatu hubungan dengan respon yang diberikan oleh sistem. Berikut interaksi di dalam aplikasi SIMPATIK:
+Event list merupakan suatu kejadian yang dapat terjadi pada lingkungan sistem dan mempunyai suatu hubungan dengan respon yang diberikan oleh sistem. Berikut adalah urutan dan interaksi yang terjadi di dalam perancangan website SIMPATIK, yang dibagi berdasarkan aktor utama:
 
-**Tabel 4.2 Event List (Staff Unit Kerja)**
+**Tabel 4.5 Event List Staff Unit Kerja**
 | Event List | Trigger/Actor | Respon Sistem |
 | --- | --- | --- |
-| Staff membuka portal sistem SIMPATIK. | Staff | Menampilkan halaman Login. |
-| Staff berhasil melakukan login dan akun belum memiliki *signature*. | Staff | Mengarahkan ke rute *Signature Onboarding*. |
-| Staff membuat pengajuan ATK dan menekan "Submit". | Staff | Memvalidasi ketersediaan stok, merubah status pesanan menjadi `Pending`, dan mengirimkan notifikasi *WhatsApp* ke Penyelia. |
-| Staff menekan tombol "Konfirmasi Terima" barang di gudang. | Staff | Merubah status transaksi menjadi `Completed` dan memicu fitur *generate* BAST PDF otomatis. |
+| Staff membuka portal website SIMPATIK. | Staff | Sistem menampilkan halaman login. |
+| Staff mengisi email dan password, lalu klik login. | Staff | Sistem memvalidasi data kredensial login. |
+| Data login valid tetapi belum memiliki tanda tangan. | Sistem | Sistem mengarahkan pengguna ke halaman *Onboarding Signature*. |
+| Staff menggambar tanda tangan dan klik "Simpan". | Staff | Sistem menyimpan gambar tanda tangan dan menampilkan halaman Dashboard. |
+| Staff memilih menu "Pengajuan Baru". | Staff | Sistem menampilkan formulir pengajuan permintaan ATK. |
+| Staff memilih barang, mengisi jumlah, dan klik "Submit". | Staff | Sistem memvalidasi ketersediaan limit stok di gudang. |
+| Stok mencukupi dan data valid. | Sistem | Sistem menyimpan pengajuan (status `Pending`) dan otomatis mengirim notifikasi WhatsApp ke Division Head. |
+| Staff membuka menu "Riwayat Pengajuan" lalu klik "Konfirmasi Terima". | Staff | Sistem mengubah status transaksi menjadi `Completed` dan men-*generate* dokumen BAST PDF. |
 
-**Tabel 4.3 Event List (Penyelia)**
+**Tabel 4.6 Event List Division Head (Penyelia)**
 | Event List | Trigger/Actor | Respon Sistem |
 | --- | --- | --- |
-| Penyelia membuka menu "Pengajuan Masuk". | Penyelia | Menampilkan daftar antrean pengajuan dari staf divisinya. |
-| Penyelia menekan tombol "Setujui" (*Approve*). | Penyelia | Menyimpan persetujuan, mengubah status menjadi `Approved`, dan mengirim notifikasi *WhatsApp* ke Admin Gudang. |
+| Division Head membuka link dari notifikasi WhatsApp. | Division Head | Sistem menampilkan halaman login (atau langsung ke Dashboard jika sesi aktif). |
+| Division Head memilih menu "Pengajuan Masuk". | Division Head | Sistem menampilkan daftar pengajuan ATK dari staf berstatus `Pending`. |
+| Division Head melihat detail form dan menekan "Setujui". | Division Head | Sistem menampilkan jendela pop-up konfirmasi persetujuan. |
+| Division Head mengonfirmasi persetujuan (*Approve*). | Division Head | Sistem menyimpan pembaruan, mengubah status menjadi `Approved`, dan mengirim notifikasi WhatsApp ke Admin Gudang. |
 
-**Tabel 4.4 Event List (Admin Gudang)**
+**Tabel 4.7 Event List Admin Gudang & Bagian Umum**
 | Event List | Trigger/Actor | Respon Sistem |
 | --- | --- | --- |
-| Admin Gudang memasukkan barang Inbound vendor baru. | Admin Gudang | Menambahkan angka *current_stock* item tersebut dan membuat baris mutasi `Inbound` di tabel *Stock Ledger*. |
-| Admin Gudang menekan tombol "Issue" pada pesanan. | Admin Gudang | Mengaktifkan perlindungan *Pessimistic Lock*, memotong nilai stok fisik, dan merubah status transaksi. |
-| Admin Gudang mengekspor data *Stock Ledger*. | Admin Gudang | Memproses kueri rekapitulasi data dan mengunduh format Excel/PDF. |
+| Admin memilih menu "Data Master" lalu "Data Barang". | Admin Gudang | Sistem menampilkan daftar katalog persediaan ATK dari database. |
+| Admin mengisi form barang baru dan klik "Simpan". | Admin Gudang | Sistem menyimpan data baru ke database dan menampilkan pesan berhasil. |
+| Admin memilih menu "Permintaan Barang". | Admin Gudang | Sistem menampilkan antrean dokumen pengajuan berstatus `Approved`. |
+| Admin mengklik "Proses Penyiapan Barang" (Issue). | Admin Gudang | Sistem memotong nilai stok fisik, membuat riwayat mutasi di tabel *Stock Ledger*, dan mengubah status menjadi `Issued`. |
+| Admin menyerahkan barang ke staf dan klik "Serahkan". | Admin Gudang | Sistem memperbarui status menjadi `Handed_Over` (menunggu konfirmasi penerimaan staf). |
+| Admin / GA membuka menu "Laporan Mutasi" dan klik "Export PDF". | Admin Gudang | Sistem memproses rekapitulasi data dan mengunduh file laporan berformat PDF ke perangkat. |
 
 ## 4.10 Perancangan Design Tampilan
 
