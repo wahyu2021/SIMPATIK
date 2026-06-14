@@ -112,7 +112,7 @@ flowchart TD
 ---
 
 ### 2.3 Proses Pengajuan & Pengeluaran Barang (*Outbound Transaction*)
-Ini adalah alur operasional utama dan paling kompleks dalam sistem, melibatkan persetujuan berjenjang dari berbagai aktor di departemen berbeda, serta mengakomodasi **Pengajuan Langsung (*Direct Request*)**.
+Ini adalah alur operasional utama dan paling kompleks dalam sistem, melibatkan persetujuan berjenjang dari berbagai aktor di departemen berbeda, serta mengakomodasi **Pengajuan Langsung (*Direct Request*)** yang memotong kompas persetujuan.
 
 ```mermaid
 flowchart TD
@@ -125,20 +125,20 @@ flowchart TD
         A1(Masuk Menu Permintaan)
         A2(Buat Pengajuan Barang)
         A3(Submit Pengajuan Normal)
-        W(Tanda Tangan Tanda Terima)
+        W(Klik Konfirmasi Penerimaan / Pickup)
     end
 
     subgraph AdminGudang [Admin Gudang]
         B1(Masuk Menu Pengambilan Langsung)
         B2(Pilih Peminta & Barang)
         B3(Submit Direct Request)
-        T(Siapkan Barang Fisik)
+        T(Klik Proses Penyiapan Barang / Issue)
         U(Cetak Dokumen SPB/BAST PDF)
-        V(Lakukan Penyerahan Barang)
+        V(Klik Serahkan Barang / Handover)
     end
 
     subgraph Sistem [Sistem SIMPATIK]
-        E{Validasi Stok?}
+        E{Validasi Stok Awal?}
         F{Tipe Transaksi?}
         G(Set Status: PENDING)
         H(Notifikasi via WhatsApp/Email ke Kepala Divisi)
@@ -146,11 +146,11 @@ flowchart TD
         K(Set Status: REJECTED)
         M(Set Status: APPROVED)
         N(Notifikasi ke Admin Gudang)
+        P(Set Status: ISSUED)
+        Q(Set Status: HANDED_OVER)
         O(Potong Stok & Catat Ledger)
         O2{Stok < Minimum?}
         O3(Kirim Low Stock Alert)
-        P(Set Status: ISSUED)
-        Q(Set Status: HANDED_OVER)
         R(Set Status: COMPLETED)
         S(Simpan Log Audit)
     end
@@ -190,23 +190,22 @@ flowchart TD
     L -- Setujui --> M
     M --> N
     N --> T
-    
-    %% Alur Direct Request
-    F -- Direct Request --> O
-    
-    %% Titik Temu Alur
-    T --> O
-    
-    O --> O2
-    O2 -- Ya --> O3
-    O3 --> P
-    O2 -- Tidak --> P
-    
+    T --> P
     P --> U
     U --> V
     V --> Q
     Q --> W
-    W --> R
+    W --> O
+    
+    %% Alur Direct Request
+    F -- Direct Request --> O
+    
+    %% Titik Temu Pemotongan Stok
+    O --> O2
+    O2 -- Ya --> O3
+    O3 --> R
+    O2 -- Tidak --> R
+    
     R --> S
     S --> End
 ```
@@ -296,47 +295,7 @@ flowchart TD
 
 ---
 
-### 2.6 Proses Prediksi Permintaan (*Demand Forecasting* - ML)
-Fitur cerdas yang menggunakan Machine Learning (contoh: XGBoost) untuk memprediksi kebutuhan stok di periode mendatang.
-
-```mermaid
-flowchart TD
-    Start([Mulai])
-    End([Selesai])
-
-    subgraph User [General Affairs / Admin]
-        A(Masuk Menu Demand Forecast)
-        B(Pilih Item dan Periode Target)
-        C(Klik 'Generate Forecast')
-    end
-
-    subgraph Sistem [Aplikasi SIMPATIK]
-        D(Kumpulkan Riwayat Transaksi Ledger)
-        E(Kirim Data ke API Machine Learning)
-        G(Terima Hasil Prediksi)
-        H(Simpan ke tabel Demand Forecast)
-        I(Tampilkan Hasil Prediksi & Rekomendasi Restock)
-    end
-
-    subgraph ML [Python ML Service]
-        F(Proses Data dengan Model AI)
-    end
-
-    Start --> A
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    H --> I
-    I --> End
-```
-
----
-
-### 2.7 Proses Pengaturan Profil & Tanda Tangan (*Profile & Signature Setup*)
+### 2.6 Proses Pengaturan Profil & Tanda Tangan (*Profile & Signature Setup*)
 Proses di mana pengguna baru atau pengguna lama melakukan pembaruan profil dan wajib menggambar tanda tangan digital untuk keperluan pengesahan dokumen SPB/BAST.
 
 ```mermaid
@@ -378,7 +337,7 @@ flowchart TD
 
 ---
 
-### 2.8 Proses Pengelolaan Data Master (*Master Data Management*)
+### 2.7 Proses Pengelolaan Data Master (*Master Data Management*)
 Proses standar (*CRUD*) yang dilakukan oleh Admin Gudang untuk menjaga akurasi data referensi seperti Item, Kategori, Departemen, maupun User.
 
 ```mermaid
