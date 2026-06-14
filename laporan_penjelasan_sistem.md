@@ -116,39 +116,54 @@ Use Case Diagram menggambarkan fungsionalitas sistem dari perspektif aktor dan b
 Secara spesifik, sistem yang bekerja dan aktor yang diperlukan terhadap *use case* dapat dideskripsikan sebagai berikut:
 
 **Definisi Aktor**
-1. **Admin Gudang:** Memasukkan Inbound, Kelola Master Data, Issue Barang, Laporan.
-2. **Penyelia:** Memberikan Approval pengajuan dari bawahannya.
-3. **Staff Unit Kerja:** Menyusun permintaan Outbound, tanda tangan terima.
-4. **Bagian Umum:** Mengakses menu laporan menyeluruh.
+1. **Admin Gudang:** Memiliki akses terluas. Melakukan *Direct Request*, *Input Inbound*, *Approve/Reject* pengajuan, *Issue Items* (potong stok), *Handover Items*, Kelola Data Master, dan melihat Log Audit.
+2. **Penyelia (Division Head):** Melakukan persetujuan (*Approve*) atau penolakan (*Reject*) terhadap pengajuan dari staf di unit kerjanya saja.
+3. **Staff Unit Kerja:** Membuat pengajuan pengeluaran barang (*Request Outbound*), mengubah/membatalkan pengajuan, serta melakukan konfirmasi penerimaan (*Pickup*).
+4. **Bagian Umum (GA):** Memiliki hak akses baca (*View & Export Reports*) untuk kebutuhan monitoring dan laporan.
 
-**Skenario Use Case**
-- **Skenario Login & Onboarding:** Memvalidasi kredensial. Jika tidak ada tanda tangan, paksa pengguna menuju rute Onboarding untuk menggambar di kanvas.
-- **Skenario Mengajukan Permintaan ATK (Staff):** Memilih item, mengisi jumlah, memvalidasi limit stok, dan menyimpan data pengajuan dengan status `Pending`. Notifikasi WhatsApp dikirim ke Penyelia.
-- **Skenario Persetujuan Pengajuan (Penyelia):** Membuka daftar pengajuan, menyetujui kuantitas (*Approve*). Status berubah menjadi `Approved` dan Admin Gudang menerima notifikasi.
-- **Skenario Pemotongan Stok dan Serah Terima:** Admin Gudang menekan "Issue" (*Pessimistic Lock* aktif, stok terpotong), kemudian Admin menekan "Handover". Staf yang mengambil barang menekan tombol "Konfirmasi Terima". Transaksi berstatus `Completed` dan SPB/BAST siap cetak PDF.
+**Skenario Use Case Berdasarkan Modul**
+- **Siklus Outbound:** Meliputi *State Machine* dari *Pending*, *Approved*, *Issued*, *HandedOver*, hingga *Completed*. Terdapat pula skenario *Direct Request* untuk *bypass* persetujuan.
+- **Modul Dokumen:** Pencetakan SPB (Surat Permintaan Barang) dan BAST (Berita Acara Serah Terima) berbasis PDF.
+- **Modul Analitik & Laporan:** Fitur Laporan Mutasi bulanan, Rekonsiliasi (*Stock Opname*), *Forecasting* kebutuhan, serta Log Audit.
+- **Modul Administrasi & Pendukung:** Pengelolaan Data Master (Barang, Kategori, Departemen), Manajemen Pengguna, integrasi Notifikasi *WhatsApp*, dan kewajiban pengaturan Profil beserta Tanda Tangan Digital.
 
 ### 4.7.2 Activity Diagram
-Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasar *swimlane* para aktor.
+Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasar *swimlane* para aktor. Pada sistem SIMPATIK, aktivitas dirincikan ke dalam tujuh proses operasional:
 
 **(Gambar 4.2 Activity Diagram terlampir di lembar desain sistem)**
 
-1. **Activity Diagram Outbound:** Menggambarkan aliran pengajuan. Mulai dari Staf menyusun pesanan → Pemeriksaan jumlah → Persetujuan/Penolakan oleh Penyelia → Pemrosesan Pemotongan Fisik oleh Admin → Konfirmasi Serah Terima.
-2. **Activity Diagram Inbound:** Menggambarkan Admin mencatatkan stok masuk vendor yang berakumulasi pada angka *current_stock*.
+1. **Proses Autentikasi (Login):** Validasi kredensial dan pengecekan kelengkapan tanda tangan digital.
+2. **Proses Pemasukan Barang (Inbound Transaction):** Aktivitas Admin Gudang untuk menambahkan stok ke *Stock Ledger*.
+3. **Proses Pengajuan & Pengeluaran Barang (Outbound):** Alur dari Staff menyusun pesanan → Pemeriksaan & Persetujuan oleh Penyelia → Pemrosesan Pemotongan Fisik oleh Admin → Konfirmasi Serah Terima oleh Staff.
+4. **Pembuatan Laporan (Reporting & Export):** Aktivitas kompilasi data mutasi menjadi format Excel/PDF.
+5. **Proses Rekonsiliasi Stok Bulanan:** Aktivitas mencocokkan stok *database* dengan perhitungan fisik gudang.
+6. **Proses Pengaturan Profil & Tanda Tangan:** Kewajiban pengguna baru menyimpan pola *canvas* tanda tangan.
+7. **Proses Pengelolaan Data Master:** Operasional CRUD (Barang, Kategori, Departemen) oleh Admin Gudang.
 
 ### 4.7.3 Sequence Diagram
-Sequence Diagram memodelkan urutan interaksi antar objek dan pemanggilan *method* dari *View* ke *Controller*, *Service*, hingga ke *Model*.
+Sequence Diagram memodelkan urutan interaksi antar objek dan pemanggilan *method* dari *View* (Inertia.js), ke *Controller*, *Service*, hingga ke *Model* (MVC-S). 
 
 **(Gambar 4.3 Sequence Diagram terlampir di lembar desain sistem)**
 
-1. **Sequence Diagram Autentikasi:** Proses validasi kredensial *login* dan pemeriksaan *Middleware* tanda tangan digital.
-2. **Sequence Diagram Inbound:** Aliran pencatatan barang masuk dan penambahan tabel `stock_ledgers`.
-3. **Sequence Diagram Outbound:** Proses dari form (*Pending*) hingga izin Penyelia (*Approved*).
-4. **Sequence Diagram Serah Terima (Handover):** Pertukaran status dari *Handed_Over* hingga *Completed*.
+1. **Sequence Diagram Autentikasi & Pengecekan Tanda Tangan:** *Middleware* memvalidasi *signature_path*.
+2. **Sequence Diagram Inbound Transaction:** Pemasukan *current_stock* via *InboundService*.
+3. **Sequence Diagram Outbound (Request & Approval):** Interaksi pengajuan status `PENDING` dan perubahan ke `APPROVED`.
+4. **Sequence Diagram Outbound (Handover & Pickup):** Penyerahan barang (`HANDED_OVER`) dan pemotongan mutasi akhir (`COMPLETED`).
+5. **Pembuatan & Unduh Laporan:** Penggunaan pustaka *DomPDF* untuk mencetak dokumen.
+6. **Proses Rekonsiliasi Stok:** Pencatatan penyesuaian nilai barang di *ReportController*.
+7. **Proses Pengaturan Profil & Tanda Tangan:** Konversi *base64 canvas* menjadi berkas gambar (PNG).
+8. **Pengelolaan Data Master:** *Routing CRUD* standar ke tabel `items`, `categories`, dan `departments`.
 
 ### 4.7.4 Class Diagram
-Class diagram SIMPATIK memvisualisasikan arsitektur keterikatan logis tabel, seperti relasi entitas `User` yang bernaung di bawah `Department`, hubungannya dengan `Role`, entitas `Item`, hingga tabel transaksional pergudangan.
+Class diagram SIMPATIK memvisualisasikan arsitektur keterikatan logis dan relasi kardinalitas (seperti *1-to-Many* atau *Pivot*) antar entitas (*Model*). 
 
 **(Gambar 4.4 Class Diagram terlampir di lembar desain sistem)**
+
+Entitas yang digambarkan mencakup:
+- **Pengguna & Akses:** `User`, `Role`, `Permission`, dan `ActivityLog`.
+- **Katalog:** `Category`, `Item`, `Department`.
+- **Transaksional:** `InboundTransaction`, `InboundTransactionDetail`, `OutboundTransaction`, `OutboundTransactionDetail`, `StockLedger`, `DemandForecast`.
+- **Laporan & Lainnya:** `StockReconciliation`, `StockReconciliationDetail`, dan `Setting`.
 
 ## 4.8 Dasar Logika
 
