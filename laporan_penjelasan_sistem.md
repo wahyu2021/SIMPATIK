@@ -169,11 +169,10 @@ Entitas yang digambarkan mencakup:
 
 ### 4.8.1 Kamus Data dan Tabel Desain
 
-Kamus data digunakan untuk menjabarkan karakteristik tipe data *field* yang terdapat di dalam tabel penyimpanan utama.
+Kamus data digunakan untuk menjabarkan karakteristik tipe data *field* yang terdapat di dalam tabel penyimpanan utama (*Core Business Tables*) sistem SIMPATIK.
 
 **1. Tabel `users`**
-Menampung profil staf dan hash keamanan.
-Kamus Data: `id + name + email + phone_number + password + signature_path + is_active + department_id + created_at + updated_at`
+Menampung profil pengguna, kredensial, dan otorisasi.
 
 | No | Nama Field | Tipe Data | Ukuran | Keterangan |
 | -- | --- | --- | --- | --- |
@@ -182,50 +181,120 @@ Kamus Data: `id + name + email + phone_number + password + signature_path + is_a
 | 3 | email | Varchar | 255 | Alamat Email (Unique) |
 | 4 | phone_number | Varchar | 50 | Kontak WhatsApp |
 | 5 | password | Varchar | 255 | Kata sandi terenkripsi (Hash) |
-| 6 | signature_path| Varchar | 255 | Lokasi URI file *png* Tanda Tangan |
+| 6 | signature_path| Varchar | 255 | Lokasi file *png* Tanda Tangan |
 | 7 | department_id | Bigint | 20 | Foreign Key -> tabel departments |
 
-**2. Tabel `items`**
-Kamus Data: `id + item_code + name + unit_of_measure + current_stock + minimum_stock_level + category_id + created_at + updated_at`
+**2. Tabel `departments`**
+Menampung data unit kerja atau cabang.
 
 | No | Nama Field | Tipe Data | Ukuran | Keterangan |
 | -- | --- | --- | --- | --- |
 | 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
-| 2 | item_code | Varchar | 50 | Kode barisan identifikasi unik |
+| 2 | name | Varchar | 255 | Nama Unit Kerja |
+
+**3. Tabel `categories`**
+Katalog pengelompokkan jenis barang.
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | name | Varchar | 255 | Nama Kategori (Cth: Kertas, Tinta) |
+
+**4. Tabel `items`**
+Katalog data barang ATK beserta ambang batas stok (*minimum_stock_level*).
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | item_code | Varchar | 50 | Kode identifikasi barang |
 | 3 | name | Varchar | 255 | Label nama barang |
 | 4 | unit_of_measure| Varchar | 50 | Kotak/Rim/Buah/Lusin |
-| 5 | current_stock | Int | 11 | Persediaan Faktual Saat Ini |
-| 6 | minimum_stock_level| Int | 11 | Ambang batas terendah (*alert*) |
+| 5 | current_stock | Int | 11 | Persediaan faktual saat ini |
+| 6 | minimum_stock_level| Int | 11 | Ambang batas peringatan stok |
 | 7 | category_id | Bigint | 20 | Foreign Key -> tabel categories |
 
-**3. Tabel `outbound_transactions`**
-Kamus Data: `id + requester_id + approver_id + issued_by + handed_over_by + picked_up_by + department_id + document_number + transaction_date + status + approved_at + issued_at + handed_over_at + picked_up_at + is_special_request + is_direct_request + rejection_reason + notes + created_at + updated_at + deleted_at`
+**5. Tabel `inbound_transactions`**
+Pencatatan riwayat dokumen penerimaan barang masuk dari Vendor.
 
 | No | Nama Field | Tipe Data | Ukuran | Keterangan |
 | -- | --- | --- | --- | --- |
 | 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
-| 2 | requester_id | Bigint | 20 | Foreign Key (Pemohon) |
+| 2 | user_id | Bigint | 20 | Foreign Key -> tabel users (Admin) |
+| 3 | reference_number| Varchar | 255 | Nomor Referensi/Faktur |
+| 4 | transaction_date| Date | - | Tanggal Penerimaan |
+| 5 | notes | Text | - | Catatan tambahan |
+
+**6. Tabel `inbound_transaction_details`**
+Rincian kuantitas item untuk setiap form barang masuk (Tabel Pivot).
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | inbound_transaction_id| Bigint | 20 | Foreign Key (Header Inbound) |
+| 3 | item_id | Bigint | 20 | Foreign Key -> tabel items |
+| 4 | quantity | Int | 11 | Jumlah Barang Masuk |
+
+**7. Tabel `outbound_transactions`**
+Dokumen form pengajuan pengeluaran barang (menyimpan status *State Machine*).
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | requester_id | Bigint | 20 | Foreign Key (Peminta) |
 | 3 | approver_id | Bigint | 20 | Foreign Key (Pemberi izin) |
-| 4 | issued_by | Bigint | 20 | Foreign Key (Admin Penyiap) |
-| 5 | handed_over_by| Bigint | 20 | Foreign Key (Admin Penyerah) |
+| 4 | issued_by | Bigint | 20 | Foreign Key (Penyiap Barang) |
+| 5 | handed_over_by| Bigint | 20 | Foreign Key (Penyerah Barang) |
 | 6 | picked_up_by | Bigint | 20 | Foreign Key (Penerima) |
 | 7 | department_id | Bigint | 20 | Foreign Key -> tabel departments |
 | 8 | document_number| Varchar | 100 | Format nomor SPB dinamis |
 | 9 | transaction_date| Date | - | Tanggal dokumen disahkan |
-| 10 | status | Varchar | 50 | PENDING, APPROVED, ISSUED, dll |
-| 11 | is_direct_request| Boolean| 1 | *Bypass Approval* flag |
+| 10| status | Varchar | 50 | PENDING, APPROVED, ISSUED, dll |
+| 11| is_direct_request| Boolean| 1 | *Bypass Approval* flag |
 
-**4. Tabel `stock_ledgers`**
-Kamus Data: `id + item_id + movement_type + qty_in + qty_out + ending_balance + transaction_date + document_reference`
+**8. Tabel `outbound_transaction_details`**
+Rincian permintaan ATK yang merekam perbedaan jumlah diajukan vs disetujui.
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | outbound_transaction_id| Bigint| 20 | Foreign Key (Header Outbound) |
+| 3 | item_id | Bigint | 20 | Foreign Key -> tabel items |
+| 4 | quantity_requested| Int | 11 | Jumlah diajukan staf |
+| 5 | quantity_approved| Int | 11 | Jumlah disetujui atasan |
+
+**9. Tabel `stock_ledgers`**
+Riwayat kartu stok mutasi akuntansi gudang secara *real-time*.
 
 | No | Nama Field | Tipe Data | Ukuran | Keterangan |
 | -- | --- | --- | --- | --- |
 | 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
 | 2 | item_id | Bigint | 20 | Foreign Key -> tabel items |
 | 3 | movement_type | Varchar | 50 | 'Inbound', 'Outbound', 'Adjust' |
-| 4 | qty_in | Int | 11 | Volume nilai tambah |
-| 5 | qty_out | Int | 11 | Volume nilai kurang |
+| 4 | qty_in | Int | 11 | Volume penambahan stok |
+| 5 | qty_out | Int | 11 | Volume pengurangan stok |
 | 6 | ending_balance | Int | 11 | Titik sisa stok pasca-mutasi |
+
+**10. Tabel `stock_reconciliations`**
+Dokumen Laporan Stock Opname / Rekonsiliasi bulanan.
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | created_by | Bigint | 20 | Foreign Key (Pembuat Laporan) |
+| 3 | month | Int | 11 | Bulan rekonsiliasi |
+| 4 | year | Int | 11 | Tahun rekonsiliasi |
+
+**11. Tabel `stock_reconciliation_details`**
+Rincian pencatatan selisih antara angka pada stok sistem dibandingkan fisik per barang.
+
+| No | Nama Field | Tipe Data | Ukuran | Keterangan |
+| -- | --- | --- | --- | --- |
+| 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
+| 2 | reconciliation_id | Bigint| 20 | Foreign Key (Header Laporan) |
+| 3 | item_id | Bigint | 20 | Foreign Key -> tabel items |
+| 4 | system_qty | Int | 11 | Stok catatan sistem |
+| 5 | physical_qty | Int | 11 | Stok fisik gudang |
+| 6 | difference | Int | 11 | Angka selisih/penyesuaian |
 
 ## 4.9 Event List
 
