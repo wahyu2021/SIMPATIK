@@ -113,19 +113,41 @@ Use Case Diagram menggambarkan fungsionalitas sistem dari perspektif aktor dan b
 
 **(Gambar 4.1 Use Case Diagram terlampir di lembar desain sistem)**
 
-Secara spesifik, sistem yang bekerja dan aktor yang diperlukan terhadap *use case* dapat dideskripsikan sebagai berikut:
+Secara spesifik, sistem yang bekerja dan Aktor yang diperlukan terhadap *use case* dapat dideskripsikan sebagai berikut:
 
-**Definisi Aktor**
-1. **Admin Gudang:** Memiliki akses terluas. Melakukan *Direct Request*, *Input Inbound*, *Approve/Reject* pengajuan, *Issue Items* (potong stok), *Handover Items*, Kelola Data Master, dan melihat Log Audit.
-2. **Penyelia (Division Head):** Melakukan persetujuan (*Approve*) atau penolakan (*Reject*) terhadap pengajuan dari staf di unit kerjanya saja.
-3. **Staff Unit Kerja:** Membuat pengajuan pengeluaran barang (*Request Outbound*), mengubah/membatalkan pengajuan, serta melakukan konfirmasi penerimaan (*Pickup*).
-4. **Bagian Umum (GA):** Memiliki hak akses baca (*View & Export Reports*) untuk kebutuhan monitoring dan laporan.
+a. Definisi Aktor
 
-**Skenario Use Case Berdasarkan Modul**
-- **Siklus Outbound:** Meliputi *State Machine* dari *Pending*, *Approved*, *Issued*, *HandedOver*, hingga *Completed*. Terdapat pula skenario *Direct Request* untuk *bypass* persetujuan.
-- **Modul Dokumen:** Pencetakan SPB (Surat Permintaan Barang) dan BAST (Berita Acara Serah Terima) berbasis PDF.
-- **Modul Analitik & Laporan:** Fitur Laporan Mutasi bulanan, Rekonsiliasi (*Stock Opname*), *Forecasting* kebutuhan, serta Log Audit.
-- **Modul Administrasi & Pendukung:** Pengelolaan Data Master (Barang, Kategori, Departemen), Manajemen Pengguna, integrasi Notifikasi *WhatsApp*, dan kewajiban pengaturan Profil beserta Tanda Tangan Digital.
+Tabel 4.3 Definisi Aktor
+| No. | Aktor | Keterangan |
+| --- | --- | --- |
+| 1. | Admin Gudang | Bertugas mengelola sistem secara keseluruhan, mulai dari login, mengelola data master, kelola pengguna, kelola pengaturan, mencatat inbound, mengeluarkan permintaan langsung, menyerahkan barang, cetak dokumen, hingga rekonsiliasi dan cek log audit. |
+| 2. | Division Head | Bertugas login untuk memverifikasi (approve/reject) terhadap pengajuan permintaan barang yang dilakukan oleh staf di bawah unit kerjanya. |
+| 3. | Staff Unit Kerja | Bertugas login untuk membuat pengajuan barang, mengedit/membatalkan pengajuan, serta melakukan konfirmasi penerimaan barang di gudang. |
+| 4. | Staff Bagian Umum | Bertugas login ke dalam sistem untuk memonitoring laporan bulanan dan riwayat mutasi stok barang. |
+
+b. Definisi Use Case
+
+Tabel 4.4 Definisi Use Case
+| No. | Use Case | Keterangan |
+| --- | --- | --- |
+| 1. | Login | Fungsi bagi semua aktor untuk masuk ke dalam sistem menggunakan akun terdaftar. |
+| 2. | Kelola Data Master | Fungsi bagi admin gudang untuk mengelola data barang, kategori, dan unit kerja. |
+| 3. | Kelola User dan Hak Akses | Fungsi bagi admin gudang untuk mengelola akun pengguna dan perannya. |
+| 4. | Kelola Settings Konfigurasi | Fungsi bagi admin gudang untuk mengatur parameter operasional aplikasi. |
+| 5. | Kelola Inbound Barang Masuk | Fungsi bagi admin gudang untuk mencatat stok barang masuk. |
+| 6. | Buat Pengajuan Barang | Fungsi bagi staff untuk membuat formulir permintaan ATK baru. |
+| 7. | Edit/Batalkan Pengajuan | Fungsi bagi staff untuk mengubah detail pengajuan yang berstatus pending. |
+| 8. | Membuat Permintaan Langsung | Fungsi khusus admin gudang untuk memotong kompas persetujuan. |
+| 9. | Verifikasi Pengajuan | Fungsi bagi division head untuk memberikan izin atau penolakan pengajuan staf. |
+| 10. | Handover Barang | Fungsi bagi admin gudang untuk menyerahkan fisik barang kepada staf peminta. |
+| 11. | Konfirmasi Penerimaan | Fungsi bagi staff untuk mengonfirmasi penerimaan fisik barang dari gudang. |
+| 12. | Cetak SPB | Fungsi untuk menghasilkan PDF Surat Permintaan Barang. |
+| 13. | Cetak BAST | Fungsi untuk menghasilkan PDF Berita Acara Serah Terima. |
+| 14. | Melihat Laporan & Mutasi Stok| Fungsi bagi bagian umum dan admin untuk memantau riwayat stok. |
+| 15. | Rekonsiliasi Bulanan | Fungsi bagi admin untuk penyesuaian stok sistem dengan stok fisik (opname). |
+| 16. | Melihat Log Audit Trail | Fungsi bagi admin untuk melihat seluruh riwayat aktivitas sistem. |
+| 17. | Kelola Profil & Tanda Tangan | Fungsi bagi seluruh aktor untuk mengelola profil dan pola tanda tangan digital. |
+| 18. | Notifikasi Web dan WhatsApp | Fungsi sistem otomatis untuk mengirim pesan informasi status transaksi. |
 
 ### 4.7.2 Activity Diagram
 Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasar *swimlane* para aktor. Pada sistem SIMPATIK, aktivitas dirincikan ke dalam tujuh proses operasional:
