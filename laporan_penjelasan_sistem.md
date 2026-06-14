@@ -144,12 +144,21 @@ Aktor yang terlibat:
 
 #### 4.7.1.1 Skenario Use Case
 
+Nama Use Case : Login & Onboarding<br>
+Aktor : Seluruh Pengguna<br>
+Deskripsi : Proses autentikasi pengguna dan pengecekan kelengkapan tanda tangan digital.
+
 **Tabel 4.2 Skenario: Login & Onboarding**
 | Aksi Aktor | Reaksi Aplikasi |
 | --- | --- |
 | 1. Memasukkan Email dan Kata Sandi. | 2. Melakukan validasi kredensial (Hash Password). |
 | 3. Menekan tombol Login. | 4. Mengevaluasi kolom `signature_path`. Jika belum ada, paksa pengguna menuju rute Onboarding. |
 | 5. Menggambar guratan di kanvas. | 6. Menyimpan hasil *base64* ke gambar *PNG*. Memberikan hak akses penuh ke *Dashboard*. |
+| **Kondisi Akhir** | **: Pengguna berhasil masuk ke dalam sistem dan memiliki tanda tangan digital yang tersimpan.** |
+
+Nama Use Case : Mengajukan Permintaan ATK<br>
+Aktor : Staff Unit Kerja<br>
+Deskripsi : Proses pembuatan formulir permintaan barang (outbound) oleh staf.
 
 **Tabel 4.3 Skenario: Mengajukan Permintaan ATK**
 | Aksi Aktor | Reaksi Aplikasi |
@@ -157,6 +166,11 @@ Aktor yang terlibat:
 | 1. Staf memilih menu "Pengajuan Baru". | 2. Menampilkan formulir dengan fitur cari barang. |
 | 3. Menentukan item, mengatur jumlah permintaan, dan menekan "Submit". | 4. Melakukan validasi limit *current_stock*. Jika valid, menyisipkan data transaksi dengan status `Pending`. |
 | | 5. Secara *background*, mengirim notifikasi WhatsApp kepada Penyelia Departemen tersebut. |
+| **Kondisi Akhir** | **: Data pengajuan tersimpan dengan status `Pending` dan notifikasi terkirim ke Penyelia.** |
+
+Nama Use Case : Persetujuan Pengajuan (Approval)<br>
+Aktor : Penyelia<br>
+Deskripsi : Proses peninjauan dan pemberian persetujuan terhadap pengajuan ATK oleh staf.
 
 **Tabel 4.4 Skenario: Persetujuan Pengajuan (Approval)**
 | Aksi Aktor | Reaksi Aplikasi |
@@ -164,6 +178,11 @@ Aktor yang terlibat:
 | 1. Penyelia membuka antrean "Pengajuan Masuk". | 2. Menyajikan daftar lengkap form staf miliknya. |
 | 3. Menyetel penyesuaian di kolom *Quantity Approved* (jika perlu). | 4. Menekan fungsi Setuju. |
 | 5. Konfirmasi persetujuan (*Approve*). | 6. Mengganti status transaksi dari `Pending` menjadi `Approved` dan menotifikasi Admin Gudang. |
+| **Kondisi Akhir** | **: Status pengajuan berubah menjadi `Approved` dan Admin Gudang menerima notifikasi.** |
+
+Nama Use Case : Pemotongan Stok dan Serah Terima<br>
+Aktor : Admin Gudang, Staff Unit Kerja<br>
+Deskripsi : Proses penyiapan barang fisik, penyerahan, hingga konfirmasi penerimaan.
 
 **Tabel 4.5 Skenario: Pemotongan Stok dan Serah Terima**
 | Aksi Aktor | Reaksi Aplikasi |
@@ -171,6 +190,7 @@ Aktor yang terlibat:
 | 1. Admin Gudang membuka form berstatus `Approved` lalu klik "Issue" (Proses Keluarkan). | 2. Mengaktifkan *Pessimistic Lock*, memotong nilai dari parameter stok asli, dan menulis riwayat mutasi (*Stock Ledger*). |
 | 3. Barang diberikan, Admin klik "Handover". | 4. Mengganti status menjadi `Handed_Over`. |
 | 5. Staf yang mengambil barang menekan tombol "Konfirmasi Terima" di akunnya. | 6. Siklus tertutup (*Completed*) dan SPB/BAST siap cetak PDF. |
+| **Kondisi Akhir** | **: Transaksi selesai, stok berkurang secara sistem, dan dokumen BAST PDF dapat dicetak.** |
 
 ### 4.7.2 Class Diagram
 Class diagram SIMPATIK memvisualisasikan arsitektur cetak biru penyusunan kolom tabel logis, meliputi keterikatan relasional seperti entitas `User` yang bernaung di bawah `Department`, hubungannya dengan `Role`, entitas objek induk `Item`, dan percabangannya ke dua arah arus gudang, yaitu `InboundTransaction` dan `OutboundTransaction`.
@@ -181,6 +201,16 @@ Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasa
 1. **Activity Diagram Outbound:** Menggambarkan aliran pengajuan. Mulai dari Staf menyusun pesanan → Pemeriksaan jumlah → Persetujuan/Penolakan oleh Penyelia → Pemrosesan Pemotongan Fisik oleh Admin → Konfirmasi Serah Terima.
 2. **Activity Diagram Inbound:** Menggambarkan Admin mencatatkan stok masuk vendor yang berakumulasi pada angka *current_stock*.
 (Gambar 4.3 Activity Diagram terlampir di lembar desain sistem)
+
+### 4.7.4 Sequence Diagram
+Sequence Diagram memodelkan urutan interaksi antar objek dan pemanggilan *method* dari *View* (Inertia.js), ke *Controller*, *Service*, hingga ke *Model* pada arsitektur SIMPATIK.
+1. **Sequence Diagram Autentikasi:** Menggambarkan proses validasi kredensial *login* dan pemeriksaan *Middleware* terhadap ketersediaan tanda tangan digital (*signature_path*).
+2. **Sequence Diagram Inbound:** Menggambarkan aliran proses ketika Admin Gudang menyimpan data barang masuk, yang berujung pada kalkulasi otomatis penambahan *current_stock* dan pencatatan histori *Stock Ledger*.
+3. **Sequence Diagram Outbound (Normal):** Menggambarkan aliran proses panjang dari pembuatan formulir (*Pending*), pemberian izin oleh Penyelia (*Approved*), hingga persiapan barang oleh Admin Gudang (*Issued*).
+4. **Sequence Diagram Serah Terima (Handover):** Menggambarkan pertukaran status transaksi menjadi *Handed_Over* oleh Admin Gudang dan konfirmasi penerimaan oleh Staf hingga berstatus *Completed*.
+5. **Sequence Diagram Laporan & Ekspor:** Menggambarkan mekanisme kompilasi kueri data *Stock Ledger* menjadi format unduhan PDF/Excel melalui *Controller*.
+6. **Sequence Diagram Rekonsiliasi:** Menggambarkan mekanisme pencocokan stok fisik di mana selisih (*qty_diff*) secara otomatis dicatat sebagai transaksi penyesuaian (*adjustment*) di dalam sistem.
+(Gambar 4.4 Sequence Diagram terlampir di lembar desain sistem)
 
 ## 4.8 Kamus Data
 
@@ -277,39 +307,39 @@ Pada tahap ini, rancangan desain purwarupa aplikasi telah berhasil diimplementas
 
 **1. Halaman Login dan Autentikasi**
 Halaman ini adalah pintu gerbang awal aplikasi SIMPATIK bagi seluruh karyawan Bank Sumsel Babel Cabang Utama. Pengguna diminta menginput *Email* dan *Password*.
-<br> *(Gambar 4.4 Halaman Login)*
+<br> *(Gambar 4.5 Halaman Login)*
 
 **2. Halaman Signature Onboarding**
 Halaman wajib bagi pengguna baru. Antarmuka ini menampilkan blok kanvas putih di bagian tengah, tempat di mana pengguna harus menggambar tanda tangan digital miliknya menggunakan kursor mouse atau sentuhan jari. Tanpa tanda tangan ini, dokumen Surat Permintaan Barang (SPB) tidak dapat disahkan.
-<br> *(Gambar 4.5 Halaman Signature Onboarding)*
+<br> *(Gambar 4.6 Halaman Signature Onboarding)*
 
 **3. Halaman Dashboard Utama**
 Dasbor pangkalan ringkasan sistem. Halaman ini menampakkan kartu metrik visual yang menerangkan jumlah pengajuan bulan ini, lalu merinci sisa item dan peringatan bahaya warna merah "Stok Kritis". 
-<br> *(Gambar 4.6 Halaman Dashboard Utama)*
+<br> *(Gambar 4.7 Halaman Dashboard Utama)*
 
 **4. Halaman Tabel Pengajuan Barang (Outbound)**
 Ruang antrean dokumen permintaan. Dihiasi fitur *Data Table* yang menampilkan *badge* status transaksi warna-warni (contoh: kuning untuk *Pending*, biru untuk *Approved*, dan hijau terang untuk *Completed*). Pengguna dapat menekan tombol biru "Buat Pengajuan Baru".
-<br> *(Gambar 4.7 Halaman Tabel Pengajuan Barang)*
+<br> *(Gambar 4.8 Halaman Tabel Pengajuan Barang)*
 
 **5. Halaman Modal Pengajuan (Buat Permintaan)**
 Kotak interaktif (Pop-up Modal) pencarian barang. Staf unit kerja dapat mencari kata kunci nama alat tulis, kemudian mengisi berapa jumlah yang dibutuhkan, dan langsung mengirimnya ke meja konfirmasi penyelia secara kilat.
-<br> *(Gambar 4.8 Halaman Modal Form Permintaan)*
+<br> *(Gambar 4.9 Halaman Modal Form Permintaan)*
 
 **6. Halaman Panel Persetujuan Penyelia (Approval Detail)**
 Halaman eksklusif bagi pemegang peran kepemimpinan. Terbagi dalam tata letak (layout) dua lajur; ringkasan profil pemohon, disusul rincian daftar jumlah barang. Terdapat tuas penyesuai kuantitas yang sah disetujui, diapit oleh tombol agung berwarna biru 'Setujui' (Approve) dan merah 'Tolak' (Reject).
-<br> *(Gambar 4.9 Halaman Panel Persetujuan Penyelia)*
+<br> *(Gambar 4.10 Halaman Panel Persetujuan Penyelia)*
 
 **7. Halaman Data Master Inventaris Gudang**
 Layar *inventory control* untuk Admin Gudang. Daftar lengkap katalog peralatan tulis yang diwadahi lengkap dengan representasi visual gambar, nama satuan, hingga angka mutlak sisa ketersediaan. Disertai fitur *filter* Kategori dan kontrol penambahan (*Create*) stok item yang baru.
-<br> *(Gambar 4.10 Halaman Data Master Inventaris)*
+<br> *(Gambar 4.11 Halaman Data Master Inventaris)*
 
 **8. Halaman Laporan Mutasi Bulanan (Stock Ledger)**
 Konsol perekaman jejak audit milik Bagian Umum (GA). Layar memuat *form* penarikan rentang tanggal dari Tanggal Awal hingga Akhir. Menyajikan tabel komprehensif debit-kredit gudang, serta ketersediaan opsi aksi penting "*Export Excel*" dan "*Export PDF*" di pojok bagian luar.
-<br> *(Gambar 4.11 Halaman Laporan Mutasi & Ekspor)*
+<br> *(Gambar 4.12 Halaman Laporan Mutasi & Ekspor)*
 
 **9. Halaman Rekonsiliasi (Stock Opname)**
 Lembar kalkulasi fisik versus sistem. Dirancang menyerupai lembar akuntansi memanjang yang membeberkan total angka sistem di layar bersebelahan dengan kotak kosong untuk diisi penghitungan fisik nyata oleh Admin Gudang. Kalkulator program mendeteksi angka "Selisih" secara seketika (*real-time*).
-<br> *(Gambar 4.12 Halaman Fitur Rekonsiliasi)*
+<br> *(Gambar 4.13 Halaman Fitur Rekonsiliasi)*
 
 ## 4.11 Pengujian Sistem
 
