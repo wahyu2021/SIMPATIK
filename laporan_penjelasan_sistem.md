@@ -199,17 +199,21 @@ Kamus Data: `id + item_code + name + unit_of_measure + current_stock + minimum_s
 | 7 | category_id | Bigint | 20 | Foreign Key -> tabel categories |
 
 **3. Tabel `outbound_transactions`**
-Kamus Data: `id + document_number + transaction_date + status + is_direct_request + requester_id + approver_id + created_at + updated_at`
+Kamus Data: `id + requester_id + approver_id + issued_by + handed_over_by + picked_up_by + department_id + document_number + transaction_date + status + approved_at + issued_at + handed_over_at + picked_up_at + is_special_request + is_direct_request + rejection_reason + notes + created_at + updated_at + deleted_at`
 
 | No | Nama Field | Tipe Data | Ukuran | Keterangan |
 | -- | --- | --- | --- | --- |
 | 1 | id | Bigint | 20 | Primary Key, Auto_Increment |
-| 2 | document_number| Varchar | 100 | Format nomor SPB dinamis |
-| 3 | transaction_date| Date | - | Tanggal dokumen disahkan |
-| 4 | status | Varchar | 50 | Indikator tahap birokrasi |
-| 5 | is_direct_request| Boolean| 1 | *Bypass Approval* flag |
-| 6 | requester_id | Bigint | 20 | Foreign Key (Pemohon) |
-| 7 | approver_id | Bigint | 20 | Foreign Key (Pemberi izin) |
+| 2 | requester_id | Bigint | 20 | Foreign Key (Pemohon) |
+| 3 | approver_id | Bigint | 20 | Foreign Key (Pemberi izin) |
+| 4 | issued_by | Bigint | 20 | Foreign Key (Admin Penyiap) |
+| 5 | handed_over_by| Bigint | 20 | Foreign Key (Admin Penyerah) |
+| 6 | picked_up_by | Bigint | 20 | Foreign Key (Penerima) |
+| 7 | department_id | Bigint | 20 | Foreign Key -> tabel departments |
+| 8 | document_number| Varchar | 100 | Format nomor SPB dinamis |
+| 9 | transaction_date| Date | - | Tanggal dokumen disahkan |
+| 10 | status | Varchar | 50 | PENDING, APPROVED, ISSUED, dll |
+| 11 | is_direct_request| Boolean| 1 | *Bypass Approval* flag |
 
 **4. Tabel `stock_ledgers`**
 Kamus Data: `id + item_id + movement_type + qty_in + qty_out + ending_balance + transaction_date + document_reference`
