@@ -77,11 +77,11 @@ Untuk dapat menghasilkan aplikasi ini dibutuhkan komponen-komponen komputer yang
    - Frontend Framework: React.js (TypeScript) melalui *bundler* Vite.
    - Microservice: Node.js (Library Baileys) untuk pemrosesan pesan masuk-keluar *WhatsApp Gateway*.
 2. **Perangkat Keras (Hardware):**
-   Perangkat keras yang digunakan untuk pengembangan adalah Komputer jinjing (Laptop) dengan spesifikasi:
-   - Processor: AMD Ryzen 5.
+   Perangkat keras yang digunakan untuk pengembangan adalah Komputer jinjing (Laptop) Acer Nitro V15 dengan spesifikasi:
+   - Processor: AMD Ryzen 5 6600H with Radeon Graphics (3.30 GHz).
    - RAM: 16 GB.
-   - Penyimpanan: 512 GB SSD NVMe.
-   - Kartu Grafis: NVIDIA RTX 3050.
+   - Penyimpanan: 512 GB SSD.
+   - Kartu Grafis: NVIDIA GeForce RTX 3050 6GB Laptop GPU.
 
 ### 4.5.2 Bahan
 Adapun bahan yang digunakan dalam menyusun laporan dan sistem ini adalah:
