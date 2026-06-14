@@ -342,7 +342,7 @@ Event list merupakan suatu kejadian yang dapat terjadi pada lingkungan sistem da
 | Division Head melihat detail form dan menekan "Setujui". | Division Head | Sistem menampilkan jendela pop-up konfirmasi persetujuan. |
 | Division Head mengonfirmasi persetujuan (*Approve*). | Division Head | Sistem menyimpan pembaruan, mengubah status menjadi `Approved`, dan mengirim notifikasi WhatsApp ke Admin Gudang. |
 
-**Tabel 4.7 Event List Admin Gudang & Bagian Umum**
+**Tabel 4.7 Event List Admin Gudang**
 | Event List | Trigger/Actor | Respon Sistem |
 | --- | --- | --- |
 | Admin memilih menu "Data Master" lalu "Data Barang". | Admin Gudang | Sistem menampilkan daftar katalog persediaan ATK dari database. |
@@ -350,7 +350,13 @@ Event list merupakan suatu kejadian yang dapat terjadi pada lingkungan sistem da
 | Admin memilih menu "Permintaan Barang". | Admin Gudang | Sistem menampilkan antrean dokumen pengajuan berstatus `Approved`. |
 | Admin mengklik "Proses Penyiapan Barang" (Issue). | Admin Gudang | Sistem memotong nilai stok fisik, membuat riwayat mutasi di tabel *Stock Ledger*, dan mengubah status menjadi `Issued`. |
 | Admin menyerahkan barang ke staf dan klik "Serahkan". | Admin Gudang | Sistem memperbarui status menjadi `Handed_Over` (menunggu konfirmasi penerimaan staf). |
-| Admin / GA membuka menu "Laporan Mutasi" dan klik "Export PDF". | Admin Gudang | Sistem memproses rekapitulasi data dan mengunduh file laporan berformat PDF ke perangkat. |
+
+**Tabel 4.8 Event List Staff Bagian Umum**
+| Event List | Trigger/Actor | Respon Sistem |
+| --- | --- | --- |
+| Staff Bagian Umum membuka menu "Laporan Mutasi". | Staff Bagian Umum | Sistem menampilkan halaman filter rentang waktu laporan mutasi stok. |
+| Staff Bagian Umum menentukan tanggal dan klik "Tampilkan". | Staff Bagian Umum | Sistem memproses kueri rekapitulasi mutasi dan menampilkan preview data. |
+| Staff Bagian Umum mengklik "Export PDF" atau "Export Excel". | Staff Bagian Umum | Sistem mengkompilasi data dan mengunduh file laporan berformat PDF/Excel ke perangkat. |
 
 ## 4.10 Perancangan Design Tampilan
 
