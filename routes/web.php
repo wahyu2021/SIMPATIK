@@ -41,21 +41,7 @@ Route::middleware(['auth'])->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    // Signature Onboarding - MUST BE OUTSIDE signature middleware
-    // Accessible untuk users yang belum ada signature
-    Route::prefix('signature')->name('signature.')->group(function () {
-        Route::get('/create', [SignatureController::class, 'create'])->name('create');
-        Route::post('/create', [SignatureController::class, 'store'])->name('store');
-        
-        // Edit & update hanya untuk users yang sudah ada signature
-        Route::middleware(['signature'])->group(function () {
-            Route::get('/edit', [SignatureController::class, 'edit'])->name('edit');
-            Route::put('/update', [SignatureController::class, 'update'])->name('update');
-        });
-    });
-
-    // Routes that require signature completion
-    Route::middleware(['signature'])->group(function () {
+    // Routes that require auth
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -77,11 +63,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [ProfileController::class, 'edit'])->name('edit');
             Route::put('/update', [ProfileController::class, 'updateProfile'])->name('update');
             Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
-            Route::put('/signature', [ProfileController::class, 'updateSignature'])->name('signature');
         });
 
-        // Barang Masuk (Inbound) — Admin Gudang only
-        Route::middleware(['role:warehouse_admin'])->group(function () {
+        // Barang Masuk (Inbound)
+        Route::middleware(['can:view-inbound'])->group(function () {
             Route::resource('inbound', InboundController::class);
         });
         // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
@@ -114,7 +99,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    });
 });
 
 

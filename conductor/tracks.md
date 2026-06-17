@@ -13,3 +13,6 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `notifications-system` | Sistem Notifikasi Multi-Channel (Web & WA) | 🔴 Todo | [Plan](./tracks/notifications-system/plan.md) |
 | `audit-trail` | Implementasi Digital Audit Trail | ✅ Completed | [Plan](./tracks/audit-trail/plan.md) |
 | `testing-qa` | Pengujian Otomatis & QA | 🔴 Todo | [Plan](./tracks/testing-qa/plan.md) |
+| `inbound-visibility` | Perubahan Hak Akses Barang Masuk (Gudang -> Umum) | ✅ Completed | [Plan](./tracks/inbound-visibility/plan.md) |
+| `disable-signature` | Disable Signature & Implementasi QR Code PDF | ✅ Completed | [Plan](./tracks/disable-signature/plan.md) |
+| `qr-timestamp-detail` | Penambahan Timestamp pada QR Code Validasi | ✅ Completed | [Plan](./tracks/qr-timestamp-detail/plan.md) |

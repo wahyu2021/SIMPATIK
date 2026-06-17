@@ -56,7 +56,7 @@ export const menuGroups: MenuGroup[] = [
     {
         title: 'Transaksi',
         items: [
-            { label: 'Barang Masuk', href: '/inbound', icon: PackagePlus, routeMatch: '/inbound', roles: ['warehouse_admin'] },
+            { label: 'Barang Masuk', href: '/inbound', icon: PackagePlus, routeMatch: '/inbound', roles: ['general_affairs'] },
             { label: 'Pengajuan Barang', href: '/outbound', icon: Send, routeMatch: '/outbound' },
         ],
     },

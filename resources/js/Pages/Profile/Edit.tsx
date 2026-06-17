@@ -4,14 +4,12 @@ import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Alert, Breadcrumbs } from '../../Components/UI';
 import UpdateProfileForm from '../../Components/Features/Profile/UpdateProfileForm';
 import UpdatePasswordForm from '../../Components/Features/Profile/UpdatePasswordForm';
-import UpdateSignatureForm from '../../Components/Features/Profile/UpdateSignatureForm';
 
 interface Props extends PageProps {
     user: User;
-    signatureUrl?: string | null;
 }
 
-export default function ProfileEdit({ user, signatureUrl }: Props) {
+export default function ProfileEdit({ user }: Props) {
     const { flash } = usePage<PageProps>().props;
 
     const roleLabels: Record<string, string> = {
@@ -43,7 +41,6 @@ export default function ProfileEdit({ user, signatureUrl }: Props) {
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
                 <UpdateProfileForm user={user} />
                 <UpdatePasswordForm />
-                <UpdateSignatureForm signatureUrl={signatureUrl} />
             </div>
         </AuthenticatedLayout>
     );

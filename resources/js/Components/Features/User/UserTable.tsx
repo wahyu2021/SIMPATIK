@@ -50,9 +50,6 @@ export default function UserTable({ users, onDelete, onToggleStatus }: UserTable
                                             </div>
                                             <div>
                                                 <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                                {user.signature_path && (
-                                                    <span className="text-[10px] text-green-600">✓ TTD</span>
-                                                )}
                                             </div>
                                         </div>
                                     </td>

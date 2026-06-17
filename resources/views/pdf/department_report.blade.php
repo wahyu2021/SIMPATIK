@@ -21,7 +21,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo.webp') }}" style="height: 50px; margin-bottom: 10px;">
         <h1>LAPORAN PENGGUNAAN BARANG PER UNIT KERJA</h1>
-        <p><strong>{{ $signatory['company_name'] }}</strong> — {{ $signatory['company_branch'] }}</p>
+        <p><strong>{{ $signatory['company_name'] }}</strong> - {{ $signatory['company_branch'] }}</p>
     </div>
 
     <div class="info-box">

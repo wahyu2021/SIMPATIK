@@ -21,6 +21,7 @@ export default function StatsGrid({ stats }: { stats: DashboardStats }) {
     const role = auth.user.roles?.[0]?.name ?? '';
     const isAdmin = role === 'warehouse_admin';
     const isPenyelia = role === 'division_head';
+    const isGeneralAffairs = role === 'general_affairs';
 
     return (
         <>
@@ -103,12 +104,27 @@ export default function StatsGrid({ stats }: { stats: DashboardStats }) {
                     color="green"
                 />
 
-                {isAdmin ? (
+                {isGeneralAffairs ? (
                     <>
                         <StatCard
                             title="Barang Masuk (Bulan Ini)"
                             value={stats.inbound_this_month}
                             icon={<PackagePlus className="w-6 h-6" />}
+                            color="blue"
+                        />
+                         <StatCard
+                            title="Stok Kritis"
+                            value={stats.low_stock_count}
+                            icon={<AlertTriangle className="w-6 h-6" />}
+                            color={stats.low_stock_count > 0 ? 'red' : 'green'}
+                        />
+                    </>
+                ) : isAdmin ? (
+                    <>
+                        <StatCard
+                            title="Unit Aktif"
+                            value={stats.total_departments}
+                            icon={<Building2 className="w-6 h-6" />}
                             color="blue"
                         />
                          <StatCard

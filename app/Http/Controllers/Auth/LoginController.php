@@ -34,14 +34,7 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        // Determine redirect path
-        if ($user->needsSignatureOnboarding()) {
-            // First-time login: go to signature onboarding
-            return redirect()->route('signature.create')
-                ->with('info', 'Selamat datang! Silakan lengkapi tanda tangan digital Anda.');
-        }
-
-        // Already has signature: go to dashboard
+        // Redirect to dashboard
         return redirect()->intended(route('dashboard'))
             ->with('success', 'Selamat datang, ' . $user->name);
     }

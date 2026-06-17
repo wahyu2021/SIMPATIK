@@ -39,8 +39,6 @@ enum UserRole: string
                 'manage-items',
                 'manage-categories',
                 'manage-departments',
-                'view-inbound',
-                'create-inbound',
                 'approve-outbound',
                 'issue-outbound',
                 'create-outbound-request',
@@ -59,6 +57,8 @@ enum UserRole: string
                 'view-reports',
                 'export-reports',
                 'view-all-requests',
+                'view-inbound',
+                'create-inbound',
             ],
             self::STAFF => [
                 'view-dashboard',

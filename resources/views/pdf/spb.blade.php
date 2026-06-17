@@ -23,7 +23,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo.webp') }}" style="height: 50px; margin-bottom: 10px;">
         <h1>SURAT PERMINTAAN BARANG (SPB)</h1>
-        <p><strong>{{ $signatory['company_name'] }}</strong> — {{ $signatory['company_branch'] }}</p>
+        <p><strong>{{ $signatory['company_name'] }}</strong> - {{ $signatory['company_branch'] }}</p>
         <p>{{ $signatory['company_address'] }}</p>
     </div>
 
@@ -71,37 +71,40 @@
         <tr>
             <td class="signature-box" style="width: {{ $outbound->is_direct_request ? '50%' : '33%' }}">
                 <p>Diajukan Oleh,</p>
-                @if($outbound->requester->signature_path)
-                    <img src="{{ storage_path('app/public/' . $outbound->requester->signature_path) }}" class="signature-img">
-                @else
-                    <div style="height: 60px;"></div>
-                @endif
-                <p><strong>{{ $outbound->requester->name }}</strong></p>
-                <p style="font-size: 9px; color: #666;">Pihak Pemohon</p>
+                @php
+                    $requesterName = $outbound->requester->name ?? 'Pemohon';
+                    $requesterInfo = "Diajukan secara elektronik oleh: " . $requesterName . " - Pihak Pemohon pada " . \Carbon\Carbon::parse($outbound->created_at ?? now())->translatedFormat('d F Y H:i:s');
+                    $requesterQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($requesterInfo));
+                @endphp
+                <img src="data:image/svg+xml;base64, {!! $requesterQr !!}" class="signature-img">
+                <p><strong>{{ $requesterName }}</strong></p>
+                <p style="font-size: 9px; color: #666;">Pihak Pemohon<br>{{ \Carbon\Carbon::parse($outbound->created_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
 
             @if(!$outbound->is_direct_request)
             <td class="signature-box" style="width: 33%">
                 <p>Diketahui Oleh,</p>
-                @if($outbound->approver && $outbound->approver->signature_path)
-                    <img src="{{ storage_path('app/public/' . $outbound->approver->signature_path) }}" class="signature-img">
-                @else
-                    <div style="height: 60px;"></div>
-                @endif
-                <p><strong>{{ $outbound->approver->name ?? '........................' }}</strong></p>
-                <p style="font-size: 9px; color: #666;">Penyelia / Pimpinan</p>
+                @php
+                    $approverName = $outbound->approver->name ?? 'Penyelia';
+                    $approverInfo = "Disetujui secara elektronik oleh: " . $approverName . " - Penyelia pada " . \Carbon\Carbon::parse($outbound->approved_at ?? now())->translatedFormat('d F Y H:i:s');
+                    $approverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($approverInfo));
+                @endphp
+                <img src="data:image/svg+xml;base64, {!! $approverQr !!}" class="signature-img">
+                <p><strong>{{ $approverName }}</strong></p>
+                <p style="font-size: 9px; color: #666;">Penyelia / Pimpinan<br>{{ \Carbon\Carbon::parse($outbound->approved_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
             @endif
 
             <td class="signature-box" style="width: {{ $outbound->is_direct_request ? '50%' : '33%' }}">
                 <p>Diserahkan Oleh,</p>
-                @if($outbound->issuedByUser && $outbound->issuedByUser->signature_path)
-                    <img src="{{ storage_path('app/public/' . $outbound->issuedByUser->signature_path) }}" class="signature-img">
-                @else
-                    <div style="height: 60px;"></div>
-                @endif
-                <p><strong>{{ $outbound->issuedByUser->name ?? '........................' }}</strong></p>
-                <p style="font-size: 9px; color: #666;">Admin Gudang</p>
+                @php
+                    $issuerName = $outbound->issuedByUser->name ?? 'Admin Gudang';
+                    $issuerInfo = "Diserahkan secara elektronik oleh: " . $issuerName . " - Admin Gudang pada " . \Carbon\Carbon::parse($outbound->issued_at ?? now())->translatedFormat('d F Y H:i:s');
+                    $issuerQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($issuerInfo));
+                @endphp
+                <img src="data:image/svg+xml;base64, {!! $issuerQr !!}" class="signature-img">
+                <p><strong>{{ $issuerName }}</strong></p>
+                <p style="font-size: 9px; color: #666;">Admin Gudang<br>{{ \Carbon\Carbon::parse($outbound->issued_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
         </tr>
     </table>
