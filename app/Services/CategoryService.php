@@ -39,17 +39,21 @@ class CategoryService
     /**
      * Buat kategori baru.
      */
-    public function createCategory(array $data): Category
+    public function createCategory(\App\DTOs\Category\CategoryDTO $dto): Category
     {
-        return $this->categoryRepository->create($data);
+        return $this->categoryRepository->create([
+            'name' => $dto->name,
+        ]);
     }
 
     /**
-     * Update kategori yang sudah ada.
+     * Update data kategori.
      */
-    public function updateCategory(Category $category, array $data): bool
+    public function updateCategory(Category $category, \App\DTOs\Category\CategoryDTO $dto): bool
     {
-        return $this->categoryRepository->update($category, $data);
+        return $this->categoryRepository->update($category, [
+            'name' => $dto->name,
+        ]);
     }
 
     /**

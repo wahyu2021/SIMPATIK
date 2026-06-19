@@ -40,7 +40,7 @@ class CategoryController extends Controller
      */
     public function store(\App\Http\Requests\Category\StoreCategoryRequest $request): RedirectResponse
     {
-        $this->categoryService->createCategory($request->validated());
+        $this->categoryService->createCategory(\App\DTOs\Category\CategoryDTO::fromRequest($request));
 
         return redirect()
             ->route('categories.index')
@@ -64,7 +64,7 @@ class CategoryController extends Controller
     {
         $category = $this->categoryService->findCategory($id);
 
-        $this->categoryService->updateCategory($category, $request->validated());
+        $this->categoryService->updateCategory($category, \App\DTOs\Category\CategoryDTO::fromRequest($request));
 
         return redirect()
             ->route('categories.index')

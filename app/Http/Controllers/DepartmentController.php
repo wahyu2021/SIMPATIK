@@ -40,7 +40,7 @@ class DepartmentController extends Controller
      */
     public function store(\App\Http\Requests\Department\StoreDepartmentRequest $request): RedirectResponse
     {
-        $this->departmentService->createDepartment($request->validated());
+        $this->departmentService->createDepartment(\App\DTOs\Department\DepartmentDTO::fromRequest($request));
 
         return redirect()
             ->route('departments.index')
@@ -64,7 +64,7 @@ class DepartmentController extends Controller
     {
         $department = $this->departmentService->findDepartment($id);
 
-        $this->departmentService->updateDepartment($department, $request->validated());
+        $this->departmentService->updateDepartment($department, \App\DTOs\Department\DepartmentDTO::fromRequest($request));
 
         return redirect()
             ->route('departments.index')
