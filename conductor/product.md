@@ -4,7 +4,11 @@
 SIMPATIK adalah sistem informasi berbasis web untuk mendigitalisasi proses pengelolaan persediaan ATK (Alat Tulis Kantor) dan formulir cetakan di lingkungan perbankan (Bank Sumsel Babel Cabang A. Rivai). Sistem menggantikan proses manual pencatatan stok, pengajuan barang, dan pelaporan mutasi menjadi alur kerja digital yang terintegrasi.
 
 ## Core Features
-- **Multi-Role Authentication**: Admin Gudang, Staff Bagian Umum, Pimpinan (Penyelia), dan Staf Unit Kerja.
+- **Multi-Role Authentication**:
+  - **Admin Gudang**: Fokus pada pengeluaran barang (outbound), pencetakan dokumen, dan monitoring persediaan.
+  - **Staff Bagian Umum**: Mengelola data master (Barang, Kategori, Unit Kerja), akun pengguna, pengaturan sistem, dan barang masuk (inbound).
+  - **Pimpinan (Penyelia)**: Menyetujui pengajuan barang dari staf.
+  - **Staf Unit Kerja**: Mengajukan permintaan barang.
 - **Mandatory Signature Onboarding**: Tanda tangan digital wajib saat pertama kali login.
 - **Manajemen Barang**: CRUD barang dengan auto-generate kode, filter kategori, alert stok rendah.
 - **Approval Workflow**: Pengajuan barang oleh staf disetujui digital oleh Penyelia, lalu dikeluarkan Admin Gudang.

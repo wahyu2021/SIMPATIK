@@ -16,3 +16,10 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `inbound-visibility` | Perubahan Hak Akses Barang Masuk (Gudang -> Umum) | ✅ Completed | [Plan](./tracks/inbound-visibility/plan.md) |
 | `disable-signature` | Disable Signature & Implementasi QR Code PDF | ✅ Completed | [Plan](./tracks/disable-signature/plan.md) |
 | `qr-timestamp-detail` | Penambahan Timestamp pada QR Code Validasi | ✅ Completed | [Plan](./tracks/qr-timestamp-detail/plan.md) |
+| `role-permission-restructure` | Restrukturisasi Role & Permission (Gudang → Outbound Only) | ✅ Completed | [Plan](./tracks/role-permission-restructure/plan.md) |
+| `inbound-receipt-upload` | Upload Bukti Transaksi / Nota pada Barang Masuk | ✅ Completed | [Plan](./tracks/inbound-receipt-upload/plan.md) |
+| `dashboard-role-customization` | Penyesuaian Card & Tampilan Dashboard per Role | ✅ Completed | [Plan](./tracks/dashboard-role-customization/plan.md) |
+| `penyelia-role-refinement` | Penyesuaian Fitur & Hak Akses Penyelia | ✅ Completed | [Plan](./tracks/penyelia-role-refinement/plan.md) |
+| `user-import-feature` | Fitur Import User massal via Excel/CSV | ✅ Completed | [Plan](./tracks/user-import-feature/plan.md) |
+| `reconciliation-export` | Fitur Export Rekonsiliasi (PDF & Excel) | ✅ Completed | [Plan](./tracks/reconciliation-export/plan.md) |
+| `refactor-form-requests` | Pemisahan Validasi ke Form Request | ✅ Completed | [Plan](./tracks/refactor-form-requests/plan.md) |

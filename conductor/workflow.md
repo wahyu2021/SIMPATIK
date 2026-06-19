@@ -26,6 +26,7 @@ Berdasarkan peninjauan kode terbaru pada branch `dev`:
 4. **Validation**: Testing alur transaksi dari sisi Staff, Penyelia, hingga Admin Gudang.
 
 ## Catatan Kolaborasi
+- **Restrukturisasi Role**: Sesuai revisi, Admin Gudang difokuskan murni untuk pengeluaran barang (outbound). Bagian Umum mengambil alih tanggung jawab penuh atas data master (Kategori, Barang, Unit Kerja), manajemen user, pengaturan sistem, dan barang masuk (inbound).
 - **Penyederhanaan Laporan**: Sesuai arahan dosen, seluruh elemen harga/nilai (Rp) telah dihapus dari modul laporan dan dashboard untuk fokus pada kuantitas stok. Input harga pada barang dan transaksi masuk kini bersifat opsional.
 - Struktur kode sudah sangat konsisten mengikuti pola Repository-Service.
 - Penambahan fitur baru harus selalu mengikuti pola ini:
