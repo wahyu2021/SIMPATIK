@@ -53,13 +53,9 @@ class ProfileController extends Controller
     /**
      * Update tanda tangan.
      */
-    public function updateSignature(Request $request): RedirectResponse
+    public function updateSignature(\App\Http\Requests\Profile\UpdateSignatureRequest $request): RedirectResponse
     {
-        $request->validate([
-            'signature' => ['required', 'string'],
-        ]);
-
-        $this->profileService->updateSignature($request->user(), $request->signature);
+        $this->profileService->updateSignature($request->user(), $request->validated('signature'));
 
         return redirect()
             ->route('profile.edit')

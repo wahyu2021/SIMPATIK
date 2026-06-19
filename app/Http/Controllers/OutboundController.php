@@ -147,25 +147,14 @@ class OutboundController extends Controller
     /**
      * Simpan pengajuan langsung oleh Admin Gudang.
      */
-    public function storeDirect(Request $request): RedirectResponse
+    public function storeDirect(\App\Http\Requests\Outbound\StoreDirectOutboundRequest $request): RedirectResponse
     {
         Gate::authorize('create', OutboundTransaction::class);
         if (!auth()->user()->hasRole('warehouse_admin')) {
             abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
         }
 
-        $validated = $request->validate([
-            'requester_id'     => ['required', 'exists:users,id'],
-            'department_id'    => ['required', 'exists:departments,id'],
-            'transaction_date' => ['required', 'date', 'before_or_equal:today'],
-            'is_special_request' => ['nullable', 'boolean'],
-            'notes'            => ['nullable', 'string', 'max:500'],
-            'details'          => ['required', 'array', 'min:1'],
-            'details.*.item_id' => ['required', 'exists:items,id'],
-            'details.*.quantity'=> ['required', 'integer', 'min:1'],
-        ]);
-
-        $outbound = $this->outboundService->createDirectRequest($validated, auth()->id());
+        $outbound = $this->outboundService->createDirectRequest($request->validated(), auth()->id());
 
         return redirect()
             ->route('outbound.show', $outbound->id)

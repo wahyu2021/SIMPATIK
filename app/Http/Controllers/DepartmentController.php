@@ -38,17 +38,9 @@ class DepartmentController extends Controller
     /**
      * Simpan unit kerja baru.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(\App\Http\Requests\Department\StoreDepartmentRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:departments,name',
-        ], [
-            'name.required' => 'Nama unit kerja wajib diisi.',
-            'name.max'      => 'Nama unit kerja maksimal 255 karakter.',
-            'name.unique'   => 'Nama unit kerja sudah digunakan.',
-        ]);
-
-        $this->departmentService->createDepartment($validated);
+        $this->departmentService->createDepartment($request->validated());
 
         return redirect()
             ->route('departments.index')
@@ -68,19 +60,11 @@ class DepartmentController extends Controller
     /**
      * Update data unit kerja.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(\App\Http\Requests\Department\UpdateDepartmentRequest $request, int $id): RedirectResponse
     {
         $department = $this->departmentService->findDepartment($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:departments,name,' . $department->id,
-        ], [
-            'name.required' => 'Nama unit kerja wajib diisi.',
-            'name.max'      => 'Nama unit kerja maksimal 255 karakter.',
-            'name.unique'   => 'Nama unit kerja sudah digunakan.',
-        ]);
-
-        $this->departmentService->updateDepartment($department, $validated);
+        $this->departmentService->updateDepartment($department, $request->validated());
 
         return redirect()
             ->route('departments.index')
