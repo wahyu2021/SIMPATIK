@@ -7,10 +7,11 @@ interface CategoryTableProps {
     categories: Category[];
     startNumber: number;
     onDelete: (category: Category) => void;
+    canManage?: boolean;
 }
 
 /** Tabel kategori barang — nomor, nama, jumlah barang, aksi. */
-export default function CategoryTable({ categories, startNumber, onDelete }: CategoryTableProps) {
+export default function CategoryTable({ categories, startNumber, onDelete, canManage = true }: CategoryTableProps) {
     const columns = [
         {
             key: 'number',
@@ -37,7 +38,10 @@ export default function CategoryTable({ categories, startNumber, onDelete }: Cat
                 </div>
             ),
         },
-        {
+    ];
+
+    if (canManage) {
+        columns.push({
             key: 'actions',
             label: 'Aksi',
             headerClassName: 'text-right',
@@ -60,8 +64,8 @@ export default function CategoryTable({ categories, startNumber, onDelete }: Cat
                     </button>
                 </div>
             ),
-        },
-    ];
+        });
+    }
 
     return (
         <DataTable

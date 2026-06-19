@@ -6,12 +6,13 @@ import { DataTable, Badge } from '../../UI';
 interface ItemTableProps {
     items: Item[];
     onDelete: (item: Item) => void;
+    canManage?: boolean;
 }
 
 /**
  * Komponen ItemTable — tabel barang dengan kolom kode, nama, kategori, stok, harga, dan aksi.
  */
-export default function ItemTable({ items, onDelete }: ItemTableProps) {
+export default function ItemTable({ items, onDelete, canManage = true }: ItemTableProps) {
     const columns = [
         {
             key: 'item_code',
@@ -55,7 +56,10 @@ export default function ItemTable({ items, onDelete }: ItemTableProps) {
                 </span>
             ),
         },
-        {
+    ];
+
+    if (canManage) {
+        columns.push({
             key: 'actions',
             label: 'Aksi',
             headerClassName: 'text-right',
@@ -78,8 +82,8 @@ export default function ItemTable({ items, onDelete }: ItemTableProps) {
                     </button>
                 </div>
             ),
-        },
-    ];
+        });
+    }
 
     return (
         <DataTable

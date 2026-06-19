@@ -63,18 +63,18 @@ export const menuGroups: MenuGroup[] = [
     {
         title: 'Master Data',
         items: [
-            { label: 'Barang', href: '/items', icon: Package, routeMatch: '/items', roles: ['warehouse_admin'] },
-            { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories', roles: ['warehouse_admin'] },
-            { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments', roles: ['warehouse_admin'] },
+            { label: 'Barang', href: '/items', icon: Package, routeMatch: '/items', roles: ['warehouse_admin', 'general_affairs'] },
+            { label: 'Kategori', href: '/categories', icon: FolderTree, routeMatch: '/categories', roles: ['warehouse_admin', 'general_affairs'] },
+            { label: 'Unit Kerja', href: '/departments', icon: Building2, routeMatch: '/departments', roles: ['warehouse_admin', 'general_affairs'] },
         ],
     },
     {
         title: 'Sistem',
         items: [
-            { label: 'Pengguna', href: '/users', icon: Users, routeMatch: '/users', roles: ['warehouse_admin'] },
-            { label: 'Audit Trail', href: '/audit-logs', icon: History, routeMatch: '/audit-logs', roles: ['warehouse_admin'] },
+            { label: 'Pengguna', href: '/users', icon: Users, routeMatch: '/users', roles: ['general_affairs'] },
+            { label: 'Audit Trail', href: '/audit-logs', icon: History, routeMatch: '/audit-logs', roles: ['general_affairs'] },
             { label: 'Laporan', href: '/reports', icon: BarChart3, routeMatch: '/reports', roles: ['warehouse_admin', 'general_affairs'] },
-            { label: 'Pengaturan', href: '/settings', icon: Settings, routeMatch: '/settings', roles: ['warehouse_admin'] },
+            { label: 'Pengaturan', href: '/settings', icon: Settings, routeMatch: '/settings', roles: ['general_affairs'] },
         ],
     },
 ];

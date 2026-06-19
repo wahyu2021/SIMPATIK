@@ -22,9 +22,9 @@ enum UserRole: string
     public function description(): string
     {
         return match($this) {
-            self::WAREHOUSE_ADMIN => 'Pengelola tunggal gudang, full control: barang, stok, transaksi, user & settings',
+            self::WAREHOUSE_ADMIN => 'Fokus pada pengeluaran barang (outbound), pencetakan dokumen, dan monitoring laporan',
             self::DIVISION_HEAD => 'Approve/reject pengajuan staf di unit kerjanya (Penyelia masing-masing)',
-            self::GENERAL_AFFAIRS => 'Monitoring, cek laporan, dan audit stok bulanan',
+            self::GENERAL_AFFAIRS => 'Mengelola data master, user management, pengaturan sistem, barang masuk (inbound), dan audit',
             self::STAFF => 'Ajukan permintaan barang per unit kerja',
         };
     }
@@ -34,31 +34,37 @@ enum UserRole: string
         return match($this) {
             self::WAREHOUSE_ADMIN => [
                 'view-dashboard',
+                'view-items',
+                'view-categories',
+                'view-departments',
+                'approve-outbound',
+                'issue-outbound',
+                'view-all-requests',
+                'view-reports',
+            ],
+            self::DIVISION_HEAD => [
+                'view-dashboard',
+                'create-outbound-request',
+                'approve-outbound',
+                'view-own-requests',
+                'view-own-unit-requests',
+            ],
+            self::GENERAL_AFFAIRS => [
+                'view-dashboard',
                 'manage-users',
                 'manage-settings',
                 'manage-items',
                 'manage-categories',
                 'manage-departments',
-                'approve-outbound',
-                'issue-outbound',
-                'create-outbound-request',
+                'view-items',
+                'view-categories',
+                'view-departments',
+                'view-inbound',
+                'create-inbound',
                 'view-all-requests',
                 'view-reports',
                 'export-reports',
                 'view-forecasting',
-            ],
-            self::DIVISION_HEAD => [
-                'view-dashboard',
-                'approve-outbound',
-                'view-own-unit-requests',
-            ],
-            self::GENERAL_AFFAIRS => [
-                'view-dashboard',
-                'view-reports',
-                'export-reports',
-                'view-all-requests',
-                'view-inbound',
-                'create-inbound',
             ],
             self::STAFF => [
                 'view-dashboard',

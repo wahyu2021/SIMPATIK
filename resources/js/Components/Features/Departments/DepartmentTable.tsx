@@ -7,13 +7,14 @@ interface DepartmentTableProps {
     departments: Department[];
     startNumber: number;
     onDelete: (department: Department) => void;
+    canManage?: boolean;
 }
 
 /**
  * Komponen DepartmentTable — tabel unit kerja dengan kolom nomor, nama, jumlah pengguna, dan aksi.
  * Menggunakan DataTable generik sebagai base component.
  */
-export default function DepartmentTable({ departments, startNumber, onDelete }: DepartmentTableProps) {
+export default function DepartmentTable({ departments, startNumber, onDelete, canManage = true }: DepartmentTableProps) {
     /** Helper untuk cast item dari DataTable ke Department */
     const asDepartment = (item: Record<string, unknown>) => item as unknown as Department;
 
@@ -46,7 +47,10 @@ export default function DepartmentTable({ departments, startNumber, onDelete }: 
                 );
             },
         },
-        {
+    ];
+
+    if (canManage) {
+        columns.push({
             key: 'actions',
             label: 'Aksi',
             headerClassName: 'text-right',
@@ -72,8 +76,8 @@ export default function DepartmentTable({ departments, startNumber, onDelete }: 
                     </div>
                 );
             },
-        },
-    ];
+        });
+    }
 
     return (
         <DataTable

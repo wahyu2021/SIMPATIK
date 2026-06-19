@@ -30,6 +30,9 @@ class RolePermissionSeeder extends Seeder
             'manage-items',
             'manage-categories',
             'manage-departments',
+            'view-items',
+            'view-categories',
+            'view-departments',
 
             // Inbound (Barang Masuk)
             'view-inbound',

@@ -12,7 +12,8 @@ interface Props extends PageProps {
 }
 
 export default function DepartmentsIndex({ departments, filters }: Props) {
-    const { flash } = usePage<PageProps>().props;
+    const { auth, flash } = usePage<PageProps>().props;
+    const canManageDepartments = auth.user.roles?.some((role: any) => role.name === 'general_affairs') ?? false;
     const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -51,12 +52,14 @@ export default function DepartmentsIndex({ departments, filters }: Props) {
                 title="Unit Kerja"
                 description="Kelola daftar unit kerja di Bank Sumsel Babel"
                 action={
-                    <Link href="/departments/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Tambah Unit Kerja
-                        </Button>
-                    </Link>
+                    canManageDepartments ? (
+                        <Link href="/departments/create">
+                            <Button className="flex items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Unit Kerja
+                            </Button>
+                        </Link>
+                    ) : undefined
                 }
             />
 
@@ -85,12 +88,14 @@ export default function DepartmentsIndex({ departments, filters }: Props) {
                         message="Tambahkan unit kerja baru untuk memulai pengelolaan data."
                         icon={Building2}
                         action={
-                            <Link href="/departments/create">
-                                <Button className="flex items-center gap-2">
-                                    <Plus className="w-4 h-4" />
-                                    Tambah Unit Kerja
-                                </Button>
-                            </Link>
+                            canManageDepartments ? (
+                                <Link href="/departments/create">
+                                    <Button className="flex items-center gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        Tambah Unit Kerja
+                                    </Button>
+                                </Link>
+                            ) : undefined
                         }
                     />
                 </div>
@@ -102,6 +107,7 @@ export default function DepartmentsIndex({ departments, filters }: Props) {
                             departments={departments.data}
                             startNumber={departments.from ?? 1}
                             onDelete={setDeleteTarget}
+                            canManage={canManageDepartments}
                         />
                     </div>
 

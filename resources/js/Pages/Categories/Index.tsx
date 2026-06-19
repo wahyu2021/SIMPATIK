@@ -12,7 +12,8 @@ interface Props extends PageProps {
 }
 
 export default function CategoriesIndex({ categories, filters }: Props) {
-    const { flash } = usePage<PageProps>().props;
+    const { auth, flash } = usePage<PageProps>().props;
+    const canManageCategories = auth.user.roles?.some((role: any) => role.name === 'general_affairs') ?? false;
     const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -48,12 +49,14 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                 title="Kategori Barang"
                 description="Kelola klasifikasi kategori barang ATK"
                 action={
-                    <Link href="/categories/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Tambah Kategori
-                        </Button>
-                    </Link>
+                    canManageCategories ? (
+                        <Link href="/categories/create">
+                            <Button className="flex items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Kategori
+                            </Button>
+                        </Link>
+                    ) : undefined
                 }
             />
 
@@ -79,12 +82,14 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                         message="Tambahkan kategori baru untuk mengklasifikasikan barang ATK."
                         icon={Tags}
                         action={
-                            <Link href="/categories/create">
-                                <Button className="flex items-center gap-2">
-                                    <Plus className="w-4 h-4" />
-                                    Tambah Kategori
-                                </Button>
-                            </Link>
+                            canManageCategories ? (
+                                <Link href="/categories/create">
+                                    <Button className="flex items-center gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        Tambah Kategori
+                                    </Button>
+                                </Link>
+                            ) : undefined
                         }
                     />
                 </div>
@@ -95,6 +100,7 @@ export default function CategoriesIndex({ categories, filters }: Props) {
                             categories={categories.data}
                             startNumber={categories.from ?? 1}
                             onDelete={setDeleteTarget}
+                            canManage={canManageCategories}
                         />
                     </div>
 
