@@ -48,7 +48,7 @@ class UserManagementController extends Controller
      */
     public function store(RegisterUserRequest $request)
     {
-        $this->userService->createUser($request->validated());
+        $this->userService->createUser(\App\DTOs\User\UserDTO::fromRequest($request));
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
@@ -87,7 +87,7 @@ class UserManagementController extends Controller
     {
         $user = $this->userService->findUser($id);
 
-        $this->userService->updateUser($user, $request->validated());
+        $this->userService->updateUser($user, \App\DTOs\User\UserDTO::fromRequest($request));
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil diperbarui.');

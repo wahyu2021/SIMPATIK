@@ -10,12 +10,12 @@ class ProfileService
     /**
      * Update profil user (nama & email).
      */
-    public function updateProfile(User $user, array $data): bool
+    public function updateProfile(User $user, \App\DTOs\Profile\ProfileDTO $dto): bool
     {
         return $user->update([
-            'name'         => $data['name'],
-            'email'        => $data['email'],
-            'phone_number' => $data['phone_number'] ?? null,
+            'name'         => $dto->name,
+            'email'        => $dto->email,
+            'phone_number' => $dto->phone_number,
         ]);
     }
 

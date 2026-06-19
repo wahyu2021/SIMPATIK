@@ -42,18 +42,18 @@ class UserService
     /**
      * Buat user baru dan assign role + permissions.
      */
-    public function createUser(array $data): User
+    public function createUser(\App\DTOs\User\UserDTO $dto): User
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($dto) {
             $user = $this->userRepository->create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => $data['password'], // auto hashed via model cast
-                'department_id' => $data['department_id'],
-                'is_active' => $data['is_active'] ?? true,
+                'name' => $dto->name,
+                'email' => $dto->email,
+                'password' => $dto->password, // auto hashed via model cast
+                'department_id' => $dto->department_id,
+                'is_active' => $dto->is_active ?? true,
             ]);
 
-            $this->syncRoleAndPermissions($user, $data['role']);
+            $this->syncRoleAndPermissions($user, $dto->role);
 
             return $user->load(['department', 'roles']);
         });
@@ -62,28 +62,28 @@ class UserService
     /**
      * Update data user, sync role jika berubah.
      */
-    public function updateUser(User $user, array $data): User
+    public function updateUser(User $user, \App\DTOs\User\UserDTO $dto): User
     {
-        return DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $dto) {
             $updateData = [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'department_id' => $data['department_id'],
-                'is_active' => $data['is_active'] ?? $user->is_active,
+                'name' => $dto->name,
+                'email' => $dto->email,
+                'department_id' => $dto->department_id,
+                'is_active' => $dto->is_active ?? $user->is_active,
             ];
 
             // Hanya update password jika diisi
-            if (!empty($data['password'])) {
-                $updateData['password'] = $data['password'];
+            if (!empty($dto->password)) {
+                $updateData['password'] = $dto->password;
             }
 
             $this->userRepository->update($user, $updateData);
 
             // Sync role jika berubah
-            if (!empty($data['role'])) {
+            if (!empty($dto->role)) {
                 $currentRole = $user->getRoleName();
-                if ($currentRole !== $data['role']) {
-                    $this->syncRoleAndPermissions($user, $data['role']);
+                if ($currentRole !== $dto->role) {
+                    $this->syncRoleAndPermissions($user, $dto->role);
                 }
             }
 
