@@ -43,27 +43,28 @@ class InboundService
      * Buat transaksi barang masuk baru.
      * Simpan header + detail, update stok (pessimistic lock), dan catat StockLedger.
      */
-    public function createInbound(array $data): InboundTransaction
+    public function createInbound(\App\DTOs\Transaction\InboundDTO $dto): InboundTransaction
     {
-        return DB::transaction(function () use ($data) {
-            if (empty($data['reference_number'])) {
-                $data['reference_number'] = $this->inboundRepository->generateReferenceNumber();
+        return DB::transaction(function () use ($dto) {
+            $referenceNumber = $dto->reference_number;
+            if (empty($referenceNumber)) {
+                $referenceNumber = $this->inboundRepository->generateReferenceNumber();
             }
 
             $receiptPath = null;
-            if (isset($data['receipt_image'])) {
-                $receiptPath = $this->storeReceiptImage($data['receipt_image']);
+            if ($dto->receipt_image) {
+                $receiptPath = $this->storeReceiptImage($dto->receipt_image);
             }
 
             $inbound = $this->inboundRepository->create([
-                'user_id'          => $data['user_id'],
-                'reference_number' => $data['reference_number'],
-                'transaction_date' => $data['transaction_date'],
-                'notes'            => $data['notes'] ?? null,
+                'user_id'          => $dto->user_id,
+                'reference_number' => $referenceNumber,
+                'transaction_date' => $dto->transaction_date,
+                'notes'            => $dto->notes,
                 'receipt_image_path' => $receiptPath,
             ]);
 
-            foreach ($data['details'] as $detail) {
+            foreach ($dto->details as $detail) {
                 $inbound->details()->create([
                     'item_id'    => $detail['item_id'],
                     'quantity'   => $detail['quantity'],
@@ -76,7 +77,7 @@ class InboundService
 
                 StockLedger::create([
                     'item_id'            => $detail['item_id'],
-                    'transaction_date'   => $data['transaction_date'],
+                    'transaction_date'   => $dto->transaction_date,
                     'movement_type'      => 'in',
                     'document_reference' => $inbound->reference_number,
                     'qty_in'             => (int) $detail['quantity'],
@@ -93,9 +94,9 @@ class InboundService
      * Update transaksi barang masuk.
      * Rollback stok lama → hapus detail/ledger → simpan ulang detail baru + stok + ledger.
      */
-    public function updateInbound(InboundTransaction $inbound, array $data): InboundTransaction
+    public function updateInbound(InboundTransaction $inbound, \App\DTOs\Transaction\InboundDTO $dto): InboundTransaction
     {
-        return DB::transaction(function () use ($inbound, $data) {
+        return DB::transaction(function () use ($inbound, $dto) {
             $inbound->load('details');
 
             foreach ($inbound->details as $oldDetail) {
@@ -113,21 +114,21 @@ class InboundService
             $inbound->details()->delete();
 
             $receiptPath = $inbound->receipt_image_path;
-            if (isset($data['receipt_image'])) {
+            if ($dto->receipt_image) {
                 $this->deleteReceiptImage($receiptPath);
-                $receiptPath = $this->storeReceiptImage($data['receipt_image']);
+                $receiptPath = $this->storeReceiptImage($dto->receipt_image);
             }
 
             $this->inboundRepository->update($inbound, [
-                'reference_number' => $data['reference_number'] ?? $inbound->reference_number,
-                'transaction_date' => $data['transaction_date'],
-                'notes'            => $data['notes'] ?? null,
+                'reference_number' => $dto->reference_number ?: $inbound->reference_number,
+                'transaction_date' => $dto->transaction_date,
+                'notes'            => $dto->notes,
                 'receipt_image_path' => $receiptPath,
             ]);
 
             $inbound->refresh();
 
-            foreach ($data['details'] as $detail) {
+            foreach ($dto->details as $detail) {
                 $inbound->details()->create([
                     'item_id'    => $detail['item_id'],
                     'quantity'   => $detail['quantity'],
@@ -140,7 +141,7 @@ class InboundService
 
                 StockLedger::create([
                     'item_id'            => $detail['item_id'],
-                    'transaction_date'   => $data['transaction_date'],
+                    'transaction_date'   => $dto->transaction_date,
                     'movement_type'      => 'in',
                     'document_reference' => $inbound->reference_number,
                     'qty_in'             => (int) $detail['quantity'],

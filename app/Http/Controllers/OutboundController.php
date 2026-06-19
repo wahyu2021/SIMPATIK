@@ -116,11 +116,10 @@ class OutboundController extends Controller
     {
         Gate::authorize('create', OutboundTransaction::class);
 
-        $data = $request->validated();
-        $data['requester_id'] = auth()->id();
-        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+        $requesterId = auth()->id();
+        $departmentId = auth()->user()->department_id; // Set otomatis dari profil
 
-        $this->outboundService->createRequest($data);
+        $this->outboundService->createRequest(\App\DTOs\Transaction\OutboundDTO::fromRequest($request, $requesterId, $departmentId));
 
         return redirect()
             ->route('outbound.index')
@@ -154,7 +153,13 @@ class OutboundController extends Controller
             abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
         }
 
-        $outbound = $this->outboundService->createDirectRequest($request->validated(), auth()->id());
+        $requesterId = $request->validated('requester_id');
+        $departmentId = $request->validated('department_id');
+
+        $outbound = $this->outboundService->createDirectRequest(
+            \App\DTOs\Transaction\OutboundDTO::fromRequest($request, $requesterId, $departmentId), 
+            auth()->id()
+        );
 
         return redirect()
             ->route('outbound.show', $outbound->id)
@@ -197,10 +202,12 @@ class OutboundController extends Controller
         $outbound = $this->outboundService->findOutbound($id);
         Gate::authorize('update', $outbound);
 
-        $data = $request->validated();
-        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+        $departmentId = auth()->user()->department_id; // Set otomatis dari profil
 
-        $this->outboundService->updateRequest($outbound, $data);
+        $this->outboundService->updateRequest(
+            $outbound, 
+            \App\DTOs\Transaction\OutboundDTO::fromRequest($request, $outbound->requester_id, $departmentId)
+        );
 
         return redirect()
             ->route('outbound.show', $id)

@@ -46,10 +46,7 @@ class InboundController extends Controller
      */
     public function store(StoreInboundRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-        $data['user_id'] = auth()->id();
-
-        $this->inboundService->createInbound($data);
+        $this->inboundService->createInbound(\App\DTOs\Transaction\InboundDTO::fromRequest($request, auth()->id()));
 
         return redirect()
             ->route('inbound.index')
@@ -78,16 +75,16 @@ class InboundController extends Controller
     }
 
     /**
-     * Update transaksi barang masuk.
+     * Update data transaksi (hanya admin gudang/super admin).
      */
     public function update(UpdateInboundRequest $request, int $id): RedirectResponse
     {
         $inbound = $this->inboundService->findInbound($id);
-
-        $this->inboundService->updateInbound($inbound, $request->validated());
+        
+        $this->inboundService->updateInbound($inbound, \App\DTOs\Transaction\InboundDTO::fromRequest($request, $inbound->user_id));
 
         return redirect()
-            ->route('inbound.index')
+            ->route('inbound.show', $id)
             ->with('success', 'Transaksi barang masuk berhasil diperbarui.');
     }
 
