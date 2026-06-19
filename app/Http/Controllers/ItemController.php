@@ -47,7 +47,7 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request): RedirectResponse
     {
-        $this->itemService->createItem($request->validated());
+        $this->itemService->createItem(\App\DTOs\Item\ItemDTO::fromRequest($request));
 
         return redirect()
             ->route('items.index')
@@ -71,7 +71,8 @@ class ItemController extends Controller
     public function update(UpdateItemRequest $request, int $id): RedirectResponse
     {
         $item = $this->itemService->findItem($id);
-        $this->itemService->updateItem($item, $request->validated());
+
+        $this->itemService->updateItem($item, \App\DTOs\Item\ItemDTO::fromRequest($request));
 
         return redirect()
             ->route('items.index')
