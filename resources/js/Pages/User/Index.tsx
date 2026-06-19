@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, UploadCloud } from 'lucide-react';
 import { PageProps, PaginatedData, User, Department } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Alert, Pagination, ConfirmDialog, Breadcrumbs, EmptyState } from '../../Components/UI';
 import UserFilters from '../../Components/Features/User/UserFilters';
 import UserTable from '../../Components/Features/User/UserTable';
+import ImportUserModal from '../../Components/Features/Users/ImportUserModal';
 
 interface Props extends PageProps {
     users: PaginatedData<User>;
@@ -19,6 +20,7 @@ export default function UserIndex({ users, departments, roles, filters }: Props)
     const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
     const [toggleTarget, setToggleTarget] = useState<User | null>(null);
     const [processing, setProcessing] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
     const handleDelete = () => {
         if (!deleteTarget) return;
@@ -55,12 +57,18 @@ export default function UserIndex({ users, departments, roles, filters }: Props)
                 title="Manajemen Pengguna"
                 description="Kelola akun pengguna, role, dan status akses"
                 action={
-                    <Link href="/users/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Tambah Pengguna
+                    <div className="flex gap-2">
+                        <Button variant="outline" className="flex items-center gap-2" onClick={() => setIsImportModalOpen(true)}>
+                            <UploadCloud className="w-4 h-4" />
+                            Import Data
                         </Button>
-                    </Link>
+                        <Link href="/users/create">
+                            <Button className="flex items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Pengguna
+                            </Button>
+                        </Link>
+                    </div>
                 }
             />
 
@@ -132,6 +140,11 @@ export default function UserIndex({ users, departments, roles, filters }: Props)
                         : `Pengguna "${toggleTarget?.name}" akan diizinkan login kembali ke sistem.`
                 }
                 processing={processing}
+            />
+
+            <ImportUserModal 
+                open={isImportModalOpen} 
+                onClose={() => setIsImportModalOpen(false)} 
             />
         </AuthenticatedLayout>
     );
