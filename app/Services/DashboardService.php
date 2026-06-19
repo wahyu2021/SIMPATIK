@@ -30,20 +30,36 @@ class DashboardService
     }
 
     /**
-     * Kumpulkan semua angka statistik utama.
+     * Kumpulkan angka statistik utama berdasarkan role user.
      */
     private function getStats($user): array
     {
-        return [
-            'total_items'        => $this->dashboardRepository->countItems(),
-            'total_categories'   => $this->dashboardRepository->countCategories(),
-            'total_departments'  => $this->dashboardRepository->countDepartments(),
-            'total_users'        => $this->dashboardRepository->countActiveUsers(),
-            'low_stock_count'    => $this->dashboardRepository->countLowStockItems(),
-            'pending_requests'   => $this->dashboardRepository->countPendingRequests($user),
-            'approved_today'     => $this->dashboardRepository->countApprovedToday($user),
-            'inbound_this_month' => $this->dashboardRepository->countInboundThisMonth(),
-        ];
+        $role = $user->roles->first()?->name;
+
+        return match ($role) {
+            'general_affairs' => [
+                'total_items'        => $this->dashboardRepository->countItems(),
+                'low_stock_count'    => $this->dashboardRepository->countLowStockItems(),
+                'inbound_this_month' => $this->dashboardRepository->countInboundThisMonth(),
+                'total_users'        => $this->dashboardRepository->countActiveUsers(),
+                'total_departments'  => $this->dashboardRepository->countDepartments(),
+            ],
+            'warehouse_admin' => [
+                'pending_issue'      => $this->dashboardRepository->countPendingIssue(),
+                'issued_today'       => $this->dashboardRepository->countIssuedToday(),
+                'total_items'        => $this->dashboardRepository->countItems(),
+                'low_stock_count'    => $this->dashboardRepository->countLowStockItems(),
+            ],
+            'division_head' => [
+                'pending_approval'   => $this->dashboardRepository->countPendingApproval($user),
+                'approved_today'     => $this->dashboardRepository->countApprovedToday($user),
+            ],
+            'staff' => [
+                'my_active_requests'    => $this->dashboardRepository->countMyActiveRequests($user),
+                'my_completed_requests' => $this->dashboardRepository->countMyCompletedRequests($user),
+            ],
+            default => [],
+        };
     }
 
     /**

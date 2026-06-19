@@ -41,10 +41,29 @@ class DashboardRepository implements DashboardRepositoryInterface
         return Item::whereColumn('current_stock', '<=', 'minimum_stock_level')->count();
     }
 
-    public function countPendingRequests(?User $user = null): int
+    public function countPendingApproval(User $user): int
     {
         return OutboundTransaction::where('status', OutboundStatus::Pending)
-            ->when($user, fn($q) => $this->applyScope($q, $user))
+            ->where('department_id', $user->department_id)
+            ->count();
+    }
+
+    public function countPendingIssue(): int
+    {
+        return OutboundTransaction::where('status', OutboundStatus::Approved)->count();
+    }
+
+    public function countMyActiveRequests(User $user): int
+    {
+        return OutboundTransaction::where('requester_id', $user->id)
+            ->whereIn('status', [OutboundStatus::Pending, OutboundStatus::Approved])
+            ->count();
+    }
+
+    public function countMyCompletedRequests(User $user): int
+    {
+        return OutboundTransaction::where('requester_id', $user->id)
+            ->where('status', OutboundStatus::Completed)
             ->count();
     }
 
@@ -53,6 +72,13 @@ class DashboardRepository implements DashboardRepositoryInterface
         return OutboundTransaction::where('status', OutboundStatus::Approved)
             ->whereDate('approved_at', Carbon::today())
             ->when($user, fn($q) => $this->applyScope($q, $user))
+            ->count();
+    }
+
+    public function countIssuedToday(): int
+    {
+        return OutboundTransaction::whereIn('status', [OutboundStatus::Issued, OutboundStatus::HandedOver, OutboundStatus::Completed])
+            ->whereDate('issued_at', Carbon::today())
             ->count();
     }
 

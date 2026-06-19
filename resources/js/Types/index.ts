@@ -73,6 +73,8 @@ export interface InboundTransaction extends Timestamps {
     reference_number: string;
     transaction_date: string;
     notes?: string;
+    receipt_image_path?: string;
+    receipt_image_url?: string;
     user?: User;
     details?: InboundTransactionDetail[];
 }
@@ -174,14 +176,25 @@ export interface Setting extends Timestamps {
 
 // --- Dashboard DTOs ---
 export interface DashboardStats {
-    total_items: number;
-    total_categories: number;
-    total_departments: number;
-    total_users: number;
-    low_stock_count: number;
-    pending_requests: number;
-    approved_today: number;
-    inbound_this_month: number;
+    // General Affairs
+    total_items?: number;
+    total_categories?: number;
+    total_departments?: number;
+    total_users?: number;
+    low_stock_count?: number;
+    inbound_this_month?: number;
+    
+    // Warehouse Admin
+    pending_issue?: number;
+    issued_today?: number;
+
+    // Division Head
+    pending_approval?: number;
+    approved_today?: number;
+
+    // Staff
+    my_active_requests?: number;
+    my_completed_requests?: number;
 }
 
 export interface RecentRequest {
