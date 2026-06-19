@@ -56,33 +56,50 @@ class OutboundService
                 $data['document_number'] = $this->outboundRepository->generateDocumentNumber();
             }
 
-            $outbound = $this->outboundRepository->create([
+            $requester = User::query()->find($data['requester_id']);
+            $isSupervisor = $requester && $requester->hasRole('division_head');
+            $status = $isSupervisor ? OutboundStatus::Approved : OutboundStatus::Pending;
+
+            $outboundData = [
                 'requester_id'     => $data['requester_id'],
                 'department_id'    => $data['department_id'],
                 'document_number'  => $data['document_number'],
                 'transaction_date' => $data['transaction_date'],
-                'status'           => OutboundStatus::Pending,
+                'status'           => $status,
                 'is_special_request' => $data['is_special_request'] ?? false,
                 'notes'            => $data['notes'] ?? null,
-            ]);
+            ];
+
+            if ($isSupervisor) {
+                $outboundData['approver_id'] = $requester->id;
+                $outboundData['approved_at'] = now();
+            }
+
+            $outbound = $this->outboundRepository->create($outboundData);
 
             foreach ($data['details'] as $detail) {
                 $outbound->details()->create([
                     'item_id'            => $detail['item_id'],
                     'quantity_requested' => $detail['quantity_requested'],
-                    'quantity_approved'  => 0,
+                    'quantity_approved'  => $isSupervisor ? $detail['quantity_requested'] : 0,
                     'notes'              => $detail['notes'] ?? null,
                 ]);
             }
 
             $outbound->load(['requester', 'department', 'details.item']);
 
-            // Notifikasi ke Penyelia di departemen yang sama
-            $supervisors = User::role('division_head')
-                ->where('department_id', $outbound->department_id)
-                ->get();
-            
-            Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+            if ($isSupervisor) {
+                // Notifikasi ke Admin Gudang bahwa ada barang yg harus disiapkan
+                $admins = User::role('warehouse_admin')->get();
+                Notification::send($admins, new OutboundReadyForIssueNotification($outbound));
+            } else {
+                // Notifikasi ke Penyelia di departemen yang sama
+                $supervisors = User::role('division_head')
+                    ->where('department_id', $outbound->department_id)
+                    ->get();
+                
+                Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+            }
 
             return $outbound;
         });
@@ -372,7 +389,7 @@ class OutboundService
             abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat dibatalkan.');
         }
 
-        return $outbound->delete();
+        return $this->outboundRepository->delete($outbound);
     }
 
     /**

@@ -22,7 +22,7 @@ export default function OutboundIndex({ outbounds, filters, departments }: Props
     const userRoles = auth.user.roles?.map(r => r.name) ?? [];
     const isAdmin = userRoles.includes('warehouse_admin');
     const isPenyelia = userRoles.includes('division_head');
-    const canCreate = isAdmin || userRoles.includes('staff');
+    const canCreate = isAdmin || userRoles.includes('staff') || isPenyelia;
 
     const handleDelete = () => {
         if (!deleteTarget) return;

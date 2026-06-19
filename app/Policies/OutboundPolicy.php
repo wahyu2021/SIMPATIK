@@ -32,11 +32,11 @@ class OutboundPolicy
     }
 
     /**
-     * Hanya staff dan warehouse admin yang boleh membuat pengajuan baru.
+     * Hanya staff, penyelia, dan warehouse admin yang boleh membuat pengajuan baru.
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['staff', 'warehouse_admin']);
+        return $user->hasRole(['staff', 'warehouse_admin', 'division_head']);
     }
 
     /**
