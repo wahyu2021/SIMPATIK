@@ -23,3 +23,4 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `user-import-feature` | Fitur Import User massal via Excel/CSV | ✅ Completed | [Plan](./tracks/user-import-feature/plan.md) |
 | `reconciliation-export` | Fitur Export Rekonsiliasi (PDF & Excel) | ✅ Completed | [Plan](./tracks/reconciliation-export/plan.md) |
 | `refactor-form-requests` | Pemisahan Validasi ke Form Request | ✅ Completed | [Plan](./tracks/refactor-form-requests/plan.md) |
+| `refactor-services-to-dto` | Implementasi Data Transfer Object (DTO) pada Service Layer | 🔴 Todo | [Plan](./tracks/refactor-services-to-dto/plan.md) |
