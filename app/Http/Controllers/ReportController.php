@@ -179,23 +179,17 @@ class ReportController extends Controller
     }
 
     /**
-     * Simpan rekonsiliasi bulanan.
+     * Simpan hasil rekonsiliasi (Submit).
      */
-    public function storeReconciliation(\App\Http\Requests\Report\StoreReconciliationRequest $request): RedirectResponse
+    public function storeReconciliation(\App\Http\Requests\Report\StoreReconciliationRequest $request)
     {
-        $validated = $request->validated();
-
         $this->reportService->saveReconciliation(
-            (int) $validated['month'],
-            (int) $validated['year'],
-            auth()->id(),
-            $validated['details'],
-            $validated['notes'] ?? null,
+            \App\DTOs\Report\ReconciliationDTO::fromRequest($request, auth()->id())
         );
 
         return redirect()
             ->route('reports.reconciliation', ['month' => $request->month, 'year' => $request->year])
-            ->with('success', 'Rekonsiliasi berhasil disimpan.');
+            ->with('success', 'Rekonsiliasi stok berhasil disimpan dan saldo telah disesuaikan.');
     }
 
     /**
