@@ -50,11 +50,17 @@ class InboundService
                 $data['reference_number'] = $this->inboundRepository->generateReferenceNumber();
             }
 
+            $receiptPath = null;
+            if (isset($data['receipt_image'])) {
+                $receiptPath = $this->storeReceiptImage($data['receipt_image']);
+            }
+
             $inbound = $this->inboundRepository->create([
                 'user_id'          => $data['user_id'],
                 'reference_number' => $data['reference_number'],
                 'transaction_date' => $data['transaction_date'],
                 'notes'            => $data['notes'] ?? null,
+                'receipt_image_path' => $receiptPath,
             ]);
 
             foreach ($data['details'] as $detail) {
@@ -106,10 +112,17 @@ class InboundService
             $this->deleteLedgerEntries($inbound);
             $inbound->details()->delete();
 
+            $receiptPath = $inbound->receipt_image_path;
+            if (isset($data['receipt_image'])) {
+                $this->deleteReceiptImage($receiptPath);
+                $receiptPath = $this->storeReceiptImage($data['receipt_image']);
+            }
+
             $this->inboundRepository->update($inbound, [
                 'reference_number' => $data['reference_number'] ?? $inbound->reference_number,
                 'transaction_date' => $data['transaction_date'],
                 'notes'            => $data['notes'] ?? null,
+                'receipt_image_path' => $receiptPath,
             ]);
 
             $inbound->refresh();
@@ -162,6 +175,8 @@ class InboundService
             $this->deleteLedgerEntries($inbound);
             $inbound->details()->delete();
 
+            $this->deleteReceiptImage($inbound->receipt_image_path);
+
             return $this->inboundRepository->delete($inbound);
         });
     }
@@ -186,5 +201,17 @@ class InboundService
             ->where('movement_type', 'in')
             ->whereIn('item_id', $itemIds)
             ->delete();
+    }
+
+    private function storeReceiptImage($file): string
+    {
+        return \Illuminate\Support\Facades\Storage::disk('public')->putFile('inbound-receipts', $file);
+    }
+
+    private function deleteReceiptImage(?string $path): void
+    {
+        if ($path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        }
     }
 }

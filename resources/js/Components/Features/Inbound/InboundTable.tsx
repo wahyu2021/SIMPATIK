@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2, Paperclip } from 'lucide-react';
 import { InboundTransaction } from '../../../Types';
 import { DataTable, Badge } from '../../UI';
 import { formatCurrency, formatDate } from '../../../Lib/formatters';
@@ -21,7 +21,16 @@ export default function InboundTable({ inbounds, onDelete }: InboundTableProps) 
         {
             key: 'reference_number',
             label: 'No. Referensi',
-            className: 'font-mono font-medium text-gray-900',
+            render: (item: InboundTransaction) => (
+                <div className="flex items-center gap-2">
+                    <span className="font-mono font-medium text-gray-900">{item.reference_number}</span>
+                    {item.receipt_image_url && (
+                        <div title="Ada Bukti Transaksi">
+                            <Paperclip className="w-4 h-4 text-blue-500" />
+                        </div>
+                    )}
+                </div>
+            ),
         },
         {
             key: 'transaction_date',

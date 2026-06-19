@@ -28,6 +28,7 @@ class UpdateInboundRequest extends FormRequest
             'details.*.item_id'    => ['required', 'integer', 'exists:items,id', 'distinct'],
             'details.*.quantity'   => ['required', 'integer', 'min:1', 'max:999999'],
             'details.*.unit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999999'],
+            'receipt_image'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ];
     }
 
@@ -53,6 +54,9 @@ class UpdateInboundRequest extends FormRequest
             'details.*.unit_price.required' => 'Harga satuan harus diisi.',
             'details.*.unit_price.min'      => 'Harga satuan tidak boleh negatif.',
             'details.*.unit_price.max'      => 'Harga satuan terlalu besar.',
+            'receipt_image.file'            => 'Bukti transaksi harus berupa file.',
+            'receipt_image.mimes'           => 'Format bukti transaksi harus JPG, JPEG, PNG, atau PDF.',
+            'receipt_image.max'             => 'Ukuran bukti transaksi maksimal 2MB.',
         ];
     }
 }
