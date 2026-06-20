@@ -12,7 +12,7 @@ interface Props {
 
 /** Form input stok fisik untuk rekonsiliasi yang belum dilakukan. */
 export default function ReconciliationForm({ items, filters }: Props) {
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         month: filters.month,
         year: filters.year,
         notes: '',
@@ -32,6 +32,17 @@ export default function ReconciliationForm({ items, filters }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Frontend validation: Check if there's any difference without notes
+        const hasMissingNotes = data.details.some((d, i) => {
+            return d.physical_qty !== items[i].system_qty && !d.notes.trim();
+        });
+
+        if (hasMissingNotes) {
+            alert('Ada barang yang berselisih stok namun belum diberi keterangan/alasan. Mohon lengkapi terlebih dahulu.');
+            return;
+        }
+
         post('/reports/reconciliation');
     };
 
@@ -80,9 +91,14 @@ export default function ReconciliationForm({ items, filters }: Props) {
                                         <td className="px-4 py-2 text-right"><DiffBadge difference={diff} /></td>
                                         <td className="px-4 py-2">
                                             {diff !== 0 && (
-                                                <input type="text" placeholder="Alasan..." value={data.details[idx].notes}
-                                                    onChange={(e) => updateDetail(idx, 'notes', e.target.value)}
-                                                    className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                                <div className="flex flex-col gap-1">
+                                                    <input type="text" placeholder="Wajib isi alasan selisih..." value={data.details[idx].notes}
+                                                        onChange={(e) => updateDetail(idx, 'notes', e.target.value)}
+                                                        className={`w-full text-xs border rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                                            errors[`details.${idx}.notes`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                                        }`} />
+                                                    {errors[`details.${idx}.notes`] && <span className="text-[10px] text-red-500 font-medium">{errors[`details.${idx}.notes`]}</span>}
+                                                </div>
                                             )}
                                         </td>
                                     </tr>

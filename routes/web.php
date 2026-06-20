@@ -41,29 +41,17 @@ Route::middleware(['auth'])->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    // Signature Onboarding - MUST BE OUTSIDE signature middleware
-    // Accessible untuk users yang belum ada signature
-    Route::prefix('signature')->name('signature.')->group(function () {
-        Route::get('/create', [SignatureController::class, 'create'])->name('create');
-        Route::post('/create', [SignatureController::class, 'store'])->name('store');
-        
-        // Edit & update hanya untuk users yang sudah ada signature
-        Route::middleware(['signature'])->group(function () {
-            Route::get('/edit', [SignatureController::class, 'edit'])->name('edit');
-            Route::put('/update', [SignatureController::class, 'update'])->name('update');
-        });
-    });
-
-    // Routes that require signature completion
-    Route::middleware(['signature'])->group(function () {
+    // Routes that require auth
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Items (Barang)
-        Route::resource('items', ItemController::class);
+        Route::resource('items', ItemController::class)->only(['index', 'show'])->middleware('can:view-items');
+        Route::resource('items', ItemController::class)->except(['index', 'show'])->middleware('can:manage-items');
 
-        // User Management (Admin only)
-        Route::middleware(['role:warehouse_admin'])->group(function () {
+        // User Management
+        Route::middleware(['role:general_affairs'])->group(function () {
+            Route::post('users/import', [UserManagementController::class, 'import'])->name('users.import');
             Route::resource('users', UserManagementController::class);
             Route::post('users/{id}/toggle-status', [UserManagementController::class, 'toggleStatus'])
                 ->name('users.toggle-status');
@@ -77,11 +65,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [ProfileController::class, 'edit'])->name('edit');
             Route::put('/update', [ProfileController::class, 'updateProfile'])->name('update');
             Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
-            Route::put('/signature', [ProfileController::class, 'updateSignature'])->name('signature');
         });
 
-        // Barang Masuk (Inbound) — Admin Gudang only
-        Route::middleware(['role:warehouse_admin'])->group(function () {
+        // Barang Masuk (Inbound)
+        Route::middleware(['can:view-inbound'])->group(function () {
             Route::resource('inbound', InboundController::class);
         });
         // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
@@ -95,26 +82,41 @@ Route::middleware(['auth'])->group(function () {
         Route::post('outbound/{id}/pickup', [OutboundController::class, 'pickup'])->name('outbound.pickup');
         Route::get('outbound/{id}/pdf/spb', [OutboundController::class, 'downloadSpb'])->name('outbound.pdf.spb');
         Route::get('outbound/{id}/pdf/bast', [OutboundController::class, 'downloadBast'])->name('outbound.pdf.bast');
-        Route::resource('categories', CategoryController::class);
-        Route::resource('departments', DepartmentController::class);
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/department', [ReportController::class, 'departmentReport'])->name('reports.department');
-        Route::get('/reports/export/mutation', [ReportController::class, 'exportMutationPdf'])->name('reports.export.mutation');
-        Route::get('/reports/export/mutation/excel', [ReportController::class, 'exportMutationExcel'])->name('reports.export.mutation.excel');
-        Route::get('/reports/export/department', [ReportController::class, 'exportDepartmentPdf'])->name('reports.export.department');
-        Route::get('/reports/export/department/excel', [ReportController::class, 'exportDepartmentExcel'])->name('reports.export.department.excel');
-        Route::get('/reports/breakdown/{itemId}', [ReportController::class, 'breakdown'])->name('reports.breakdown');
-        Route::get('/reports/stock-ledger', [ReportController::class, 'stockLedger'])->name('reports.stock-ledger');
-        Route::get('/reports/reconciliation', [ReportController::class, 'reconciliation'])->name('reports.reconciliation');
-        Route::post('/reports/reconciliation', [ReportController::class, 'storeReconciliation'])->name('reports.reconciliation.store');
-        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        // Categories & Departments
+        Route::resource('categories', CategoryController::class)->only(['index', 'show'])->middleware('can:view-categories');
+        Route::resource('categories', CategoryController::class)->except(['index', 'show'])->middleware('can:manage-categories');
+        Route::resource('departments', DepartmentController::class)->only(['index', 'show'])->middleware('can:view-departments');
+        Route::resource('departments', DepartmentController::class)->except(['index', 'show'])->middleware('can:manage-departments');
+        
+        // Reports
+        Route::middleware(['can:view-reports'])->group(function () {
+            Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/reports/department', [ReportController::class, 'departmentReport'])->name('reports.department');
+            Route::get('/reports/breakdown/{itemId}', [ReportController::class, 'breakdown'])->name('reports.breakdown');
+            Route::get('/reports/stock-ledger', [ReportController::class, 'stockLedger'])->name('reports.stock-ledger');
+            Route::get('/reports/reconciliation', [ReportController::class, 'reconciliation'])->name('reports.reconciliation');
+            Route::post('/reports/reconciliation', [ReportController::class, 'storeReconciliation'])->name('reports.reconciliation.store');
+        });
+
+        Route::middleware(['can:export-reports'])->group(function () {
+            Route::get('/reports/export/mutation', [ReportController::class, 'exportMutationPdf'])->name('reports.export.mutation');
+            Route::get('/reports/export/mutation/excel', [ReportController::class, 'exportMutationExcel'])->name('reports.export.mutation.excel');
+            Route::get('/reports/export/department', [ReportController::class, 'exportDepartmentPdf'])->name('reports.export.department');
+            Route::get('/reports/export/department/excel', [ReportController::class, 'exportDepartmentExcel'])->name('reports.export.department.excel');
+            Route::get('/reports/reconciliation/export-worksheet', [ReportController::class, 'exportReconciliationWorksheet'])->name('reports.reconciliation.export-worksheet');
+            Route::get('/reports/reconciliation/export-pdf', [ReportController::class, 'exportReconciliationPdf'])->name('reports.reconciliation.export-pdf');
+        });
+        
+        // Settings
+        Route::middleware(['can:manage-settings'])->group(function () {
+            Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        });
 
         // Notifikasi
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    });
 });
 
 

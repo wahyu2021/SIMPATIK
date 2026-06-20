@@ -76,13 +76,7 @@ export default function UserShow({ user }: Props) {
                     <InfoField label="Email" icon={Mail} mono>{user.email}</InfoField>
                     <InfoField label="Unit Kerja" icon={Building2}>{user.department?.name ?? '-'}</InfoField>
                     <InfoField label="Role" icon={Shield}>{ROLE_LABELS[roleName] || roleName}</InfoField>
-                    <InfoField label="Tanda Tangan" icon={FileSignature}>
-                        {user.signature_path ? (
-                            <span className="text-green-600 font-medium">✓ Sudah ada</span>
-                        ) : (
-                            <span className="text-amber-600 font-medium">⚠ Belum ada</span>
-                        )}
-                    </InfoField>
+
                     <InfoField label="Dibuat" icon={Calendar}>{formatDateLong(user.created_at)}</InfoField>
                     <InfoField label="Terakhir Update" icon={Calendar}>{formatDateLong(user.updated_at)}</InfoField>
                 </div>

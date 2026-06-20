@@ -49,40 +49,58 @@ class OutboundService
     /**
      * Buat pengajuan barang baru (status: Pending).
      */
-    public function createRequest(array $data): OutboundTransaction
+    public function createRequest(\App\DTOs\Transaction\OutboundDTO $dto): OutboundTransaction
     {
-        return DB::transaction(function () use ($data) {
-            if (empty($data['document_number'])) {
-                $data['document_number'] = $this->outboundRepository->generateDocumentNumber();
+        return DB::transaction(function () use ($dto) {
+            $documentNumber = $dto->document_number;
+            if (empty($documentNumber)) {
+                $documentNumber = $this->outboundRepository->generateDocumentNumber();
             }
 
-            $outbound = $this->outboundRepository->create([
-                'requester_id'     => $data['requester_id'],
-                'department_id'    => $data['department_id'],
-                'document_number'  => $data['document_number'],
-                'transaction_date' => $data['transaction_date'],
-                'status'           => OutboundStatus::Pending,
-                'is_special_request' => $data['is_special_request'] ?? false,
-                'notes'            => $data['notes'] ?? null,
-            ]);
+            $requester = User::query()->find($dto->requester_id);
+            $isSupervisor = $requester && $requester->hasRole('division_head');
+            $status = $isSupervisor ? OutboundStatus::Approved : OutboundStatus::Pending;
 
-            foreach ($data['details'] as $detail) {
+            $outboundData = [
+                'requester_id'     => $dto->requester_id,
+                'department_id'    => $dto->department_id,
+                'document_number'  => $documentNumber,
+                'transaction_date' => $dto->transaction_date,
+                'status'           => $status,
+                'is_special_request' => $dto->is_special_request,
+                'notes'            => $dto->notes,
+            ];
+
+            if ($isSupervisor) {
+                $outboundData['approver_id'] = $requester->id;
+                $outboundData['approved_at'] = now();
+            }
+
+            $outbound = $this->outboundRepository->create($outboundData);
+
+            foreach ($dto->details as $detail) {
                 $outbound->details()->create([
                     'item_id'            => $detail['item_id'],
-                    'quantity_requested' => $detail['quantity_requested'],
-                    'quantity_approved'  => 0,
+                    'quantity_requested' => $detail['quantity_requested'] ?? $detail['quantity'],
+                    'quantity_approved'  => $isSupervisor ? ($detail['quantity_requested'] ?? $detail['quantity']) : 0,
                     'notes'              => $detail['notes'] ?? null,
                 ]);
             }
 
             $outbound->load(['requester', 'department', 'details.item']);
 
-            // Notifikasi ke Penyelia di departemen yang sama
-            $supervisors = User::role('division_head')
-                ->where('department_id', $outbound->department_id)
-                ->get();
-            
-            Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+            if ($isSupervisor) {
+                // Notifikasi ke Admin Gudang bahwa ada barang yg harus disiapkan
+                $admins = User::role('warehouse_admin')->get();
+                Notification::send($admins, new OutboundReadyForIssueNotification($outbound));
+            } else {
+                // Notifikasi ke Penyelia di departemen yang sama
+                $supervisors = User::role('division_head')
+                    ->where('department_id', $outbound->department_id)
+                    ->get();
+                
+                Notification::send($supervisors, new NewOutboundRequestNotification($outbound));
+            }
 
             return $outbound;
         });
@@ -92,28 +110,29 @@ class OutboundService
      * Buat pengajuan barang langsung (Direct Request - Bypass Approval).
      * Status langsung menjadi Issued dan stok dipotong.
      */
-    public function createDirectRequest(array $data, int $adminId): OutboundTransaction
+    public function createDirectRequest(\App\DTOs\Transaction\OutboundDTO $dto, int $adminId): OutboundTransaction
     {
-        return DB::transaction(function () use ($data, $adminId) {
-            if (empty($data['document_number'])) {
-                $data['document_number'] = $this->outboundRepository->generateDocumentNumber();
+        return DB::transaction(function () use ($dto, $adminId) {
+            $documentNumber = $dto->document_number;
+            if (empty($documentNumber)) {
+                $documentNumber = $this->outboundRepository->generateDocumentNumber();
             }
 
             $outbound = $this->outboundRepository->create([
-                'requester_id'     => $data['requester_id'],
-                'department_id'    => $data['department_id'],
-                'document_number'  => $data['document_number'],
-                'transaction_date' => $data['transaction_date'],
+                'requester_id'     => $dto->requester_id,
+                'department_id'    => $dto->department_id,
+                'document_number'  => $documentNumber,
+                'transaction_date' => $dto->transaction_date,
                 'status'           => OutboundStatus::Issued, // Langsung Issued
-                'is_special_request' => $data['is_special_request'] ?? false,
+                'is_special_request' => $dto->is_special_request,
                 'is_direct_request'  => true,
                 'issued_by'        => $adminId,
                 'issued_at'        => now(),
-                'notes'            => $data['notes'] ?? 'Input langsung oleh Admin Gudang.',
+                'notes'            => $dto->notes ?? 'Input langsung oleh Admin Gudang.',
             ]);
 
-            foreach ($data['details'] as $detail) {
-                $qty = $detail['quantity'];
+            foreach ($dto->details as $detail) {
+                $qty = $detail['quantity'] ?? $detail['quantity_requested'];
                 
                 // 1. Simpan detail
                 $outbound->details()->create([
@@ -136,9 +155,9 @@ class OutboundService
                 // 3. Catat Ledger
                 StockLedger::create([
                     'item_id'            => $detail['item_id'],
-                    'transaction_date'   => $data['transaction_date'],
+                    'transaction_date'   => $dto->transaction_date,
                     'movement_type'      => 'out',
-                    'document_reference' => $data['document_number'],
+                    'document_reference' => $documentNumber,
                     'qty_in'             => 0,
                     'qty_out'            => $qty,
                     'ending_balance'     => $newStock,
@@ -153,26 +172,26 @@ class OutboundService
      * Edit pengajuan yang masih Pending.
      * Header data diperbarui, detail lama dihapus dan diganti detail baru.
      */
-    public function updateRequest(OutboundTransaction $outbound, array $data): OutboundTransaction
+    public function updateRequest(OutboundTransaction $outbound, \App\DTOs\Transaction\OutboundDTO $dto): OutboundTransaction
     {
         if (!$outbound->isPending()) {
             abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat diedit.');
         }
 
-        return DB::transaction(function () use ($outbound, $data) {
+        return DB::transaction(function () use ($outbound, $dto) {
             $this->outboundRepository->update($outbound, [
-                'department_id'    => $data['department_id'],
-                'transaction_date' => $data['transaction_date'],
-                'is_special_request' => $data['is_special_request'] ?? false,
-                'notes'            => $data['notes'] ?? null,
+                'department_id'    => $dto->department_id,
+                'transaction_date' => $dto->transaction_date,
+                'is_special_request' => $dto->is_special_request,
+                'notes'            => $dto->notes,
             ]);
 
             $outbound->details()->delete();
 
-            foreach ($data['details'] as $detail) {
+            foreach ($dto->details as $detail) {
                 $outbound->details()->create([
                     'item_id'            => $detail['item_id'],
-                    'quantity_requested' => $detail['quantity_requested'],
+                    'quantity_requested' => $detail['quantity_requested'] ?? $detail['quantity'],
                     'quantity_approved'  => 0,
                     'notes'              => $detail['notes'] ?? null,
                 ]);
@@ -372,7 +391,7 @@ class OutboundService
             abort(422, 'Hanya pengajuan berstatus "Menunggu" yang dapat dibatalkan.');
         }
 
-        return $outbound->delete();
+        return $this->outboundRepository->delete($outbound);
     }
 
     /**

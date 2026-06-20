@@ -37,14 +37,34 @@ interface DashboardRepositoryInterface
     public function countLowStockItems(): int;
 
     /**
-     * Hitung pengajuan berstatus Pending (dapat difilter per user/unit)
+     * Hitung pengajuan berstatus Pending untuk disetujui (khusus unit kerja user)
      */
-    public function countPendingRequests(?User $user = null): int;
+    public function countPendingApproval(User $user): int;
 
     /**
-     * Hitung pengajuan yang di-approve hari ini (dapat difilter per user/unit)
+     * Hitung pengajuan berstatus Approved yang menunggu diserahkan Gudang
+     */
+    public function countPendingIssue(): int;
+
+    /**
+     * Hitung pengajuan berstatus Pending atau Approved milik user
+     */
+    public function countMyActiveRequests(User $user): int;
+
+    /**
+     * Hitung pengajuan berstatus Completed milik user
+     */
+    public function countMyCompletedRequests(User $user): int;
+
+    /**
+     * Hitung pengajuan yang disetujui hari ini (dapat difilter per user/unit)
      */
     public function countApprovedToday(?User $user = null): int;
+
+    /**
+     * Hitung pengajuan yang diserahkan/diselesaikan hari ini
+     */
+    public function countIssuedToday(): int;
 
     /**
      * Hitung transaksi barang masuk bulan ini

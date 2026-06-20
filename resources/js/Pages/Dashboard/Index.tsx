@@ -16,6 +16,13 @@ interface DashboardProps extends PageProps {
 }
 
 export default function Dashboard({ auth, stats, recentRequests, lowStockItems, monthlyTrend, statusDistribution }: DashboardProps) {
+    const role = auth.user.roles?.[0]?.name ?? '';
+    
+    // Konfigurasi Visibilitas per Role
+    const showTrendChart = role === 'general_affairs';
+    const showDistributionChart = role === 'warehouse_admin' || role === 'general_affairs';
+    const showLowStock = role === 'general_affairs' || role === 'warehouse_admin';
+
     return (
         <AuthenticatedLayout title="Dashboard">
             {/* ── Welcome Header ── */}
@@ -30,19 +37,25 @@ export default function Dashboard({ auth, stats, recentRequests, lowStockItems, 
             <StatsGrid stats={stats} />
 
             {/* ── Charts ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div className="lg:col-span-2">
-                    <MonthlyTrendChart data={monthlyTrend} />
+            {(showTrendChart || showDistributionChart) && (
+                <div className={`grid grid-cols-1 ${showTrendChart && showDistributionChart ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-6 mb-6`}>
+                    {showTrendChart && (
+                        <div className={showDistributionChart ? "lg:col-span-2" : "col-span-1"}>
+                            <MonthlyTrendChart data={monthlyTrend} />
+                        </div>
+                    )}
+                    {showDistributionChart && (
+                        <div className="col-span-1">
+                            <StatusDistributionChart data={statusDistribution} />
+                        </div>
+                    )}
                 </div>
-                <div>
-                    <StatusDistributionChart data={statusDistribution} />
-                </div>
-            </div>
+            )}
 
             {/* ── Tables ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className={`grid grid-cols-1 ${showLowStock ? 'lg:grid-cols-2' : ''} gap-6`}>
                 <RecentRequests data={recentRequests} />
-                <LowStockAlerts data={lowStockItems} />
+                {showLowStock && <LowStockAlerts data={lowStockItems} />}
             </div>
         </AuthenticatedLayout>
     );

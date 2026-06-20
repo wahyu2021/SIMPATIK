@@ -37,19 +37,23 @@ class DepartmentService
     }
 
     /**
-     * Buat department baru.
+     * Buat unit kerja baru.
      */
-    public function createDepartment(array $data): Department
+    public function createDepartment(\App\DTOs\Department\DepartmentDTO $dto): Department
     {
-        return $this->departmentRepository->create($data);
+        return $this->departmentRepository->create([
+            'name' => $dto->name,
+        ]);
     }
 
     /**
-     * Update department yang sudah ada.
+     * Update data unit kerja.
      */
-    public function updateDepartment(Department $department, array $data): bool
+    public function updateDepartment(Department $department, \App\DTOs\Department\DepartmentDTO $dto): bool
     {
-        return $this->departmentRepository->update($department, $data);
+        return $this->departmentRepository->update($department, [
+            'name' => $dto->name,
+        ]);
     }
 
     /**

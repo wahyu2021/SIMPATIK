@@ -179,32 +179,17 @@ class ReportController extends Controller
     }
 
     /**
-     * Simpan rekonsiliasi bulanan.
+     * Simpan hasil rekonsiliasi (Submit).
      */
-    public function storeReconciliation(Request $request): RedirectResponse
+    public function storeReconciliation(\App\Http\Requests\Report\StoreReconciliationRequest $request)
     {
-        $request->validate([
-            'month' => 'required|integer|min:1|max:12',
-            'year' => 'required|integer|min:2024',
-            'notes' => 'nullable|string|max:500',
-            'details' => 'required|array|min:1',
-            'details.*.item_id' => 'required|integer|exists:items,id',
-            'details.*.system_qty' => 'required|integer',
-            'details.*.physical_qty' => 'required|integer|min:0',
-            'details.*.notes' => 'nullable|string|max:255',
-        ]);
-
         $this->reportService->saveReconciliation(
-            (int) $request->month,
-            (int) $request->year,
-            auth()->id(),
-            $request->details,
-            $request->notes,
+            \App\DTOs\Report\ReconciliationDTO::fromRequest($request, auth()->id())
         );
 
         return redirect()
             ->route('reports.reconciliation', ['month' => $request->month, 'year' => $request->year])
-            ->with('success', 'Rekonsiliasi berhasil disimpan.');
+            ->with('success', 'Rekonsiliasi stok berhasil disimpan dan saldo telah disesuaikan.');
     }
 
     /**
@@ -233,5 +218,45 @@ class ReportController extends Controller
                 'department_id' => $departmentId,
             ],
         ]);
+    }
+
+    /**
+     * Export Worksheet Rekonsiliasi ke Excel (kosong untuk lapangan).
+     */
+    public function exportReconciliationWorksheet()
+    {
+        return Excel::download(
+            new \App\Exports\ReconciliationWorksheetExport(),
+            "Worksheet-Opname-Fisik-" . date('Y-m-d') . ".xlsx"
+        );
+    }
+
+    /**
+     * Export Berita Acara Rekonsiliasi ke PDF.
+     */
+    public function exportReconciliationPdf(Request $request)
+    {
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
+
+        $data = $this->reportService->getReconciliationData($month, $year);
+
+        if ($data['status'] !== 'completed') {
+            return back()->with('error', 'Rekonsiliasi untuk bulan ini belum dilakukan.');
+        }
+
+        $reconciliation = $data['reconciliation'];
+        
+        // Filter hanya item yang ada selisih
+        $discrepancies = $reconciliation->details->filter(function ($detail) {
+            return $detail->difference != 0;
+        });
+
+        $signatory = $this->reportService->getSignatory();
+
+        $pdf = Pdf::loadView('pdf.reconciliation_report', compact('reconciliation', 'discrepancies', 'signatory', 'month', 'year'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Berita-Acara-Rekonsiliasi-{$year}-{$month}.pdf");
     }
 }

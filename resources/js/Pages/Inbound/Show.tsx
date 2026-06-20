@@ -64,6 +64,32 @@ export default function InboundShow({ inbound }: Props) {
                 )}
             </div>
 
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Bukti Transaksi / Nota</h2>
+                {inbound.receipt_image_url ? (
+                    inbound.receipt_image_url.endsWith('.pdf') ? (
+                        <a
+                            href={inbound.receipt_image_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-[#0052A3] rounded-lg font-medium hover:bg-blue-100 transition-colors text-sm"
+                        >
+                            Lihat Dokumen PDF
+                        </a>
+                    ) : (
+                        <a href={inbound.receipt_image_url} target="_blank" rel="noreferrer" className="block max-w-sm rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+                            <img
+                                src={inbound.receipt_image_url}
+                                alt="Bukti Transaksi"
+                                className="w-full h-auto object-contain"
+                            />
+                        </a>
+                    )
+                ) : (
+                    <p className="text-sm text-gray-500 italic">Tidak ada bukti transaksi terlampir.</p>
+                )}
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900">

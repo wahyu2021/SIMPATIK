@@ -39,22 +39,38 @@ class ItemService
     /**
      * Buat item baru dengan kode barang otomatis.
      */
-    public function createItem(array $data): Item
+    public function createItem(\App\DTOs\Item\ItemDTO $dto): Item
     {
+        $itemCode = $dto->item_code;
         // Generate kode barang otomatis jika belum diisi
-        if (empty($data['item_code'])) {
-            $data['item_code'] = $this->itemRepository->generateItemCode();
+        if (empty($itemCode)) {
+            $itemCode = $this->itemRepository->generateItemCode();
         }
 
-        return $this->itemRepository->create($data);
+        return $this->itemRepository->create([
+            'name' => $dto->name,
+            'item_code' => $itemCode,
+            'category_id' => $dto->category_id,
+            'unit_of_measure' => $dto->unit_of_measure,
+            'unit_price' => $dto->unit_price,
+            'minimum_stock' => $dto->minimum_stock,
+            'notes' => $dto->notes,
+        ]);
     }
 
     /**
      * Update item yang sudah ada.
      */
-    public function updateItem(Item $item, array $data): bool
+    public function updateItem(Item $item, \App\DTOs\Item\ItemDTO $dto): bool
     {
-        return $this->itemRepository->update($item, $data);
+        return $this->itemRepository->update($item, [
+            'name' => $dto->name,
+            'category_id' => $dto->category_id,
+            'unit_of_measure' => $dto->unit_of_measure,
+            'unit_price' => $dto->unit_price,
+            'minimum_stock' => $dto->minimum_stock,
+            'notes' => $dto->notes,
+        ]);
     }
 
     /**

@@ -16,10 +16,11 @@ interface Props extends PageProps {
 export default function InboundForm({ inbound, items, nextReference }: Props) {
     const isEdit = !!inbound;
 
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         reference_number: inbound?.reference_number || nextReference || '',
         transaction_date: normalizeDate(inbound?.transaction_date),
         notes: inbound?.notes || '',
+        receipt_image: null as File | null,
         details: (inbound?.details && inbound.details.length > 0)
             ? inbound.details.map(d => ({
                 item_id: d.item_id.toString(),
@@ -78,9 +79,13 @@ export default function InboundForm({ inbound, items, nextReference }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isEdit) {
-            put(`/inbound/${inbound!.id}`);
+            transform((data) => ({
+                ...data,
+                _method: 'PUT',
+            }));
+            post(`/inbound/${inbound!.id}`, { forceFormData: true });
         } else {
-            post('/inbound');
+            post('/inbound', { forceFormData: true });
         }
     };
 
@@ -137,6 +142,69 @@ export default function InboundForm({ inbound, items, nextReference }: Props) {
                             error={errors.notes}
                             rows={2}
                         />
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Bukti Transaksi</h2>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Bukti Transaksi / Nota (Wajib)
+                            </label>
+                            <input
+                                type="file"
+                                id="receipt_image"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                onChange={(e) => setData('receipt_image', e.target.files ? e.target.files[0] : null)}
+                                className={`block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-lg file:border-0
+                                    file:text-sm file:font-medium
+                                    file:bg-blue-50 file:text-[#0052A3]
+                                    hover:file:bg-blue-100
+                                    border border-gray-200 rounded-lg cursor-pointer
+                                    ${errors.receipt_image ? 'border-red-500' : ''}`}
+                            />
+                            {errors.receipt_image && (
+                                <p className="text-sm text-red-600 mt-1">{errors.receipt_image}</p>
+                            )}
+                            <p className="text-xs text-gray-500 mt-1">Upload foto atau scan nota (JPG, PNG, PDF, maks 2MB)</p>
+                        </div>
+
+                        {/* Preview */}
+                        {(data.receipt_image || (isEdit && inbound?.receipt_image_url)) && (
+                            <div className="mt-4">
+                                <p className="text-sm font-medium text-gray-700 mb-2">Preview Bukti:</p>
+                                {data.receipt_image ? (
+                                    data.receipt_image.type === 'application/pdf' ? (
+                                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200 w-fit">
+                                            <span className="text-sm font-medium text-gray-700">{data.receipt_image.name}</span>
+                                            <span className="text-xs text-gray-500">({(data.receipt_image.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                    ) : (
+                                        <img
+                                            src={URL.createObjectURL(data.receipt_image)}
+                                            alt="Preview"
+                                            className="h-40 object-contain rounded-lg border border-gray-200"
+                                        />
+                                    )
+                                ) : (
+                                    inbound?.receipt_image_url?.endsWith('.pdf') ? (
+                                        <a href={inbound.receipt_image_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm">
+                                            Lihat File PDF Saat Ini
+                                        </a>
+                                    ) : (
+                                        <img
+                                            src={inbound?.receipt_image_url}
+                                            alt="Preview"
+                                            className="h-40 object-contain rounded-lg border border-gray-200"
+                                        />
+                                    )
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

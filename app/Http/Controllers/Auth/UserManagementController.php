@@ -48,7 +48,7 @@ class UserManagementController extends Controller
      */
     public function store(RegisterUserRequest $request)
     {
-        $this->userService->createUser($request->validated());
+        $this->userService->createUser(\App\DTOs\User\UserDTO::fromRequest($request));
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
@@ -87,7 +87,7 @@ class UserManagementController extends Controller
     {
         $user = $this->userService->findUser($id);
 
-        $this->userService->updateUser($user, $request->validated());
+        $this->userService->updateUser($user, \App\DTOs\User\UserDTO::fromRequest($request));
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil diperbarui.');
@@ -118,5 +118,26 @@ class UserManagementController extends Controller
 
         return redirect()->back()
             ->with('success', "User berhasil {$status}.");
+    }
+    /**
+     * Import users dari file Excel/CSV (GForm export).
+     */
+    public function import(\App\Http\Requests\Auth\ImportUserRequest $request)
+    {
+        try {
+            $import = new \App\Imports\UsersImport;
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+
+            if ($import->importedCount === 0) {
+                return redirect()->route('users.index')
+                    ->with('error', 'Gagal mengimpor. Sistem tidak menemukan kolom Nama dan Email di file Anda, atau data sudah ada.');
+            }
+
+            return redirect()->route('users.index')
+                ->with('success', "Berhasil! {$import->importedCount} data user telah ditambahkan.");
+        } catch (\Exception $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Gagal mengimpor data: format file tidak sesuai atau rusak.');
+        }
     }
 }

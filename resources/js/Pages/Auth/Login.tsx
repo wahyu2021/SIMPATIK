@@ -28,7 +28,7 @@ export default function Login({ errors = {} }: LoginPageProps) {
                                 <h1 className="text-3xl font-bold text-white">SIMPATIK</h1>
                                 <div className="text-blue-100 mt-2">
                                     <p className="block lg:hidden text-sm">Sistem Manajemen Permintaan ATK Terpadu</p>
-                                    <p className="hidden lg:block text-base">Sistem Informasi Manajemen Persediaan ATK dan prediksi Kebutuhan</p>
+                                    <p className="hidden lg:block text-base">Sistem Informasi Manajemen Persediaan ATK</p>
                                 </div>
                                 <p className="text-blue-100 text-xs lg:text-sm mt-1">Bank Sumsel Babel</p>
                             </div>
@@ -56,7 +56,7 @@ export default function Login({ errors = {} }: LoginPageProps) {
                     <div className="hidden lg:flex flex-1 flex-col space-y-6 self-start">
                         <div className="text-white mb-8 text-center">
                             <h2 className="text-4xl font-bold mb-2">Selamat Datang</h2>
-                            <p className="text-blue-100">Sistem Informasi Manajemen Persediaan ATK dan prediksi Kebutuhan</p>
+                            <p className="text-blue-100">Sistem Informasi Manajemen Persediaan ATK</p>
                         </div>
 
                         <FeatureCard

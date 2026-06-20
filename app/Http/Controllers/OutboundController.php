@@ -116,11 +116,10 @@ class OutboundController extends Controller
     {
         Gate::authorize('create', OutboundTransaction::class);
 
-        $data = $request->validated();
-        $data['requester_id'] = auth()->id();
-        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+        $requesterId = auth()->id();
+        $departmentId = auth()->user()->department_id; // Set otomatis dari profil
 
-        $this->outboundService->createRequest($data);
+        $this->outboundService->createRequest(\App\DTOs\Transaction\OutboundDTO::fromRequest($request, $requesterId, $departmentId));
 
         return redirect()
             ->route('outbound.index')
@@ -147,25 +146,20 @@ class OutboundController extends Controller
     /**
      * Simpan pengajuan langsung oleh Admin Gudang.
      */
-    public function storeDirect(Request $request): RedirectResponse
+    public function storeDirect(\App\Http\Requests\Outbound\StoreDirectOutboundRequest $request): RedirectResponse
     {
         Gate::authorize('create', OutboundTransaction::class);
         if (!auth()->user()->hasRole('warehouse_admin')) {
             abort(403, 'Hanya Admin Gudang yang dapat melakukan penginputan langsung.');
         }
 
-        $validated = $request->validate([
-            'requester_id'     => ['required', 'exists:users,id'],
-            'department_id'    => ['required', 'exists:departments,id'],
-            'transaction_date' => ['required', 'date', 'before_or_equal:today'],
-            'is_special_request' => ['nullable', 'boolean'],
-            'notes'            => ['nullable', 'string', 'max:500'],
-            'details'          => ['required', 'array', 'min:1'],
-            'details.*.item_id' => ['required', 'exists:items,id'],
-            'details.*.quantity'=> ['required', 'integer', 'min:1'],
-        ]);
+        $requesterId = $request->validated('requester_id');
+        $departmentId = $request->validated('department_id');
 
-        $outbound = $this->outboundService->createDirectRequest($validated, auth()->id());
+        $outbound = $this->outboundService->createDirectRequest(
+            \App\DTOs\Transaction\OutboundDTO::fromRequest($request, $requesterId, $departmentId), 
+            auth()->id()
+        );
 
         return redirect()
             ->route('outbound.show', $outbound->id)
@@ -208,10 +202,12 @@ class OutboundController extends Controller
         $outbound = $this->outboundService->findOutbound($id);
         Gate::authorize('update', $outbound);
 
-        $data = $request->validated();
-        $data['department_id'] = auth()->user()->department_id; // Set otomatis dari profil
+        $departmentId = auth()->user()->department_id; // Set otomatis dari profil
 
-        $this->outboundService->updateRequest($outbound, $data);
+        $this->outboundService->updateRequest(
+            $outbound, 
+            \App\DTOs\Transaction\OutboundDTO::fromRequest($request, $outbound->requester_id, $departmentId)
+        );
 
         return redirect()
             ->route('outbound.show', $id)

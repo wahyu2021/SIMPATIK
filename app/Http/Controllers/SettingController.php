@@ -24,24 +24,9 @@ class SettingController extends Controller
     /**
      * Simpan perubahan pengaturan.
      */
-    public function update(Request $request)
+    public function update(\App\Http\Requests\Setting\UpdateSettingRequest $request)
     {
-        $request->validate([
-            'company_name' => 'required|string|max:255',
-            'company_branch' => 'required|string|max:255',
-            'company_address' => 'required|string|max:500',
-            'document_prefix_inbound' => 'required|string|max:10',
-            'document_prefix_outbound' => 'required|string|max:10',
-            'wa_api_url' => 'nullable|string|max:500',
-            'wa_alert_numbers' => 'nullable|string|max:500',
-            'ml_api_url' => 'nullable|url|max:500',
-        ]);
-
-        $data = $request->only([
-            'company_name', 'company_branch', 'company_address',
-            'document_prefix_inbound', 'document_prefix_outbound',
-            'wa_api_url', 'wa_alert_numbers', 'ml_api_url',
-        ]);
+        $data = $request->validated();
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(

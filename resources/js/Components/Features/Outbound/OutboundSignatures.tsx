@@ -1,5 +1,6 @@
 import { OutboundTransaction, User } from '../../../Types';
-import { formatDateLong } from '../../../Lib/formatters';
+import { formatDateLong, formatDateTime } from '../../../Lib/formatters';
+import { CheckCircle } from 'lucide-react';
 
 interface OutboundSignaturesProps {
     outbound: OutboundTransaction;
@@ -61,7 +62,6 @@ export default function OutboundSignatures({ outbound }: OutboundSignaturesProps
 /** Card satu slot tanda tangan. */
 function SignatureCard({ label, user, date }: SignatureSlot) {
     const hasSigned = !!user;
-    const hasSignatureImage = !!user?.signature_url;
 
     return (
         <div className={`flex flex-col items-center p-4 rounded-lg border ${
@@ -70,16 +70,17 @@ function SignatureCard({ label, user, date }: SignatureSlot) {
                 : 'border-dashed border-gray-200 bg-gray-50/50'
         }`}>
             <div className="w-full h-16 flex items-center justify-center mb-2">
-                {hasSignatureImage ? (
-                    <img
-                        src={user.signature_url!}
-                        alt={`Tanda tangan ${user.name}`}
-                        className="max-h-16 max-w-full object-contain"
-                    />
-                ) : hasSigned ? (
-                    <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                        TTD belum diupload
-                    </span>
+                {hasSigned ? (
+                    <div className="flex flex-col items-center">
+                        <span className="text-xs text-green-700 bg-green-100 px-3 py-1 rounded-full flex items-center gap-1 font-medium mb-1">
+                            <CheckCircle className="w-3 h-3" /> Tervalidasi Elektronik
+                        </span>
+                        {date && (
+                            <span className="text-[10px] text-gray-500 font-mono">
+                                {formatDateTime(date)}
+                            </span>
+                        )}
+                    </div>
                 ) : (
                     <span className="text-xs text-gray-400 italic">Menunggu</span>
                 )}

@@ -38,17 +38,9 @@ class CategoryController extends Controller
     /**
      * Simpan kategori baru.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(\App\Http\Requests\Category\StoreCategoryRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ], [
-            'name.required' => 'Nama kategori wajib diisi.',
-            'name.max'      => 'Nama kategori maksimal 255 karakter.',
-            'name.unique'   => 'Nama kategori sudah digunakan.',
-        ]);
-
-        $this->categoryService->createCategory($validated);
+        $this->categoryService->createCategory(\App\DTOs\Category\CategoryDTO::fromRequest($request));
 
         return redirect()
             ->route('categories.index')
@@ -68,19 +60,11 @@ class CategoryController extends Controller
     /**
      * Update data kategori.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(\App\Http\Requests\Category\UpdateCategoryRequest $request, int $id): RedirectResponse
     {
         $category = $this->categoryService->findCategory($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-        ], [
-            'name.required' => 'Nama kategori wajib diisi.',
-            'name.max'      => 'Nama kategori maksimal 255 karakter.',
-            'name.unique'   => 'Nama kategori sudah digunakan.',
-        ]);
-
-        $this->categoryService->updateCategory($category, $validated);
+        $this->categoryService->updateCategory($category, \App\DTOs\Category\CategoryDTO::fromRequest($request));
 
         return redirect()
             ->route('categories.index')

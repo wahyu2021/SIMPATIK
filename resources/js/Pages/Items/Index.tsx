@@ -14,7 +14,8 @@ interface Props extends PageProps {
 }
 
 export default function ItemsIndex({ items, categories, filters }: Props) {
-    const { flash } = usePage<PageProps>().props;
+    const { auth, flash } = usePage<PageProps>().props;
+    const canManageItems = auth.user.roles?.some((role: any) => role.name === 'general_affairs') ?? false;
     const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -40,12 +41,14 @@ export default function ItemsIndex({ items, categories, filters }: Props) {
                 title="Daftar Barang"
                 description="Kelola barang inventaris gudang Bank Sumsel Babel"
                 action={
-                    <Link href="/items/create">
-                        <Button className="flex items-center gap-2">
-                            <Plus className="w-4 h-4" />
-                            Tambah Barang
-                        </Button>
-                    </Link>
+                    canManageItems ? (
+                        <Link href="/items/create">
+                            <Button className="flex items-center gap-2">
+                                <Plus className="w-4 h-4" />
+                                Tambah Barang
+                            </Button>
+                        </Link>
+                    ) : undefined
                 }
             />
 
@@ -61,7 +64,7 @@ export default function ItemsIndex({ items, categories, filters }: Props) {
 
             {/* Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <ItemTable items={items.data} onDelete={setDeleteTarget} />
+                <ItemTable items={items.data} onDelete={setDeleteTarget} canManage={canManageItems} />
             </div>
 
             {/* Pagination */}

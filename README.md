@@ -11,7 +11,7 @@ SIMPATIK adalah sistem informasi berbasis web yang dirancang untuk mendigitalisa
 ### Fitur Utama
 
 - 🔐 **Multi-Role Authentication** — Admin Gudang, Staff Bagian Umum, Pimpinan, dan Staf Unit Kerja
-- ✍️ **Mandatory Signature Onboarding** — Tanda tangan digital wajib saat pertama kali login
+
 - 📦 **Manajemen Barang** — CRUD barang dengan auto-generate kode, filter kategori, dan alert stok rendah
 - 👤 **Profil** — Edit informasi, ganti password, dan perbarui tanda tangan digital
 - 📊 **Dashboard** — Statistik ringkas, pengajuan terbaru, dan peringatan stok rendah

@@ -1,8 +1,9 @@
 import { Head, router, usePage } from '@inertiajs/react';
+import { FileSpreadsheet, FileText } from 'lucide-react';
 import { PageProps } from '../../Types';
 import { ReconItem, CompletedRecon, ReconFilters } from '../../Types/reconciliation';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Breadcrumbs, Combobox, Label, Alert } from '../../Components/UI';
+import { PageHeader, Breadcrumbs, Combobox, Label, Alert, Button } from '../../Components/UI';
 import { MONTH_OPTIONS, getYearOptions } from '../../Lib/constants';
 import ReportTabs from '../../Components/Features/Reports/ReportTabs';
 import CompletedReconciliation from '../../Components/Features/Reports/CompletedReconciliation';
@@ -29,7 +30,33 @@ export default function Reconciliation({ reconData, filters }: Props) {
         <AuthenticatedLayout title="Rekonsiliasi">
             <Head title="Rekonsiliasi Bulanan" />
             <Breadcrumbs items={[{ label: 'Laporan', href: '/reports' }, { label: 'Rekonsiliasi' }]} />
-            <PageHeader title="Rekonsiliasi Bulanan" description="Cocokkan saldo sistem dengan stok fisik aktual" />
+            <PageHeader 
+                title="Rekonsiliasi Bulanan" 
+                description="Cocokkan saldo sistem dengan stok fisik aktual" 
+                action={
+                    <div className="flex gap-2">
+                        <a href="/reports/reconciliation/export-worksheet">
+                            <Button variant="outline" className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50">
+                                <FileSpreadsheet className="w-4 h-4" />
+                                Worksheet Excel
+                            </Button>
+                        </a>
+                        {reconData.status === 'completed' ? (
+                            <a href={`/reports/reconciliation/export-pdf?month=${filters.month}&year=${filters.year}`} target="_blank">
+                                <Button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white">
+                                    <FileText className="w-4 h-4" />
+                                    Berita Acara PDF
+                                </Button>
+                            </a>
+                        ) : (
+                            <Button variant="outline" className="flex items-center gap-2 opacity-50 cursor-not-allowed" onClick={() => alert('Submit rekonsiliasi terlebih dahulu untuk bisa mencetak Berita Acara.')}>
+                                <FileText className="w-4 h-4" />
+                                Berita Acara PDF
+                            </Button>
+                        )}
+                    </div>
+                }
+            />
             <ReportTabs active="reconciliation" />
 
             {/* Filters */}

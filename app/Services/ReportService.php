@@ -207,19 +207,19 @@ class ReportService
     /**
      * Simpan rekonsiliasi bulanan dan lakukan penyesuaian stok jika ada selisih.
      */
-    public function saveReconciliation(int $month, int $year, int $userId, array $details, ?string $notes = null): object
+    public function saveReconciliation(\App\DTOs\Report\ReconciliationDTO $dto): object
     {
-        return DB::transaction(function () use ($month, $year, $userId, $details, $notes) {
+        return DB::transaction(function () use ($dto) {
             // 1. Simpan Header & Detail Rekonsiliasi
             $recon = $this->reportRepository->saveReconciliation(
                 [
-                    'month' => $month,
-                    'year' => $year,
+                    'month' => $dto->month,
+                    'year' => $dto->year,
                     'reconciliation_date' => now(),
-                    'created_by' => $userId,
-                    'notes' => $notes,
+                    'created_by' => $dto->user_id,
+                    'notes' => $dto->notes,
                 ],
-                collect($details)->map(fn ($d) => [
+                collect($dto->details)->map(fn ($d) => [
                     'item_id' => $d['item_id'],
                     'system_qty' => $d['system_qty'],
                     'physical_qty' => $d['physical_qty'],
@@ -229,7 +229,7 @@ class ReportService
             );
 
             // 2. Proses Adjustment Stok jika ada perbedaan
-            foreach ($details as $d) {
+            foreach ($dto->details as $d) {
                 $diff = $d['physical_qty'] - $d['system_qty'];
                 
                 if ($diff != 0) {
@@ -243,7 +243,7 @@ class ReportService
                         'item_id'            => $d['item_id'],
                         'transaction_date'   => now(),
                         'movement_type'      => 'adjustment',
-                        'document_reference' => "RECON-{$month}-{$year}",
+                        'document_reference' => "RECON-{$dto->month}-{$dto->year}",
                         'qty_in'             => $diff > 0 ? $diff : 0,
                         'qty_out'            => $diff < 0 ? abs($diff) : 0,
                         'ending_balance'     => $d['physical_qty'],

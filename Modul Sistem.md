@@ -38,7 +38,7 @@
   - **Penyelia / Kepala Unit Kerja** (`division_head`) — approve pengajuan staf di unit kerjanya
   - **Staff Bagian Umum** (`general_affairs`) — monitoring, cek laporan, audit stok bulanan *(mapping: Kak Redho)*
   - **Staf Unit Kerja** (`staff`) — ajukan barang per unit, lihat pengajuan divisi sendiri
-* **Mandatory Signature Onboarding:** Setiap pengguna yang baru pertama kali *login* diwajibkan menggambar dan menyimpan tanda tangan digital sebelum bisa menggunakan fitur lain. Menggunakan plugin `saade/filament-autograph`.
+
 * **Digital Audit Trail:** Sistem mencatat IP Address, nama user, dan timestamp setiap aktivitas pengajuan atau persetujuan barang.
 
 ### 2. Modul Data Induk (*Master Data*)
