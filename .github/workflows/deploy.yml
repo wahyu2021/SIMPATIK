@@ -129,7 +129,7 @@ jobs:
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
             echo "🎨 Install & Build frontend assets..."
-            npm ci --omit=dev
+            npm ci
             npm run build
 
             echo "🗄️ Jalankan database migrations..."
