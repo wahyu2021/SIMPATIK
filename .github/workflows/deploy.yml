@@ -92,7 +92,7 @@ jobs:
 
       # ── 9. Jalankan PHPUnit ───────────────────────────────────
       - name: 🧪 Jalankan PHPUnit tests
-        run: php artisan test --parallel
+        run: php artisan test
 
   # ============================================================
   # JOB 2: CD — Deploy ke Production (hanya jika CI lolos)
