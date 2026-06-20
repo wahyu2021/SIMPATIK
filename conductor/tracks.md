@@ -24,3 +24,5 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `reconciliation-export` | Fitur Export Rekonsiliasi (PDF & Excel) | ✅ Completed | [Plan](./tracks/reconciliation-export/plan.md) |
 | `refactor-form-requests` | Pemisahan Validasi ke Form Request | ✅ Completed | [Plan](./tracks/refactor-form-requests/plan.md) |
 | `refactor-services-to-dto` | Implementasi Data Transfer Object (DTO) pada Service Layer | 🔴 Todo | [Plan](./tracks/refactor-services-to-dto/plan.md) |
+| `update-activity-diagram` | Pembaruan Activity Diagram (1 Use Case = 1 Diagram) | ✅ Completed | [Plan](./tracks/update-activity-diagram/plan.md) |
+| `cicd-github-actions` | Implementasi GitHub Actions CI/CD ke Production VPS | ✅ Completed | [Plan](./tracks/cicd-github-actions/plan.md) |

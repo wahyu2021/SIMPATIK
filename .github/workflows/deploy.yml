@@ -1,0 +1,153 @@
+name: 🚀 CI/CD — Deploy ke Production
+
+# ============================================================
+# Trigger: hanya saat ada push ke branch production
+# ============================================================
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch: # Izinkan trigger manual dari tab Actions
+
+# Hanya jalankan satu deployment dalam satu waktu
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================
+  # JOB 1: CI — Continuous Integration (Build & Test)
+  # ============================================================
+  ci:
+    name: 🔍 CI — Build & Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: simpatik_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      # ── 1. Checkout kode ──────────────────────────────────────
+      - name: 📥 Checkout kode
+        uses: actions/checkout@v4
+
+      # ── 2. Setup PHP ──────────────────────────────────────────
+      - name: 🐘 Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, xml, bcmath, gd, zip, intl
+          coverage: none
+
+      # ── 3. Cache Composer dependencies ───────────────────────
+      - name: 📦 Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      # ── 4. Install PHP dependencies ───────────────────────────
+      - name: 📦 Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      # ── 5. Setup Node.js ──────────────────────────────────────
+      - name: 🟩 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 6. Install & Build frontend ───────────────────────────
+      - name: 🎨 Install & Build frontend (Vite)
+        run: |
+          npm ci
+          npm run build
+
+      # ── 7. Siapkan .env untuk testing ─────────────────────────
+      - name: ⚙️ Siapkan environment untuk testing
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          sed -i 's|DB_CONNECTION=sqlite|DB_CONNECTION=mysql|' .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=simpatik_test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=secret" >> .env
+
+      # ── 8. Jalankan migrasi untuk testing ─────────────────────
+      - name: 🗄️ Jalankan database migration (test)
+        run: php artisan migrate --force
+
+      # ── 9. Jalankan PHPUnit ───────────────────────────────────
+      - name: 🧪 Jalankan PHPUnit tests
+        run: php artisan test --parallel
+
+  # ============================================================
+  # JOB 2: CD — Deploy ke Production (hanya jika CI lolos)
+  # ============================================================
+  deploy:
+    name: 🚀 Deploy ke Production
+    runs-on: ubuntu-latest
+    needs: ci # Tunggu job CI selesai dan lolos
+    environment: production # Terhubung ke GitHub Environment "production"
+
+    steps:
+      # ── 1. Deploy via SSH ─────────────────────────────────────
+      - name: 🔐 Deploy via SSH ke VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e  # Hentikan script jika ada perintah yang gagal
+
+            echo "📁 Masuk ke direktori proyek..."
+            cd ${{ secrets.APP_PATH }}
+
+            echo "🔽 Tarik kode terbaru dari branch production..."
+            git fetch origin production
+            git reset --hard origin/production
+
+            echo "🔒 Aktifkan Maintenance Mode..."
+            php artisan down --retry=60
+
+            echo "📦 Install PHP dependencies (production)..."
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+            echo "🎨 Install & Build frontend assets..."
+            npm ci --omit=dev
+            npm run build
+
+            echo "🗄️ Jalankan database migrations..."
+            php artisan migrate --force
+
+            echo "🧹 Clear & Optimize cache aplikasi..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+
+            echo "🔗 Refresh storage symlink..."
+            php artisan storage:link --force
+
+            echo "🔄 Restart queue workers..."
+            php artisan queue:restart
+
+            echo "✅ Nonaktifkan Maintenance Mode..."
+            php artisan up
+
+            echo "🎉 Deploy selesai!"
