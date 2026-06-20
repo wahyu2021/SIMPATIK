@@ -59,7 +59,7 @@ jobs:
 
       # ── 4. Install PHP dependencies ───────────────────────────
       - name: 📦 Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       # ── 5. Setup Node.js ──────────────────────────────────────
       - name: 🟩 Setup Node.js
