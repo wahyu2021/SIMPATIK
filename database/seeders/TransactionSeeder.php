@@ -86,6 +86,7 @@ class TransactionSeeder extends Seeder
                 'user_id' => $admin->id,
                 'reference_number' => $inb['ref'],
                 'transaction_date' => $inb['date'],
+                'receipt_image_path' => 'receipts/dummy-receipt.jpg',
                 'notes' => $inb['notes'],
                 'created_at' => Carbon::parse($inb['date'])->addHours(rand(8, 14))->addMinutes(rand(0, 59)),
             ]);
