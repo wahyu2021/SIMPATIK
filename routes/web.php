@@ -46,8 +46,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Items (Barang)
-        Route::resource('items', ItemController::class)->only(['index', 'show'])->middleware('can:view-items');
         Route::resource('items', ItemController::class)->except(['index', 'show'])->middleware('can:manage-items');
+        Route::resource('items', ItemController::class)->only(['index', 'show'])->middleware('can:view-items');
 
         // User Management
         Route::middleware(['role:general_affairs'])->group(function () {
