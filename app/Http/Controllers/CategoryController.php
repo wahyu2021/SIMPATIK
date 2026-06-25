@@ -83,4 +83,12 @@ class CategoryController extends Controller
             ->route('categories.index')
             ->with('success', 'Kategori berhasil dihapus.');
     }
+
+    /**
+     * Tampilkan detail kategori.
+     */
+    public function show(int $id)
+    {
+        abort(404);
+    }
 }

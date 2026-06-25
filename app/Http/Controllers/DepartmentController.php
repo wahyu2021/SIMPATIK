@@ -83,4 +83,12 @@ class DepartmentController extends Controller
             ->route('departments.index')
             ->with('success', 'Unit kerja berhasil dihapus.');
     }
+
+    /**
+     * Tampilkan detail unit kerja.
+     */
+    public function show(int $id)
+    {
+        abort(404);
+    }
 }

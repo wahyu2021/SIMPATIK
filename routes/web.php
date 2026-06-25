@@ -83,10 +83,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('outbound/{id}/pdf/spb', [OutboundController::class, 'downloadSpb'])->name('outbound.pdf.spb');
         Route::get('outbound/{id}/pdf/bast', [OutboundController::class, 'downloadBast'])->name('outbound.pdf.bast');
         // Categories & Departments
-        Route::resource('categories', CategoryController::class)->only(['index', 'show'])->middleware('can:view-categories');
         Route::resource('categories', CategoryController::class)->except(['index', 'show'])->middleware('can:manage-categories');
-        Route::resource('departments', DepartmentController::class)->only(['index', 'show'])->middleware('can:view-departments');
+        Route::resource('categories', CategoryController::class)->only(['index', 'show'])->middleware('can:view-categories');
         Route::resource('departments', DepartmentController::class)->except(['index', 'show'])->middleware('can:manage-departments');
+        Route::resource('departments', DepartmentController::class)->only(['index', 'show'])->middleware('can:view-departments');
         
         // Reports
         Route::middleware(['can:view-reports'])->group(function () {
