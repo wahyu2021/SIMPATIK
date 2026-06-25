@@ -91,4 +91,12 @@ class ItemController extends Controller
             ->route('items.index')
             ->with('success', 'Barang berhasil dihapus.');
     }
+
+    /**
+     * Tampilkan detail barang.
+     */
+    public function show(int $id)
+    {
+        abort(404);
+    }
 }
