@@ -7,6 +7,7 @@ use App\Http\Requests\Outbound\StoreOutboundRequest;
 use App\Models\Department;
 use App\Models\Item;
 use App\Models\OutboundTransaction;
+use App\Models\User;
 use App\Services\OutboundService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
