@@ -1,8 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { LogIn, Shield, TrendingUp, BarChart3, Users, Lock } from 'lucide-react';
 import LoginForm from '../../Components/Features/Auth/LoginForm';
-import DemoCredentials from '../../Components/Features/Auth/DemoCredentials';
-import FeatureCard from '../../Components/Fragments/FeatureCard';
 
 interface LoginPageProps {
     errors?: Record<string, string>;
@@ -12,83 +9,81 @@ export default function Login({ errors = {} }: LoginPageProps) {
     return (
         <>
             <Head title="Login" />
-            <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-linear-to-br from-[#003366] to-[#0052A3]">
-                <div className="w-full max-w-md lg:max-w-6xl flex gap-20 justify-center items-center">
-                    
-                    {/* Kolom Kiri: Form Login */}
-                    <div className="flex-1 w-full max-w-md mx-auto">
-                        <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-                            {/* Header Form */}
-                            <div className="px-8 py-8 text-center bg-linear-to-br from-[#003366] to-[#0052A3]">
-                                <div className="flex justify-center mb-4">
-                                    <div className="bg-white p-3 rounded-lg shadow-inner">
-                                        <img src="/images/logo.webp" alt="Logo" className="w-10 h-10 object-contain" />
-                                    </div>
+
+            {/* Animasi entrance via CSS keyframes */}
+            <style>{`
+                @keyframes loginEntrance {
+                    from {
+                        opacity: 0;
+                        transform: translateY(24px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                .login-card-enter {
+                    animation: loginEntrance 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                }
+            `}</style>
+
+            {/* Full-screen background dengan overlay */}
+            <div
+                className="relative min-h-screen flex items-center justify-center px-4 py-12"
+                style={{
+                    backgroundImage: 'url(/images/login-bg.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundColor: '#003366',
+                }}
+            >
+                {/* Overlay gelap semi-transparan */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#001a33]/80 via-[#003366]/70 to-[#0052A3]/60" />
+
+                {/* Card form login — single column centered */}
+                <div className="relative z-10 w-full max-w-md login-card-enter">
+                    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+                        {/* Header: Logo + Branding */}
+                        <div className="px-8 pt-10 pb-6 text-center">
+                            <div className="flex justify-center mb-5">
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                    <img
+                                        src="/images/logo.webp"
+                                        alt="Logo SIMPATIK"
+                                        className="w-11 h-11 object-contain"
+                                    />
                                 </div>
-                                <h1 className="text-3xl font-bold text-white">SIMPATIK</h1>
-                                <div className="text-blue-100 mt-2">
-                                    <p className="block lg:hidden text-sm">Sistem Manajemen Permintaan ATK Terpadu</p>
-                                    <p className="hidden lg:block text-base">Sistem Informasi Manajemen Persediaan ATK</p>
-                                </div>
-                                <p className="text-blue-100 text-xs lg:text-sm mt-1">Bank Sumsel Babel</p>
                             </div>
-
-                            {/* Area Form */}
-                            <div className="px-8 py-8">
-                                <LoginForm errors={errors} />
-                            </div>
-
-                            {/* Demo Credentials yang di-extract */}
-                            <DemoCredentials />
-
-                            <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 text-center text-xs text-gray-600">
-                                <p>© 2026 Bank Sumsel Babel. All rights reserved.</p>
-                            </div>
+                            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                                SIMPATIK
+                            </h1>
+                            <p className="text-slate-500 text-sm mt-1.5 leading-relaxed">
+                                Sistem Informasi Manajemen Persediaan ATK
+                            </p>
+                            <p className="text-slate-400 text-xs mt-0.5">
+                                Bank Sumsel Babel
+                            </p>
                         </div>
 
-                        {/* Additional Info (Only visible on Mobile view) */}
-                        <div className="mt-6 text-center text-white text-sm lg:hidden">
-                            <p>Butuh bantuan? <button type="button" className="underline hover:no-underline bg-transparent border-0 cursor-pointer text-white">Hubungi IT Support</button></p>
-                        </div>
-                    </div>
+                        {/* Pemisah halus */}
+                        <div className="mx-8 border-t border-slate-100" />
 
-                    {/* Kolom Kanan: Feature Panel (Hanya tampak di Desktop) */}
-                    <div className="hidden lg:flex flex-1 flex-col space-y-6 self-start">
-                        <div className="text-white mb-8 text-center">
-                            <h2 className="text-4xl font-bold mb-2">Selamat Datang</h2>
-                            <p className="text-blue-100">Sistem Informasi Manajemen Persediaan ATK</p>
+                        {/* Area Form Login */}
+                        <div className="px-8 py-8">
+                            <LoginForm errors={errors} />
                         </div>
 
-                        <FeatureCard
-                            icon={Shield}
-                            title="Keamanan Terpercaya"
-                            description="Sistem autentikasi berlapis dengan enkripsi password dan audit trail digital"
-                        />
-                        <FeatureCard
-                            icon={TrendingUp}
-                            title="Efisiensi Operasional"
-                            description="Kelola permintaan ATK dengan cepat dan mudah melalui interface yang intuitif"
-                        />
-                        <FeatureCard
-                            icon={BarChart3}
-                            title="Laporan & Analitik"
-                            description="Dapatkan insights mendalam tentang mutasi barang dan tren penggunaan"
-                        />
-                        <FeatureCard
-                            icon={Users}
-                            title="Kolaborasi Tim"
-                            description="Bekerja bersama dengan role-based access control untuk setiap departemen"
-                        />
-                        <FeatureCard
-                            icon={Lock}
-                            title="Privasi Terjamin"
-                            description="Tanda tangan digital dan data user dilindungi dengan sistem keamanan standar bank"
-                        />
+                        {/* Footer copyright */}
+                        <div className="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center">
+                            <p className="text-xs text-slate-400">
+                                © {new Date().getFullYear()} Bank Sumsel Babel. All rights reserved.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </>
     );
 }
-
-
