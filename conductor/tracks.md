@@ -10,7 +10,7 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `reporting-finalization` | Finalisasi Modul Laporan & Rekonsiliasi | ✅ Completed | [Plan](./tracks/reporting-finalization/plan.md) |
 | `department-report` | Fitur Laporan per Unit Kerja | ✅ Completed | [Plan](./tracks/department-report/plan.md) |
 | `pdf-generation` | Implementasi Generator PDF SPB & BAST | ✅ Completed | [Plan](./tracks/pdf-generation/plan.md) |
-| `notifications-system` | Sistem Notifikasi Multi-Channel (Web & WA) | 🔴 Todo | [Plan](./tracks/notifications-system/plan.md) |
+| `notifications-system` | Sistem Notifikasi Multi-Channel (Web & WA) | ✅ Completed | [Plan](./tracks/notifications-system/plan.md) |
 | `audit-trail` | Implementasi Digital Audit Trail | ✅ Completed | [Plan](./tracks/audit-trail/plan.md) |
 | `testing-qa` | Pengujian Otomatis & QA | 🔴 Todo | [Plan](./tracks/testing-qa/plan.md) |
 | `inbound-visibility` | Perubahan Hak Akses Barang Masuk (Gudang -> Umum) | ✅ Completed | [Plan](./tracks/inbound-visibility/plan.md) |
@@ -23,7 +23,7 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `user-import-feature` | Fitur Import User massal via Excel/CSV | ✅ Completed | [Plan](./tracks/user-import-feature/plan.md) |
 | `reconciliation-export` | Fitur Export Rekonsiliasi (PDF & Excel) | ✅ Completed | [Plan](./tracks/reconciliation-export/plan.md) |
 | `refactor-form-requests` | Pemisahan Validasi ke Form Request | ✅ Completed | [Plan](./tracks/refactor-form-requests/plan.md) |
-| `refactor-services-to-dto` | Implementasi Data Transfer Object (DTO) pada Service Layer | 🔴 Todo | [Plan](./tracks/refactor-services-to-dto/plan.md) |
+| `refactor-services-to-dto` | Implementasi Data Transfer Object (DTO) pada Service Layer | ✅ Completed | [Plan](./tracks/refactor-services-to-dto/plan.md) |
 | `update-activity-diagram` | Pembaruan Activity Diagram (1 Use Case = 1 Diagram) | ✅ Completed | [Plan](./tracks/update-activity-diagram/plan.md) |
 | `cicd-github-actions` | Implementasi GitHub Actions CI/CD ke Production VPS | ✅ Completed | [Plan](./tracks/cicd-github-actions/plan.md) |
 | `redesign-login-page` | Redesign Halaman Login (Modern, Clean, Background Image) | ✅ Completed | [Plan](./tracks/redesign-login-page_20260702/plan.md) |
