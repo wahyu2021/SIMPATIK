@@ -26,4 +26,4 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 | `refactor-services-to-dto` | Implementasi Data Transfer Object (DTO) pada Service Layer | 🔴 Todo | [Plan](./tracks/refactor-services-to-dto/plan.md) |
 | `update-activity-diagram` | Pembaruan Activity Diagram (1 Use Case = 1 Diagram) | ✅ Completed | [Plan](./tracks/update-activity-diagram/plan.md) |
 | `cicd-github-actions` | Implementasi GitHub Actions CI/CD ke Production VPS | ✅ Completed | [Plan](./tracks/cicd-github-actions/plan.md) |
-| `redesign-login-page` | Redesign Halaman Login (Modern, Clean, Background Image) | 🔴 Todo | [Plan](./tracks/redesign-login-page_20260702/plan.md) |
+| `redesign-login-page` | Redesign Halaman Login (Modern, Clean, Background Image) | ✅ Completed | [Plan](./tracks/redesign-login-page_20260702/plan.md) |
