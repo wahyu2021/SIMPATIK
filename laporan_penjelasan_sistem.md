@@ -40,12 +40,12 @@ Untuk mengatasi permasalahan tersebut, penulis mengusulkan Rancang Bangun Sistem
    Sistem membagi hak akses menjadi empat peran utama.
 3. **Fitur Notifikasi WhatsApp Real-Time**
    Notifikasi dikirimkan instan agar koordinasi berjalan cepat.
-4. **Digitalisasi Dokumen dan Tanda Tangan Elektronik**
-   Seluruh formulir kertas ditiadakan dan diganti menjadi format PDF dengan *QR Code* dan tanda tangan elektronik.
+4. **Digitalisasi Dokumen dan Persetujuan Berlapis**
+   Seluruh formulir kertas ditiadakan dan diganti menjadi format digital berbasis PDF yang dicetak sistem.
 
 ### 4.3.3 Tata Cara Pemakaian Sistem
 Tata cara atau alur kerja umum yang diterapkan dalam penggunaan aplikasi SIMPATIK adalah:
-1. **Proses Autentikasi (Login) dan Onboarding** (Signature Onboarding).
+1. **Proses Autentikasi (Login)**.
 2. **Pengajuan Barang** (Staff Unit Kerja).
 3. **Proses Disposisi/Persetujuan** (Penyelia).
 4. **Penyiapan dan Pemotongan Stok** (Admin Gudang).
@@ -59,7 +59,7 @@ Dalam penulisan rancang bangun ini, penulis mempertimbangkan beberapa faktor stu
 **Tabel 4.1 Perbandingan Studi Kelayakan**
 | Faktor Kelayakan | Sistem Lama (Manual) | Sistem Baru (SIMPATIK) |
 | --- | --- | --- |
-| **Kelayakan Teknis** | Proses otorisasi ATK bergantung pada perpindahan formulir fisik secara berjenjang. Harus mencari keberadaan pimpinan untuk mendapatkan tanda tangan basah. | Dengan sistem baru, seluruh proses didigitalisasi menggunakan tanda tangan elektronik. Sistem dihubungkan dengan integrasi WhatsApp untuk memberikan *push notification* instan. |
+| **Kelayakan Teknis** | Proses otorisasi ATK bergantung pada perpindahan formulir fisik secara berjenjang. Harus mencari keberadaan pimpinan untuk mendapatkan tanda tangan basah. | Dengan sistem baru, seluruh proses didigitalisasi dengan sistem persetujuan digital berlapis berbasis peran (*Role-Based Access*). Sistem dihubungkan dengan integrasi WhatsApp untuk memberikan *push notification* instan. |
 | **Kelayakan Operasi** | Admin gudang mencatat mutasi barang keluar-masuk di buku besar (*Kartu Stok*) dan menghitung persediaan akhir satu-persatu secara berkala. | Sistem secara terpusat dan otomatis merekam setiap perpindahan barang ke dalam tabel *Stock Ledger*. Saldo diperbarui secara *real-time*. Pelaporan operasional dapat diunduh (eksport) oleh manajemen kapan saja. |
 | **Kelayakan Ekonomi** | Biaya operasional tinggi karena penggunaan kertas (formulir, kartu stok) dan efisiensi waktu pegawai yang rendah. | Pengurangan biaya cetak kertas dan peningkatan efisiensi waktu, mempercepat proses operasional perusahaan. |
 
@@ -120,61 +120,148 @@ a. Definisi Aktor
 Tabel 4.3 Definisi Aktor
 | No. | Aktor | Keterangan |
 | --- | --- | --- |
-| 1. | Admin Gudang | Bertugas mengelola sistem secara keseluruhan, mulai dari login, mengelola data master, kelola pengguna, kelola pengaturan, mencatat inbound, mengeluarkan permintaan langsung, menyerahkan barang, cetak dokumen, hingga rekonsiliasi dan cek log audit. |
-| 2. | Division Head | Bertugas login untuk memverifikasi (approve/reject) terhadap pengajuan permintaan barang yang dilakukan oleh staf di bawah unit kerjanya. |
-| 3. | Staff Unit Kerja | Bertugas login untuk membuat pengajuan barang, mengedit/membatalkan pengajuan, serta melakukan konfirmasi penerimaan barang di gudang. |
-| 4. | Staff Bagian Umum | Bertugas login ke dalam sistem untuk memonitoring laporan bulanan dan riwayat mutasi stok barang. |
+| 1. | Bagian Umum | Bertugas mengelola pengaturan sistem, data master, akun pengguna, memonitoring laporan, serta log audit (audit trail). |
+| 2. | Admin Gudang | Bertugas melakukan operasional gudang seperti menyetujui penyiapan barang, menyerahkan barang, mencetak dokumen, dan membuat permintaan langsung. |
+| 3. | Penyelia (Division Head) | Memiliki seluruh hak akses Staff dengan tambahan fitur untuk memverifikasi (approve/reject) pengajuan permintaan barang staf. |
+| 4. | Staff Unit Kerja | Bertugas login untuk mengajukan permintaan barang, melakukan konfirmasi serah terima barang, dan mencetak dokumen. |
 
 b. Definisi Use Case
 
 Tabel 4.4 Definisi Use Case
 | No. | Use Case | Keterangan |
 | --- | --- | --- |
-| 1. | Login | Fungsi bagi semua aktor untuk masuk ke dalam sistem menggunakan akun terdaftar. |
-| 2. | Kelola Data Master | Fungsi bagi admin gudang untuk mengelola data barang, kategori, dan unit kerja. |
-| 3. | Kelola User dan Hak Akses | Fungsi bagi admin gudang untuk mengelola akun pengguna dan perannya. |
-| 4. | Kelola Settings Konfigurasi | Fungsi bagi admin gudang untuk mengatur parameter operasional aplikasi. |
-| 5. | Kelola Inbound Barang Masuk | Fungsi bagi admin gudang untuk mencatat stok barang masuk. |
-| 6. | Buat Pengajuan Barang | Fungsi bagi staff untuk membuat formulir permintaan ATK baru. |
-| 7. | Edit/Batalkan Pengajuan | Fungsi bagi staff untuk mengubah detail pengajuan yang berstatus pending. |
-| 8. | Membuat Permintaan Langsung | Fungsi khusus admin gudang untuk memotong kompas persetujuan. |
-| 9. | Verifikasi Pengajuan | Fungsi bagi division head untuk memberikan izin atau penolakan pengajuan staf. |
-| 10. | Handover Barang | Fungsi bagi admin gudang untuk menyerahkan fisik barang kepada staf peminta. |
-| 11. | Konfirmasi Penerimaan | Fungsi bagi staff untuk mengonfirmasi penerimaan fisik barang dari gudang. |
-| 12. | Cetak SPB | Fungsi untuk menghasilkan PDF Surat Permintaan Barang. |
-| 13. | Cetak BAST | Fungsi untuk menghasilkan PDF Berita Acara Serah Terima. |
-| 14. | Melihat Laporan & Mutasi Stok| Fungsi bagi bagian umum dan admin untuk memantau riwayat stok. |
-| 15. | Rekonsiliasi Bulanan | Fungsi bagi admin untuk penyesuaian stok sistem dengan stok fisik (opname). |
-| 16. | Melihat Log Audit Trail | Fungsi bagi admin untuk melihat seluruh riwayat aktivitas sistem. |
-| 17. | Kelola Profil & Tanda Tangan | Fungsi bagi seluruh aktor untuk mengelola profil dan pola tanda tangan digital. |
-| 18. | Notifikasi Web dan WhatsApp | Fungsi sistem otomatis untuk mengirim pesan informasi status transaksi. |
+| 1. | Login | Autentikasi untuk membedakan hak akses (*role*) setiap aktor setelah berhasil masuk. |
+| 2. | Mengelola Data Master | Mengelola data utama (Barang, Kategori, Departemen) dengan penandaan hapus sementara (*soft delete*). |
+| 3. | Menginput Barang Masuk | Mencatat barang dari vendor beserta lampiran bukti transaksi. |
+| 4. | Mengelola Pengguna | Mengelola akun; hapus dicegah bila pengguna memiliki riwayat transaksi. |
+| 5. | Melihat Audit Trail Digital| Meninjau log aktivitas (sebelum dan sesudah) perubahan data. |
+| 6. | Mengelola Pengaturan Sistem | Menyimpan konfigurasi dasar atau nilai (*value*) pengaturan aplikasi saat ini. |
+| 7. | Melihat Laporan & Rekonsiliasi| Membuat laporan umum PDF/Excel dan input penyesuaian stok (rekonsiliasi fisik vs sistem). |
+| 8. | Mengajukan Permintaan Barang | Proses permintaan barang oleh pemohon (Staff menjadi Pending, Penyelia otomatis Approved). |
+| 9. | Mengonfirmasi Serah Terima Barang | Admin menyerahkan fisik barang, lalu pemohon mengonfirmasi penerimaan secara sistem. |
+| 10. | Cetak Dokumen Transaksi | Cetak PDF Surat SPB dan BAST (BAST hanya setelah barang diserah-terimakan). |
+| 11. | Verifikasi Permintaan Barang | Peninjauan (Approve/Reject) oleh Penyelia atas permintaan Staff. |
+| 12. | Membuat Permintaan Langsung | Admin Gudang mengeluarkan barang secara langsung tanpa verifikasi Penyelia. |
+| 13. | Menyetujui Permintaan Barang | Admin Gudang mengesahkan dokumen status *Approved* untuk proses penyiapan pemotongan fisik. |
+| 14. | Melihat Data Barang | Memantau daftar sisa data stok beserta notifikasi jika status stok kritis (minim). |
 
 ### 4.7.2 Activity Diagram
-Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasar *swimlane* para aktor. Pada sistem SIMPATIK, aktivitas dirincikan ke dalam tujuh proses operasional:
+Activity Diagram membedah proses bisnis menjadi kotak alur berkelanjutan berdasar *swimlane* para aktor. Pada sistem SIMPATIK, aktivitas operasional dirincikan ke dalam empat belas proses utama sesuai dengan *Use Case* yang ada:
 
-**(Gambar 4.2 Activity Diagram terlampir di lembar desain sistem)**
+a. Activity Diagram Login
+Activity Diagram Login merupakan proses autentikasi yang membedakan hak akses (*role*) setiap aktor setelah berhasil login.
 
-1. **Proses Autentikasi (Login):** Validasi kredensial dan pengecekan kelengkapan tanda tangan digital.
-2. **Proses Pemasukan Barang (Inbound Transaction):** Aktivitas Admin Gudang untuk menambahkan stok ke *Stock Ledger*.
-3. **Proses Pengajuan & Pengeluaran Barang (Outbound):** Alur dari Staff menyusun pesanan → Pemeriksaan & Persetujuan oleh Penyelia → Pemrosesan Pemotongan Fisik oleh Admin → Konfirmasi Serah Terima oleh Staff.
-4. **Pembuatan Laporan (Reporting & Export):** Aktivitas kompilasi data mutasi menjadi format Excel/PDF.
-5. **Proses Rekonsiliasi Stok Bulanan:** Aktivitas mencocokkan stok *database* dengan perhitungan fisik gudang.
-6. **Proses Pengaturan Profil & Tanda Tangan:** Kewajiban pengguna baru menyimpan pola *canvas* tanda tangan.
-7. **Proses Pengelolaan Data Master:** Operasional CRUD (Barang, Kategori, Departemen) oleh Admin Gudang.
+Gambar 4.2 Activity Diagram Login
+
+b. Activity Diagram Mengelola Data Master
+Activity Diagram Mengelola Data Master merupakan proses pengelolaan data master oleh Bagian Umum, termasuk penandaan penghapusan sementara (*soft delete*).
+
+Gambar 4.3 Activity Diagram Mengelola Data Master
+
+c. Activity Diagram Menginput Barang Masuk
+Activity Diagram Menginput Barang Masuk merupakan proses pencatatan barang dari vendor, dengan kewajiban melampirkan bukti transaksi.
+
+Gambar 4.4 Activity Diagram Menginput Barang Masuk
+
+d. Activity Diagram Mengelola Pengguna
+Activity Diagram Mengelola Pengguna merupakan proses pengelolaan akun pengguna. Penghapusan akan dicegah jika pengguna sudah memiliki riwayat transaksi.
+
+Gambar 4.5 Activity Diagram Mengelola Pengguna
+
+e. Activity Diagram Melihat Audit Trail Digital
+Activity Diagram Melihat Audit Trail Digital merupakan proses melihat log aktivitas beserta detail perubahan data sebelum dan sesudahnya.
+
+Gambar 4.6 Activity Diagram Melihat Audit Trail Digital
+
+f. Activity Diagram Mengelola Pengaturan Sistem
+Activity Diagram Mengelola Pengaturan Sistem merupakan proses menyimpan konfigurasi dasar yang menampilkan nilai (*value*) pengaturan saat ini.
+
+Gambar 4.7 Activity Diagram Mengelola Pengaturan Sistem
+
+g. Activity Diagram Melihat Laporan & Rekonsiliasi
+Activity Diagram Melihat Laporan & Rekonsiliasi merupakan proses membuat laporan umum dan melakukan input rekonsiliasi stok fisik versus sistem.
+
+Gambar 4.8 Activity Diagram Melihat Laporan & Rekonsiliasi
+
+h. Activity Diagram Mengajukan Permintaan Barang
+Activity Diagram Mengajukan Permintaan Barang merupakan proses permintaan barang dari Staff (butuh persetujuan) berbeda dengan Penyelia (otomatis disetujui).
+
+Gambar 4.9 Activity Diagram Mengajukan Permintaan Barang
+
+i. Activity Diagram Mengonfirmasi Serah Terima Barang
+Activity Diagram Mengonfirmasi Serah Terima Barang merupakan proses dua arah: Admin Gudang menyerahkan, kemudian Pemohon mengonfirmasi penerimaan secara fisik.
+
+Gambar 4.10 Activity Diagram Mengonfirmasi Serah Terima Barang
+
+j. Activity Diagram Cetak Dokumen Transaksi
+Activity Diagram Cetak Dokumen Transaksi merupakan proses pencetakan di mana Surat Permintaan Barang (SPB) dapat dicetak di awal, tetapi Berita Acara Serah Terima (BAST) baru bisa dicetak setelah serah terima selesai.
+
+Gambar 4.11 Activity Diagram Cetak Dokumen Transaksi
+
+k. Activity Diagram Verifikasi Permintaan Barang
+Activity Diagram Verifikasi Permintaan Barang merupakan proses peninjauan oleh Penyelia terhadap pengajuan dari Staff. Bisa disesuaikan jumlah atau ditolak dengan alasan.
+
+Gambar 4.12 Activity Diagram Verifikasi Permintaan Barang
+
+l. Activity Diagram Membuat Permintaan Langsung
+Activity Diagram Membuat Permintaan Langsung merupakan aktivitas admin gudang mengeluarkan barang tanpa melalui alur verifikasi penyelia (potong stok langsung).
+
+Gambar 4.13 Activity Diagram Membuat Permintaan Langsung
+
+m. Activity Diagram Menyetujui Permintaan Barang
+Activity Diagram Menyetujui Permintaan Barang merupakan tindakan Admin Gudang untuk benar-benar mengeluarkan stok dari pengajuan yang sudah disetujui (*Approved*).
+
+Gambar 4.14 Activity Diagram Menyetujui Permintaan Barang
+
+n. Activity Diagram Melihat Data Barang
+Activity Diagram Melihat Data Barang merupakan aktivitas pemantauan data stok oleh Admin Gudang dengan ketersediaan fitur filter khusus peringatan stok minim.
+
+Gambar 4.15 Activity Diagram Melihat Data Barang
 
 ### 4.7.3 Sequence Diagram
 Sequence Diagram memodelkan urutan interaksi antar objek dan pemanggilan *method* dari *View* (Inertia.js), ke *Controller*, *Service*, hingga ke *Model* (MVC-S). 
 
-**(Gambar 4.3 Sequence Diagram terlampir di lembar desain sistem)**
+a) Sequence Diagram Login
+Sequence Diagram Login merupakan proses autentikasi dasar untuk membedakan hak akses (*role*) setiap aktor setelah berhasil login.
 
-1. **Sequence Diagram Autentikasi & Pengecekan Tanda Tangan:** *Middleware* memvalidasi *signature_path*.
-2. **Sequence Diagram Inbound Transaction:** Pemasukan *current_stock* via *InboundService*.
-3. **Sequence Diagram Outbound (Request & Approval):** Interaksi pengajuan status `PENDING` dan perubahan ke `APPROVED`.
-4. **Sequence Diagram Outbound (Handover & Pickup):** Penyerahan barang (`HANDED_OVER`) dan pemotongan mutasi akhir (`COMPLETED`).
-5. **Pembuatan & Unduh Laporan:** Penggunaan pustaka *DomPDF* untuk mencetak dokumen.
-6. **Proses Rekonsiliasi Stok:** Pencatatan penyesuaian nilai barang di *ReportController*.
-7. **Proses Pengaturan Profil & Tanda Tangan:** Konversi *base64 canvas* menjadi berkas gambar (PNG).
-8. **Pengelolaan Data Master:** *Routing CRUD* standar ke tabel `items`, `categories`, dan `departments`.
+b) Sequence Diagram Mengelola Data Master
+Sequence Diagram Mengelola Data Master merupakan proses pengelolaan data master oleh Bagian Umum, termasuk penandaan penghapusan sementara (*soft delete*).
+
+c) Sequence Diagram Menginput Barang Masuk
+Sequence Diagram Menginput Barang Masuk merupakan proses pencatatan barang dari vendor, dengan kewajiban melampirkan bukti transaksi.
+
+d) Sequence Diagram Mengelola Pengguna
+Sequence Diagram Mengelola Pengguna merupakan proses pengelolaan akun pengguna, di mana penghapusan akan dicegah jika pengguna sudah memiliki riwayat transaksi.
+
+e) Sequence Diagram Melihat Audit Trail Digital
+Sequence Diagram Melihat Audit Trail Digital merupakan proses pemanggilan data log aktivitas beserta detail perubahan data sebelum dan sesudahnya.
+
+f) Sequence Diagram Mengelola Pengaturan Sistem
+Sequence Diagram Mengelola Pengaturan Sistem merupakan proses memvalidasi dan menyimpan konfigurasi nilai pengaturan aplikasi saat ini.
+
+g) Sequence Diagram Melihat Laporan & Rekonsiliasi
+Sequence Diagram Melihat Laporan & Rekonsiliasi merupakan proses membuat laporan umum serta perhitungan selisih input rekonsiliasi stok fisik versus sistem.
+
+h) Sequence Diagram Mengajukan Permintaan Barang
+Sequence Diagram Mengajukan Permintaan Barang merupakan proses permintaan barang yang membedakan rute otomatis bagi staf dan penyelia.
+
+i) Sequence Diagram Mengonfirmasi Serah Terima Barang
+Sequence Diagram Mengonfirmasi Serah Terima Barang merupakan proses dua arah ketika Admin Gudang menyerahkan fisik barang lalu pemohon mengonfirmasi penerimaan secara sistem.
+
+j) Sequence Diagram Cetak Dokumen Transaksi
+Sequence Diagram Cetak Dokumen Transaksi merupakan proses pencetakan luaran (*output*) berupa PDF Surat Permintaan Barang (SPB) dan Berita Acara (BAST).
+
+k) Sequence Diagram Verifikasi Permintaan Barang
+Sequence Diagram Verifikasi Permintaan Barang merupakan proses peninjauan oleh Penyelia terhadap pengajuan dari staf untuk disesuaikan atau ditolak.
+
+l) Sequence Diagram Membuat Permintaan Langsung
+Sequence Diagram Membuat Permintaan Langsung merupakan aktivitas pemotongan ketersediaan stok riil secara *bypass* oleh Admin Gudang tanpa verifikasi penyelia.
+
+m) Sequence Diagram Menyetujui Permintaan Barang
+Sequence Diagram Menyetujui Permintaan Barang merupakan tindakan verifikasi akhir ketersediaan stok fisik barang berstatus disetujui (*Approved*) untuk dieksekusi potong stok oleh Admin Gudang.
+
+n) Sequence Diagram Melihat Data Barang
+Sequence Diagram Melihat Data Barang merupakan proses pemanggilan kueri dari pangkalan data barang beserta penerapan filter khusus batas peringatan stok kritis.
 
 ### 4.7.4 Class Diagram
 Class diagram SIMPATIK memvisualisasikan arsitektur keterikatan logis dan relasi kardinalitas (seperti *1-to-Many* atau *Pivot*) antar entitas (*Model*). 
@@ -326,9 +413,7 @@ Event list merupakan suatu kejadian yang dapat terjadi pada lingkungan sistem da
 | Event List | Trigger/Actor | Respon Sistem |
 | --- | --- | --- |
 | Staff membuka portal website SIMPATIK. | Staff | Sistem menampilkan halaman login. |
-| Staff mengisi email dan password, lalu klik login. | Staff | Sistem memvalidasi data kredensial login. |
-| Data login valid tetapi belum memiliki tanda tangan. | Sistem | Sistem mengarahkan pengguna ke halaman *Onboarding Signature*. |
-| Staff menggambar tanda tangan dan klik "Simpan". | Staff | Sistem menyimpan gambar tanda tangan dan menampilkan halaman Dashboard. |
+| Staff mengisi email dan password, lalu klik login. | Staff | Sistem memvalidasi data kredensial login dan mengarahkan ke Dashboard. |
 | Staff memilih menu "Pengajuan Baru". | Staff | Sistem menampilkan formulir pengajuan permintaan ATK. |
 | Staff memilih barang, mengisi jumlah, dan klik "Submit". | Staff | Sistem memvalidasi ketersediaan limit stok di gudang. |
 | Stok mencukupi dan data valid. | Sistem | Sistem menyimpan pengajuan (status `Pending`) dan otomatis mengirim notifikasi WhatsApp ke Division Head. |
@@ -366,33 +451,29 @@ Pada tahap ini, rancangan desain purwarupa aplikasi diimplementasikan menjadi an
 Pintu gerbang awal aplikasi SIMPATIK bagi karyawan. Pengguna diminta menginput *Email* dan *Password*.
 *(Gambar 4.5 Halaman Login terlampir)*
 
-**2. Halaman Signature Onboarding**
-Halaman wajib bagi pengguna baru. Antarmuka ini menampilkan blok kanvas putih di bagian tengah, tempat di mana pengguna harus menggambar tanda tangan digital.
-*(Gambar 4.6 Halaman Signature Onboarding terlampir)*
-
-**3. Halaman Dashboard Utama**
+**2. Halaman Dashboard Utama**
 Halaman ini menampakkan kartu metrik visual yang menerangkan jumlah pengajuan bulan ini, lalu merinci sisa item dan peringatan bahaya warna merah "Stok Kritis".
-*(Gambar 4.7 Halaman Dashboard Utama terlampir)*
+*(Gambar 4.6 Halaman Dashboard Utama terlampir)*
 
-**4. Halaman Tabel Pengajuan Barang (Outbound)**
+**3. Halaman Tabel Pengajuan Barang (Outbound)**
 Menampilkan *Data Table* status transaksi (*Pending*, *Approved*, *Completed*). Pengguna dapat menekan tombol "Buat Pengajuan Baru".
-*(Gambar 4.8 Halaman Tabel Pengajuan Barang terlampir)*
+*(Gambar 4.7 Halaman Tabel Pengajuan Barang terlampir)*
 
-**5. Halaman Modal Pengajuan (Buat Permintaan)**
+**4. Halaman Modal Pengajuan (Buat Permintaan)**
 Kotak interaktif (Pop-up Modal) pencarian barang untuk staf unit kerja menginput rincian item.
-*(Gambar 4.9 Halaman Modal Form Permintaan terlampir)*
+*(Gambar 4.8 Halaman Modal Form Permintaan terlampir)*
 
-**6. Halaman Panel Persetujuan Penyelia (Approval Detail)**
+**5. Halaman Panel Persetujuan Penyelia (Approval Detail)**
 Menyajikan ringkasan pemohon dan daftar barang. Terdapat tombol "Setujui" (Approve) dan "Tolak" (Reject).
-*(Gambar 4.10 Halaman Panel Persetujuan Penyelia terlampir)*
+*(Gambar 4.9 Halaman Panel Persetujuan Penyelia terlampir)*
 
-**7. Halaman Data Master Inventaris Gudang**
+**6. Halaman Data Master Inventaris Gudang**
 Daftar katalog peralatan tulis yang dilengkapi gambar visual, kategori, dan batas stok sisa.
-*(Gambar 4.11 Halaman Data Master Inventaris terlampir)*
+*(Gambar 4.10 Halaman Data Master Inventaris terlampir)*
 
-**8. Halaman Laporan Mutasi Bulanan (Stock Ledger)**
+**7. Halaman Laporan Mutasi Bulanan (Stock Ledger)**
 Memuat *form* filter penarikan tanggal, menyajikan tabel komprehensif, dan tombol "*Export Excel/PDF*".
-*(Gambar 4.12 Halaman Laporan Mutasi terlampir)*
+*(Gambar 4.11 Halaman Laporan Mutasi terlampir)*
 
 ## 4.11 Pengujian Sistem
 
@@ -401,7 +482,7 @@ Pengujian dilakukan secara ekstensif menggunakan metode *Black Box Testing*. Met
 **Tabel 4.5 Tabel Pengujian Sistem (Black Box)**
 | No | Skenario Pengujian | Hasil yang Diharapkan | Hasil Pengujian | Kesimpulan |
 | -- | --- | --- | --- | --- |
-| 1 | **Autentikasi (Signature Lock)** | Akun baru tanpa `signature_path` ter-*redirect* ke rute *Onboarding* untuk menggambar kanvas. | Sesuai Harapan | Berhasil |
+| 1 | **Autentikasi Hak Akses (Login Multi-Role)** | Akun staf, penyelia, maupun admin berhasil divalidasi dan langsung diarahkan ke Dashboard sesuai level otoritasnya. | Sesuai Harapan | Berhasil |
 | 2 | **Validasi Limit Stok** | Staf mencoba mengajukan barang melebihi limit. Sistem menolak dan melontarkan *Error Validation*. | Sesuai Harapan | Berhasil |
 | 3 | **Alur Notifikasi Pengajuan** | Staf menekan tombol *Submit*, sistem memicu *push notification* teks WhatsApp ke Penyelia. | Sesuai Harapan | Berhasil |
 | 4 | **Pessimistic Locking Stok** | Admin menekan tombol "Issue". Sistem menahan eksekusi ganda dan memotong angka secara mutlak. | Sesuai Harapan | Berhasil |
@@ -410,4 +491,4 @@ Pengujian dilakukan secara ekstensif menggunakan metode *Black Box Testing*. Met
 
 Sistem Manajemen Persediaan Terpadu (SIMPATIK) berbasis website pada PT. Bank Pembangunan Daerah Sumatera Selatan dan Bangka Belitung telah sukses digagas, dikembangkan, dan diuji fungsionalitasnya. Pembangunan platform terkomputerisasi ini menjadi wujud konkrit perbaikan atas metode konvensional manajemen pasokan logistik ATK.
 
-Berdasarkan paparan hasil pengujian, arsitektur SIMPATIK mampu mentransformasi siklus alur permintaan kertas (manual) menjadi birokrasi tanpa kertas (*paperless*) bernilai otentik via fitur Tanda Tangan Digital. Inovasi penggunaan *WhatsApp Gateway* dan notifikasi instan terbukti andal dalam memperlancar jalur persetujuan (*Approval*). Mekanisme pembukuan log mutasi (*Stock Ledger*) otomatis mencegah risiko selisih perhitungan ganda. Hal ini sejalan dengan objektif awal perancangan sistem, yakni menghadirkan tata kelola inventori persediaan yang responsif, berkecepatan tinggi, termonitor lintas jenjang manajemen, dan meminimalisir celah kesalahan manusia secara signifikan.
+Berdasarkan paparan hasil pengujian, arsitektur SIMPATIK mampu mentransformasi siklus alur permintaan kertas (manual) menjadi birokrasi tanpa kertas (*paperless*) dan terekam penuh rekam jejaknya. Inovasi penggunaan persetujuan sistem digital berlapis berbasis peran dipadukan dengan *WhatsApp Gateway* dan notifikasi instan terbukti andal dalam memperlancar jalur persetujuan (*Approval*). Mekanisme pembukuan log mutasi (*Stock Ledger*) otomatis mencegah risiko selisih perhitungan ganda. Hal ini sejalan dengan objektif awal perancangan sistem, yakni menghadirkan tata kelola inventori persediaan yang responsif, berkecepatan tinggi, termonitor lintas jenjang manajemen, dan meminimalisir celah kesalahan manusia secara signifikan.

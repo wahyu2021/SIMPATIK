@@ -8,25 +8,22 @@
 
 ## 1. Pendahuluan
 
-Sequence Diagram memodelkan urutan pemanggilan *method* dari satu komponen ke komponen lain pada arsitektur perangkat lunak. Pada sistem **SIMPATIK**, Sequence Diagram ini disusun berdasarkan arsitektur riil proyek yang menggunakan **Inertia.js (React)** sebagai *View*, **Laravel Controllers**, **Services** untuk logika bisnis, dan **Eloquent Models**.
+Sequence Diagram memodelkan urutan pemanggilan *method* dari satu komponen ke komponen lain pada arsitektur perangkat lunak. Pada sistem **SIMPATIK**, Sequence Diagram ini disusun berdasarkan arsitektur riil proyek yang menggunakan **Inertia.js (React)** sebagai *View*, **Laravel Controllers**, **Services**, dan **Eloquent Models**.
 
 ---
 
 ## 2. Sequence Diagram per Fitur Utama
 
-### 2.1 Proses Autentikasi & Pengecekan Tanda Tangan (*Login & Signature Middleware*)
-Proses ini mencakup *login* standar via `LoginController` dan pengecekan kelengkapan tanda tangan oleh *Middleware*.
+### SD-01 — Login
+Proses autentikasi dasar untuk membedakan hak akses (*role*) setiap aktor setelah berhasil login.
 
 ```mermaid
 sequenceDiagram
-    autonumber
     actor U as Pengguna
     participant V as View (Inertia React)
     participant C as LoginController
-    participant MW as Signature Middleware
     participant M as User Model
 
-    U->>V: Buka '/login'
     U->>V: Input Email & Password, Klik "Login"
     V->>C: store(Request)
     
@@ -36,281 +33,357 @@ sequenceDiagram
         V-->>U: Tampilkan Pesan Error
     else Jika Kredensial Valid
         C->>C: session()->regenerate()
-        C-->>V: Redirect intended ('/dashboard')
-    end
-    
-    V->>MW: Request '/dashboard' (atau rute lain)
-    MW->>M: user()->signature_path
-    
-    alt Jika signature_path NULL
-        MW-->>V: Redirect to '/signature/create'
-        V-->>U: Tampilkan Form Tanda Tangan Onboarding
-    else Jika signature_path Ada
-        MW-->>V: Teruskan Request ke Controller Tujuan
-        V-->>U: Tampilkan Halaman Tujuan
+        C-->>V: Redirect ke Dashboard sesuai Role
+        V-->>U: Tampilkan Halaman Dashboard
     end
 ```
 
 ---
 
-### 2.2 Proses Pemasukan Barang (*Inbound Transaction*)
-Proses pencatatan barang masuk oleh Admin Gudang.
+### SD-02 — Mengelola Data Master
+Proses pengelolaan data master oleh Bagian Umum, termasuk penandaan penghapusan sementara (*soft delete*).
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    actor A as Admin Gudang
-    participant V as View (Inbound/Form)
-    participant C as InboundController
-    participant S as InboundService
-    participant MI as InboundTransaction Model
-    participant ML as StockLedger Model
-    participant MItem as Item Model
-
-    A->>V: Input Data Referensi & Daftar Barang
-    A->>V: Klik "Simpan"
-    V->>C: store(StoreInboundRequest)
-    
-    C->>S: createTransaction(validatedData)
-    
-    S->>MI: create(transactionData)
-    MI-->>S: transaction
-    
-    loop Setiap Item
-        S->>MI: create details
-        S->>ML: recordMutation(in)
-        S->>MItem: increment('current_stock', qty)
-    end
-    
-    S-->>C: void
-    C-->>V: Redirect ke index with success
-    V-->>A: Tampilkan Flash Message Sukses
-```
-
----
-
-### 2.3 Proses Pengajuan Barang Normal (*Outbound Transaction - Request & Approval*)
-Tahap pengajuan (*Pending*), persetujuan oleh Kepala Divisi (*Approved*), dan penyiapan oleh Admin Gudang (*Issued*).
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor R as Staff
-    participant V as View (Outbound/Form)
-    participant C as OutboundController
-    participant S as OutboundService
-    participant MO as OutboundTransaction Model
-    actor KD as Kepala Divisi
-    actor AG as Admin Gudang
-
-    R->>V: Input Daftar Permintaan Barang
-    R->>V: Klik "Submit Pengajuan"
-    V->>C: store(StoreOutboundRequest)
-    C->>S: createRequest(data)
-    S->>MO: create(status: 'PENDING')
-    S-->>C: transaction
-    C-->>V: Redirect success
-    
-    %% Persetujuan
-    KD->>V: Buka Detail Pengajuan (PENDING)
-    KD->>V: Klik "Setujui"
-    V->>C: approve(outbound_id)
-    C->>S: approveRequest(outbound, user_id)
-    S->>MO: update(status: 'APPROVED')
-    S-->>C: void
-    C-->>V: Redirect success
-    
-    %% Issue (Penyiapan)
-    AG->>V: Buka Detail Pengajuan (APPROVED)
-    AG->>V: Klik "Proses Penyiapan Barang"
-    V->>C: issue(outbound_id)
-    C->>S: issueItems(outbound, user_id)
-    S->>MO: update(status: 'ISSUED')
-    S-->>C: void
-```
-
----
-
-### 2.4 Proses Penyerahan & Konfirmasi Barang (*Outbound - Handover & Pickup*)
-Tahap akhir di mana Admin Gudang menyerahkan fisik barang (*Handed Over*) dan Peminta mengonfirmasi penerimaan secara sistem (*Completed*).
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor AG as Admin Gudang
-    participant V as View (Inertia React)
-    participant C as OutboundController
-    participant S as OutboundService
-    participant MO as OutboundTransaction Model
-    participant ML as StockLedger Model
-    participant MItem as Item Model
-    actor R as Staff (Peminta)
-
-    %% Handover
-    AG->>V: Buka Pengajuan (ISSUED)
-    AG->>V: Klik "Serahkan Barang"
-    V->>C: handover(outbound_id)
-    C->>S: handoverItems(outbound, user_id)
-    S->>MO: update(status: 'HANDED_OVER', handed_over_by)
-    C-->>V: Redirect success
-    V-->>AG: Tampilkan Status "Menunggu Konfirmasi"
-    
-    AG->>R: Serahkan Fisik Barang
-    
-    %% Pickup
-    R->>V: Buka Pengajuan (HANDED_OVER)
-    R->>V: Klik "Konfirmasi Penerimaan"
-    V->>C: pickup(outbound_id)
-    C->>S: pickupItems(outbound, user_id)
-    
-    S->>MO: update(status: 'COMPLETED', picked_up_by)
-    
-    loop Setiap Item
-        S->>ML: recordMutation(out)
-        S->>MItem: decrement('current_stock', qty)
-        S->>MItem: checkLowStock()
-    end
-    
-    S-->>C: void
-    C-->>V: Redirect success
-    V-->>R: Status Transaksi Selesai
-```
-
----
-
-### 2.5 Pembuatan & Unduh Laporan (*Reporting & BAST PDF*)
-Menampilkan interaksi pembuatan laporan (PDF/Excel) menggunakan *DomPDF* / *Excel Exporter* via *Controller* dan *Service*.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as User
-    participant V as View (Inertia React)
-    participant C as ReportController / OutboundController
-    participant PDF as DomPDF / Excel Facade
-    participant DB as Database
-
-    U->>V: Klik "Unduh BAST" atau "Export Laporan Mutasi"
-    
-    alt Download BAST
-        V->>C: downloadBast(outbound_id)
-        C->>DB: getOutboundData(id)
-        C->>PDF: loadView('pdf.bast', data)
-    else Export Laporan
-        V->>C: exportMutationPdf(filters)
-        C->>DB: queryMutationData(filters)
-        C->>PDF: loadView('pdf.mutation', data)
-    end
-    
-    PDF-->>C: pdf_stream
-    C-->>V: return response()->stream()
-    V-->>U: File Berhasil Diunduh
-```
-
----
-
-### 2.6 Proses Rekonsiliasi Stok (*Stock Reconciliation*)
-Rekonsiliasi ditangani langsung oleh `ReportController` untuk mengecek stok awal, input fisik aktual, dan melakukan penyesuaian (adjustment).
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor A as Admin Gudang
-    participant V as View (Reconciliation Page)
-    participant C as ReportController
-    participant MR as StockReconciliation Model
-    participant ML as StockLedger Model
-    participant MItem as Item Model
-
-    A->>V: Buka Halaman Rekonsiliasi
-    V->>C: reconciliation(Request)
-    C-->>V: Render Data Stok Sistem Saat Ini
-    
-    A->>V: Input Qty Fisik per Item, Klik "Submit"
-    V->>C: storeReconciliation(Request)
-    
-    C->>MR: create(reconciliationData)
-    
-    loop Setiap Item yang Diinput
-        C->>C: qty_diff = qty_fisik - qty_sistem
-        alt Jika qty_diff != 0
-            C->>ML: recordMutation(type: adjustment, qty_diff)
-            C->>MItem: update(['current_stock' => qty_fisik])
-        end
-    end
-    
-    C-->>V: Redirect with success
-    V-->>A: Laporan Rekonsiliasi Berhasil Disimpan
-```
-
----
-
-### 2.7 Proses Pengaturan Profil & Tanda Tangan (*Profile Update*)
-Bagaimana pengguna menyimpan tanda tangan digital (*signature*) untuk kebutuhan cetak BAST, yang akan ditangani oleh `SignatureController` atau `ProfileController`.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as Pengguna
-    participant V as View (Profile/Edit)
-    participant C as ProfileController
-    participant S as ProfileService / Storage
-    participant M as User Model
-
-    U->>V: Gambar Tanda Tangan (Canvas), Klik "Simpan"
-    V->>C: updateSignature(Request)
-    
-    C->>C: validateBase64()
-    C->>S: processAndSaveImage(base64Data)
-    S-->>C: signature_path (file_url)
-    
-    C->>M: update(['signature_path' => signature_path])
-    
-    C-->>V: Redirect back with success
-    V-->>U: Tanda Tangan Disimpan
-```
-
----
-
-### 2.8 Pengelolaan Data Master (*Master Data Management*)
-Pola interaksi konvensional untuk *CRUD* Master Data (Barang, Kategori, Departemen) via *Controller*.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor A as Admin Gudang
-    participant V as View (Inertia React)
-    participant C as MasterController (Item/Category/Dept)
+    actor BU as Bagian Umum
+    participant V as View (Data Master)
+    participant C as MasterController
     participant M as Model (Item/Category/Dept)
 
-    A->>V: Isi Form Tambah / Edit / Hapus
-    A->>V: Klik "Submit / Delete"
+    BU->>V: Input Form / Klik Hapus
+    V->>C: store() / update() / destroy()
     
-    alt Create
-        V->>C: store(Request)
-        C->>C: validate()
-        C->>M: create(data)
-    else Update
-        V->>C: update(Request, id)
-        C->>C: validate()
-        C->>M: update(data)
-    else Delete
-        V->>C: destroy(id)
-        C->>M: delete()
+    C->>C: Validasi Request
+    
+    alt Simpan/Ubah Data
+        C->>M: create() / update()
+    else Hapus Data
+        C->>M: delete() (Soft Delete)
     end
     
-    C-->>V: Redirect with flash message
-    V-->>A: Tampilkan Notifikasi Keberhasilan
+    C-->>V: Redirect with success message
+    V-->>BU: Tampilkan Pesan Sukses
 ```
 
 ---
 
-## 3. Penjelasan Arsitektur Interaksi
+### SD-03 — Menginput Barang Masuk
+Proses pencatatan barang dari vendor, dengan kewajiban melampirkan bukti transaksi (Nota).
 
-Berdasarkan *Sequence Diagram* di atas, arsitektur SIMPATIK menggunakan pola **Inertia.js - Laravel MVC-S**:
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View (Inbound Form)
+    participant C as InboundController
+    participant S as InboundService
+    participant DB as Database (Item & Ledger)
 
-1.  **Actor (Pengguna):** Berinteraksi langsung dengan *browser*.
-2.  **View (Inertia React):** Dibangun dengan *React.js* yang di-render oleh Inertia. Bertugas menampilkan UI, menangani *state* lokal, dan mengirimkan *HTTP Request* tanpa *page reload* penuh (SPA).
-3.  **Controller:** Berfungsi sebagai gerbang masuk dari *View* (melalui *Route*), melakukan validasi dasar via *FormRequest*, mengecek otorisasi pengguna (`Gate::authorize`), dan memanggil *Service* atau *Model*.
-4.  **Service:** Kelas (*Service Class* seperti `OutboundService`) yang menampung logika bisnis kompleks, transaksi *database* banyak tabel, dan penanganan kalkulasi stok, agar *Controller* tetap *clean* dan mudah diuji.
-5.  **Model (Eloquent):** Bertanggung jawab atas kueri data ke *database*, mutasi struktur, relasi, dan pengelolaan riwayat.
+    AG->>V: Input Data & Upload Nota Wajib
+    V->>C: store(Request)
+    
+    C->>C: Validasi Form & File Nota
+    C->>S: createTransaction(data)
+    
+    S->>DB: Simpan Transaksi Inbound
+    S->>DB: Tambah current_stock pada Item
+    S->>DB: Catat riwayat di StockLedger
+    
+    S-->>C: success
+    C-->>V: Redirect with success message
+    V-->>AG: Tampilkan Notifikasi Sukses
+```
+
+---
+
+### SD-04 — Mengelola Pengguna
+Proses pengelolaan akun pengguna. Penghapusan akan dicegah jika pengguna sudah memiliki riwayat transaksi.
+
+```mermaid
+sequenceDiagram
+    actor BU as Bagian Umum
+    participant V as View (User Management)
+    participant C as UserController
+    participant M as User Model
+
+    BU->>V: Pilih Aksi CRUD Pengguna
+    V->>C: store() / update() / destroy()
+    
+    alt Jika Perintah Hapus (destroy)
+        C->>M: Cek Relasi Transaksi
+        alt Ada Relasi
+            C-->>V: Tolak Hapus, Sarankan Nonaktif
+            V-->>BU: Tampilkan Pesan Peringatan
+        else Tidak Ada Relasi
+            C->>M: delete()
+            C-->>V: Redirect success
+        end
+    else Jika Simpan/Ubah
+        C->>M: create() / update()
+        C-->>V: Redirect success
+    end
+```
+
+---
+
+### SD-05 — Melihat Audit Trail Digital
+Proses melihat log aktivitas beserta detail perubahan data sebelum dan sesudahnya.
+
+```mermaid
+sequenceDiagram
+    actor BU as Bagian Umum
+    participant V as View (Audit Trail)
+    participant C as AuditController
+    participant M as ActivityLog Model
+
+    BU->>V: Buka Menu Audit Trail
+    V->>C: index(filters)
+    
+    C->>M: Ambil Data Log (Before & After)
+    M-->>C: Data Log Aktivitas
+    
+    C-->>V: Render Halaman beserta Data
+    V-->>BU: Tampilkan Daftar Log
+```
+
+---
+
+### SD-06 — Mengelola Pengaturan Sistem
+Proses menyimpan konfigurasi dasar yang menampilkan nilai pengaturan saat ini.
+
+```mermaid
+sequenceDiagram
+    actor BU as Bagian Umum
+    participant V as View (Settings Form)
+    participant C as SettingController
+    participant M as Setting Model
+
+    BU->>V: Ubah Nilai Konfigurasi
+    V->>C: update(Request)
+    
+    C->>C: Validasi Input
+    C->>M: update() Data Pengaturan
+    
+    C-->>V: Redirect success message
+    V-->>BU: Konfigurasi Berhasil Disimpan
+```
+
+---
+
+### SD-07 — Melihat Laporan & Rekonsiliasi
+Proses membuat laporan umum dan melakukan input rekonsiliasi stok fisik versus sistem.
+
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View (Report)
+    participant C as ReportController
+    participant DB as Database
+
+    AG->>V: Pilih Laporan atau Rekonsiliasi
+    
+    alt Unduh Laporan
+        V->>C: exportReport()
+        C->>C: Generate PDF / Excel
+        C-->>V: File Download Stream
+    else Proses Rekonsiliasi
+        V->>C: storeReconciliation(qty_fisik)
+        C->>C: Hitung qty_diff = qty_fisik - qty_sistem
+        C->>DB: Simpan Laporan Rekonsiliasi
+        C->>DB: Buat Mutasi Penyesuaian (Adjustment) jika qty_diff != 0
+        C-->>V: Redirect success
+    end
+```
+
+---
+
+### SD-08 — Mengajukan Permintaan Barang
+Permintaan barang dari Staff (butuh persetujuan) berbeda dengan Penyelia (otomatis disetujui).
+
+```mermaid
+sequenceDiagram
+    actor U as Pemohon (Staff / Penyelia)
+    participant V as View (Request Form)
+    participant C as OutboundController
+    participant M as Outbound Model
+
+    U->>V: Input Detail Permintaan Barang
+    V->>C: store(Request)
+    
+    C->>C: Identifikasi Pemohon
+    alt Jika Pemohon = Staff
+        C->>M: create(status: 'PENDING')
+        C->>C: Kirim Notifikasi ke Penyelia
+    else Jika Pemohon = Penyelia
+        C->>M: create(status: 'APPROVED')
+        C->>C: Kirim Notifikasi ke Admin Gudang
+    end
+    
+    C-->>V: Redirect success message
+    V-->>U: Pengajuan Berhasil Terkirim
+```
+
+---
+
+### SD-09 — Mengonfirmasi Serah Terima Barang
+Proses dua arah: Admin Gudang menyerahkan, kemudian Pemohon mengonfirmasi penerimaan secara fisik.
+
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View
+    participant C as OutboundController
+    participant M as Outbound Model
+    actor P as Pemohon
+
+    %% Tahap 1: Penyerahan
+    AG->>V: Klik "Serahkan Barang"
+    V->>C: handover(id)
+    C->>M: update(status: 'HANDED_OVER')
+    C->>C: Kirim Notifikasi ke Pemohon
+    
+    %% Tahap 2: Konfirmasi
+    P->>V: Klik "Konfirmasi Terima"
+    V->>C: complete(id)
+    C->>M: update(status: 'COMPLETED')
+    C-->>V: Transaksi Selesai
+```
+
+---
+
+### SD-10 — Cetak Dokumen Transaksi
+SPB dapat dicetak di awal, tetapi BAST baru bisa dicetak setelah serah terima selesai.
+
+```mermaid
+sequenceDiagram
+    actor U as Pengguna
+    participant V as View
+    participant C as DocumentController
+    participant PDF as DomPDF
+
+    U->>V: Pilih Cetak Dokumen
+    
+    alt Cetak SPB
+        V->>C: printSPB(id)
+        C->>PDF: Generate SPB
+        C-->>V: Download SPB PDF
+    else Cetak BAST
+        V->>C: printBAST(id)
+        C->>C: Cek Status (Harus HandedOver/Completed)
+        alt Status Valid
+            C->>PDF: Generate BAST
+            C-->>V: Download BAST PDF
+        else Status Belum Valid
+            C-->>V: Tolak Cetak BAST
+        end
+    end
+```
+
+---
+
+### SD-11 — Verifikasi Permintaan Barang
+Penyelia melakukan peninjauan terhadap pengajuan dari Staff. Bisa sesuaikan jumlah atau menolak dengan alasan.
+
+```mermaid
+sequenceDiagram
+    actor KD as Penyelia
+    participant V as View (Approval Page)
+    participant C as ApprovalController
+    participant M as Outbound Model
+
+    KD->>V: Review Detail Pengajuan (Pending)
+    V->>C: processApproval(Request)
+    
+    alt Setujui
+        C->>C: Sesuaikan qty_approved (Opsional)
+        C->>M: update(status: 'APPROVED')
+    else Tolak
+        C->>C: Catat Alasan Penolakan (Wajib)
+        C->>M: update(status: 'REJECTED')
+    end
+    
+    C-->>V: Redirect success message
+    V-->>KD: Keputusan Telah Disimpan
+```
+
+---
+
+### SD-12 — Membuat Permintaan Langsung
+Admin gudang mengeluarkan barang tanpa melalui alur verifikasi penyelia (potong stok langsung).
+
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View (Direct Request)
+    participant C as OutboundController
+    participant DB as Database (Item & Ledger)
+
+    AG->>V: Input Form Permintaan Langsung
+    V->>C: storeDirect(Request)
+    
+    C->>DB: Cek Stok Aktual (current_stock)
+    
+    alt Stok Tidak Cukup
+        C-->>V: Error Stok Tidak Mencukupi
+        V-->>AG: Tampilkan Pesan Error
+    else Stok Cukup
+        C->>DB: Simpan Outbound status 'ISSUED'
+        C->>DB: Potong Stok Aktual
+        C->>DB: Catat di StockLedger
+        C-->>V: Redirect success
+    end
+```
+
+---
+
+### SD-13 — Menyetujui Permintaan Barang
+Tindakan Admin Gudang untuk benar-benar mengeluarkan stok dari pengajuan yang sudah disetujui (*Approved*).
+
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View (Preparation)
+    participant C as OutboundController
+    participant DB as Database (Item & Ledger)
+
+    AG->>V: Proses Penyiapan Barang (Approved)
+    V->>C: issueItems(id)
+    
+    C->>DB: Verifikasi Ketersediaan Stok Fisik
+    
+    alt Stok Tidak Cukup
+        C-->>V: Error Stok Habis
+        V-->>AG: Tampilkan Pesan Error
+    else Stok Cukup
+        C->>DB: Potong Stok (current_stock)
+        C->>DB: Update Outbound status 'ISSUED'
+        C->>DB: Catat Mutasi StockLedger
+        C-->>V: Redirect success
+    end
+```
+
+---
+
+### SD-14 — Melihat Data Barang
+Pemantauan data stok oleh Admin Gudang dengan ketersediaan fitur filter khusus peringatan stok minim.
+
+```mermaid
+sequenceDiagram
+    actor AG as Admin Gudang
+    participant V as View (Item List)
+    participant C as ItemController
+    participant M as Item Model
+
+    AG->>V: Akses Menu Barang / Terapkan Filter
+    V->>C: index(filters)
+    
+    C->>M: Kueri Daftar Barang & Cek Stok Kritis
+    M-->>C: Hasil Kueri Barang
+    
+    C-->>V: Render Inertia View (Data Barang)
+    V-->>AG: Tampilkan Daftar & Notifikasi Stok Minim
+```
+
+---
+
+## 3. Penutup
+Keseluruhan 14 urutan interaksi sistem di atas merepresentasikan bentuk penyederhanaan dari kompleksitas sistem **SIMPATIK** di lapangan, yang difokuskan pada kejelasan aliran instruksi dari aksi Pengguna ke lapisan presentasi (*View*), ke pengendali (*Controller*), dan akhirnya berlabuh pada basis data (*Model/Database*).
