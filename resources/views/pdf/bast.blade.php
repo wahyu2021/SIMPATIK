@@ -73,7 +73,7 @@
                 @php
                     $adminName = $outbound->is_direct_request ? ($outbound->issuedByUser->name ?? 'Admin Gudang') : ($outbound->handedOverByUser->name ?? 'Admin Gudang');
                     $adminInfo = "Disetujui secara elektronik oleh: " . $adminName . " - Admin Gudang pada " . \Carbon\Carbon::parse($outbound->issued_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $adminQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($adminInfo));
+                    $adminQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(240)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($adminInfo));
                 @endphp
                 <img src="data:image/png;base64, {!! $adminQr !!}" class="signature-img">
                 <p><strong>{{ $adminName }}</strong></p>
@@ -86,7 +86,7 @@
                 @php
                     $approverName = $outbound->approver->name ?? 'Penyelia';
                     $approverInfo = "Disetujui secara elektronik oleh: " . $approverName . " - Penyelia pada " . \Carbon\Carbon::parse($outbound->approved_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $approverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($approverInfo));
+                    $approverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(240)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($approverInfo));
                 @endphp
                 <img src="data:image/png;base64, {!! $approverQr !!}" class="signature-img">
                 <p><strong>{{ $approverName }}</strong></p>
@@ -99,7 +99,7 @@
                 @php
                     $receiverName = $outbound->pickedUpByUser->name ?? ($outbound->requester->name ?? 'Penerima');
                     $receiverInfo = "Disetujui secara elektronik oleh: " . $receiverName . " - Penerima Barang pada " . \Carbon\Carbon::parse($outbound->picked_up_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $receiverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($receiverInfo));
+                    $receiverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(240)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($receiverInfo));
                 @endphp
                 <img src="data:image/png;base64, {!! $receiverQr !!}" class="signature-img">
                 <p><strong>{{ $receiverName }}</strong></p>
@@ -109,7 +109,7 @@
     </table>
 
     <div class="qr-code">
-        <img src="data:image/png;base64, {!! $qrCode !!}">
+        <img src="data:image/png;base64, {!! $qrCode !!}" width="80" height="80">
         <p style="font-size: 8px; color: #999;">Validasi dokumen via QR Code SIMPATIK</p>
     </div>
 
