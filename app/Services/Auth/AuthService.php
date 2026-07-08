@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Service Layer: AuthService
+ *
+ * [Business Logic & Transaksi]
+ * Class ini menangani seluruh alur logika bisnis utama (Business Rules).
+ * - Bertanggung jawab atas integritas data.
+ * - Sering dibungkus dalam DB::transaction() jika melibatkan multi-tabel.
+ * - Berkomunikasi dengan database HANYA melalui interface Repository.
+ */
 class AuthService
 {
     public function __construct(

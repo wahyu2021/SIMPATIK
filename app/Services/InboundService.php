@@ -9,6 +9,15 @@ use App\Repositories\Contracts\InboundRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Service Layer: InboundService
+ *
+ * [Business Logic & Transaksi]
+ * Class ini menangani seluruh alur logika bisnis utama (Business Rules).
+ * - Bertanggung jawab atas integritas data.
+ * - Sering dibungkus dalam DB::transaction() jika melibatkan multi-tabel.
+ * - Berkomunikasi dengan database HANYA melalui interface Repository.
+ */
 class InboundService
 {
     public function __construct(

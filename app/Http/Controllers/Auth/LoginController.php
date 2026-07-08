@@ -9,6 +9,14 @@ use App\Services\Auth\AuthService;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Controller: LoginController
+ *
+ * [Arsitektur Layered]
+ * Controller ini murni bertugas menangani Request HTTP (Input) dan Response (Output).
+ * Seluruh logika bisnis atau manipulasi database dilarang berada di sini, melainkan 
+ * harus didelegasikan (di-passing) ke lapisan Service melalui Data Transfer Object (DTO).
+ */
 class LoginController extends Controller
 {
     public function __construct(

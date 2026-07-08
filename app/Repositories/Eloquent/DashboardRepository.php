@@ -14,6 +14,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
+/**
+ * Repository: DashboardRepository
+ *
+ * [Data Access Layer]
+ * Pattern Repository digunakan untuk memisahkan abstraksi query database dari logika bisnis.
+ * Hal ini memastikan bahwa kode yang berhubungan langsung dengan struktur tabel/kolom Eloquent
+ * terisolasi dan mudah di-mock (ditiru) saat melakukan Unit Testing.
+ */
 class DashboardRepository implements DashboardRepositoryInterface
 {
     public function countItems(): int

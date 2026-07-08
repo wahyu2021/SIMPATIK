@@ -5,6 +5,15 @@ namespace App\Services;
 use App\Repositories\Contracts\DashboardRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Service Layer: DashboardService
+ *
+ * [Business Logic & Transaksi]
+ * Class ini menangani seluruh alur logika bisnis utama (Business Rules).
+ * - Bertanggung jawab atas integritas data.
+ * - Sering dibungkus dalam DB::transaction() jika melibatkan multi-tabel.
+ * - Berkomunikasi dengan database HANYA melalui interface Repository.
+ */
 class DashboardService
 {
     public function __construct(

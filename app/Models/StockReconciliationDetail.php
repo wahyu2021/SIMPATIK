@@ -5,6 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Eloquent Model: StockReconciliationDetail
+ *
+ * [Representasi Tabel & Relasi]
+ * - Mendefinisikan struktur relasional entitas di database.
+ * - Memuat properti fillable untuk mencegah Mass Assignment Vulnerability.
+ * - Method-method di dalamnya mendeskripsikan kardinalitas relasi (HasMany, BelongsTo, dll).
+ */
 class StockReconciliationDetail extends Model
 {
     public $timestamps = false;

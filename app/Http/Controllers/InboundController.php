@@ -11,6 +11,14 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Controller: InboundController
+ *
+ * [Arsitektur Layered]
+ * Controller ini murni bertugas menangani Request HTTP (Input) dan Response (Output).
+ * Seluruh logika bisnis atau manipulasi database dilarang berada di sini, melainkan 
+ * harus didelegasikan (di-passing) ke lapisan Service melalui Data Transfer Object (DTO).
+ */
 class InboundController extends Controller
 {
     public function __construct(
@@ -43,6 +51,15 @@ class InboundController extends Controller
 
     /**
      * Simpan transaksi barang masuk baru.
+     *
+     * [Arsitektur & Keamanan]
+     * - Request divalidasi ketat menggunakan StoreInboundRequest.
+     * - Data dibungkus menjadi InboundDTO sebelum dilempar ke layer Service untuk menjaga 
+     *   keterpisahan logika (Separation of Concerns).
+     * - Auth ID otomatis disisipkan sebagai pencatat transaksi (user_id).
+     *
+     * @param StoreInboundRequest $request Validasi form barang masuk
+     * @return RedirectResponse
      */
     public function store(StoreInboundRequest $request): RedirectResponse
     {
@@ -89,7 +106,16 @@ class InboundController extends Controller
     }
 
     /**
-     * Hapus transaksi barang masuk (rollback stok).
+     * Hapus transaksi barang masuk.
+     * 
+     * [Integritas Data]
+     * - Penghapusan transaksi akan memicu proses rollback stok (pengurangan stok otomatis)
+     *   di dalam InboundService::deleteInbound().
+     * - History pada tabel stock_ledgers juga akan disesuaikan untuk menjaga
+     *   keseimbangan neraca barang.
+     *
+     * @param int $id ID Transaksi
+     * @return RedirectResponse
      */
     public function destroy(int $id): RedirectResponse
     {

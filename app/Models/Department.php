@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Eloquent Model: Department
+ *
+ * [Representasi Tabel & Relasi]
+ * - Mendefinisikan struktur relasional entitas di database.
+ * - Memuat properti fillable untuk mencegah Mass Assignment Vulnerability.
+ * - Method-method di dalamnya mendeskripsikan kardinalitas relasi (HasMany, BelongsTo, dll).
+ */
 class Department extends Model
 {
     use HasFactory, HasAuditLog, SoftDeletes;

@@ -19,6 +19,14 @@ use App\Services\ReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
+/**
+ * Controller: OutboundController
+ *
+ * [Arsitektur Layered]
+ * Controller ini murni bertugas menangani Request HTTP (Input) dan Response (Output).
+ * Seluruh logika bisnis atau manipulasi database dilarang berada di sini, melainkan 
+ * harus didelegasikan (di-passing) ke lapisan Service melalui Data Transfer Object (DTO).
+ */
 class OutboundController extends Controller
 {
     public function __construct(

@@ -12,6 +12,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Eloquent Model: User
+ *
+ * [Representasi Tabel & Relasi]
+ * - Mendefinisikan struktur relasional entitas di database.
+ * - Memuat properti fillable untuk mencegah Mass Assignment Vulnerability.
+ * - Method-method di dalamnya mendeskripsikan kardinalitas relasi (HasMany, BelongsTo, dll).
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */

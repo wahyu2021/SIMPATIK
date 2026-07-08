@@ -10,6 +10,14 @@ use App\Repositories\Contracts\ReportRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Repository: ReportRepository
+ *
+ * [Data Access Layer]
+ * Pattern Repository digunakan untuk memisahkan abstraksi query database dari logika bisnis.
+ * Hal ini memastikan bahwa kode yang berhubungan langsung dengan struktur tabel/kolom Eloquent
+ * terisolasi dan mudah di-mock (ditiru) saat melakukan Unit Testing.
+ */
 class ReportRepository implements ReportRepositoryInterface
 {
     /**
