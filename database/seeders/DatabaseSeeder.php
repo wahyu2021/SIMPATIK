@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             OutboundFebruari2026Seeder::class,
             OutboundMaret2026Seeder::class,
             OutboundApril2026Seeder::class,
+            InboundJuli2026Seeder::class,
+            OutboundJuli2026Seeder::class,
         ]);
     }
 }
