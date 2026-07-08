@@ -51,7 +51,12 @@ export default function DatePicker({
     const maxDate = max ? new Date(max + 'T00:00:00') : null;
     const minDate = min ? new Date(min + 'T00:00:00') : null;
 
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         const handleOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setOpen(false);
@@ -62,7 +67,12 @@ export default function DatePicker({
     }, []);
 
     // Auto-detect alignment when opening
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         if (open && align === 'auto' && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
             const spaceRight = window.innerWidth - rect.right;

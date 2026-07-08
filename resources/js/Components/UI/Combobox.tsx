@@ -55,7 +55,12 @@ export default function Combobox({
         );
     }, [options, search]);
 
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         if (open) {
             searchRef.current?.focus();
             setHighlightIndex(-1);
@@ -64,7 +69,12 @@ export default function Combobox({
         }
     }, [open]);
 
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         const handleOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setOpen(false);
@@ -74,7 +84,12 @@ export default function Combobox({
         return () => document.removeEventListener('mousedown', handleOutside);
     }, []);
 
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         if (highlightIndex >= 0 && listRef.current) {
             const el = listRef.current.children[highlightIndex] as HTMLElement;
             el?.scrollIntoView({ block: 'nearest' });

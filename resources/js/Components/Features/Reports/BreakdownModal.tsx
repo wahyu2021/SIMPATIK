@@ -32,7 +32,12 @@ export default function BreakdownModal({ isOpen, onClose, itemId, itemName, mont
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<BreakdownEntry[]>([]);
 
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         if (isOpen && itemId) {
             fetchBreakdown();
         }
