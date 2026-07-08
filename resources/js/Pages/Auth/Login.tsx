@@ -46,7 +46,7 @@ export default function Login({ errors = {} }: LoginPageProps) {
                 }}
             >
                 {/* Overlay gelap semi-transparan */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#001a33]/80 via-[#003366]/70 to-[#0052A3]/60" />
+                <div className="absolute inset-0 bg-linear-to-br from-[#001a33]/80 via-[#003366]/70 to-[#0052A3]/60" />
 
                 {/* Card form login — single column centered */}
                 <div className="relative z-10 w-full max-w-md login-card-enter">

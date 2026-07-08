@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { 
     ArrowLeft, 
     Plus, 

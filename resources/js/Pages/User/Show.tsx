@@ -1,5 +1,5 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { ArrowLeft, Pencil, Power, Mail, Building2, Shield, Calendar, FileSignature } from 'lucide-react';
+import { ArrowLeft, Pencil, Power, Mail, Building2, Shield, Calendar } from 'lucide-react';
 import { PageProps, User } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { Breadcrumbs, Alert, Button, InfoField } from '../../Components/UI';
@@ -54,7 +54,7 @@ export default function UserShow({ user }: Props) {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shrink-0">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div>

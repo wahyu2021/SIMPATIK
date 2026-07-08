@@ -221,7 +221,7 @@ export default function InboundForm({ inbound, items, nextReference }: Props) {
                         <Button
                             type="button"
                             onClick={addDetail}
-                            className="flex items-center gap-1.5 !text-sm"
+                            className="flex items-center gap-1.5 text-sm!"
                         >
                             <Plus className="w-4 h-4" />
                             Tambah Baris

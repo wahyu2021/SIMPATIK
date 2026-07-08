@@ -43,7 +43,7 @@ interface Props extends PageProps {
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
 export default function DepartmentReport({ reportData, departments, filters }: Props) {
-    const { items, period } = reportData;
+    const { items } = reportData;
 
     const deptOptions = [
         { value: '', label: '— Pilih Unit Kerja —' },
@@ -112,10 +112,10 @@ export default function DepartmentReport({ reportData, departments, filters }: P
                             </>
                         ) : (
                             <>
-                                <Button variant="outline" size="sm" className="bg-green-50 text-green-700 border-green-200 opacity-50 cursor-not-allowed">
+                                <Button variant="secondary" size="sm" className="bg-green-50 text-green-700 border-green-200 opacity-50 cursor-not-allowed">
                                     <FileSpreadsheet className="w-4 h-4 mr-1.5" /> Excel
                                 </Button>
-                                <Button variant="outline" size="sm" className="bg-red-50 text-red-700 border-red-200 opacity-50 cursor-not-allowed">
+                                <Button variant="secondary" size="sm" className="bg-red-50 text-red-700 border-red-200 opacity-50 cursor-not-allowed">
                                     <FileText className="w-4 h-4 mr-1.5" /> PDF
                                 </Button>
                             </>
