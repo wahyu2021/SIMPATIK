@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { 
     History, 
-    Search, 
     User as UserIcon, 
     ShieldAlert, 
     Monitor, 
     Globe, 
     Eye,
-    X,
     Database,
     ArrowRight
 } from 'lucide-react';
@@ -83,11 +81,11 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
         }
     };
 
-    const getBadgeColor = (desc: string) => {
-        if (desc.includes('Dibuat')) return 'green';
-        if (desc.includes('Diperbarui')) return 'blue';
-        if (desc.includes('Dihapus')) return 'red';
-        return 'gray';
+    const getBadgeVariant = (desc: string) => {
+        if (desc.includes('Dibuat')) return 'success';
+        if (desc.includes('Diperbarui')) return 'info';
+        if (desc.includes('Dihapus')) return 'danger';
+        return 'default';
     };
 
     return (
@@ -99,13 +97,12 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
             <PageHeader 
                 title="Audit Trail Digital" 
                 description="Rekam jejak setiap perubahan data dan aktivitas pengguna dalam sistem."
-                icon={<History className="w-8 h-8 text-blue-600" />}
             />
 
             {/* Filters */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
                 <div className="flex flex-wrap gap-4 items-end">
-                    <div className="flex-1 min-w-[200px]">
+                    <div className="flex-1 min-w-50">
                         <Input 
                             placeholder="Cari user, aktivitas, atau modul..." 
                             value={filters.search || ''} 
@@ -163,7 +160,7 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <Badge color={getBadgeColor(log.description)} size="sm" variant="flat">
+                                            <Badge variant={getBadgeVariant(log.description)}>
                                                 {log.description}
                                             </Badge>
                                         </td>
@@ -203,12 +200,11 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
                 />
             </div>
 
-            {/* Detail Modal */}
             <Modal
                 open={!!selectedLog}
                 onClose={() => { setSelectedLog(null); setDetailDetailData(null); }}
                 title="Detail Aktivitas & Perubahan Data"
-                size="xl"
+                size="lg"
             >
                 {loadingDetail ? (
                     <div className="py-12 flex justify-center"><Loading /></div>
@@ -247,7 +243,7 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
                                 </h4>
                                 
                                 <div className="bg-gray-900 rounded-xl p-6 overflow-x-auto border border-gray-800 shadow-2xl">
-                                    <div className="grid grid-cols-2 gap-8 min-w-[600px]">
+                                    <div className="grid grid-cols-2 gap-8 min-w-150">
                                         <div>
                                             <p className="text-red-400 text-xs font-bold mb-3 uppercase tracking-widest">Sebelum</p>
                                             <div className="space-y-2">
@@ -283,7 +279,7 @@ export default function AuditLogsIndex({ logs, filters, modules }: Props) {
                         )}
 
                         <div className="flex justify-end pt-4 border-t border-gray-100">
-                            <Button variant="outline" onClick={() => setSelectedLog(null)}>Tutup</Button>
+                            <Button variant="secondary" onClick={() => setSelectedLog(null)}>Tutup</Button>
                         </div>
                     </div>
                 )}
