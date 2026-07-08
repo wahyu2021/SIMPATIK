@@ -1,5 +1,5 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Building2, FileText, MessageSquare, BrainCircuit, Save, Server } from 'lucide-react';
+import { Building2, FileText, MessageSquare, Save} from 'lucide-react';
 import { PageProps } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Input, Alert, Breadcrumbs } from '../../Components/UI';
@@ -142,12 +142,12 @@ export default function SettingsIndex({ settings }: Props) {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3 mb-2">
+                        {/* <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3 mb-2">
                             <Server className="w-5 h-5 text-blue-600 mt-0.5" />
                             <div className="text-xs text-blue-800 leading-relaxed">
                                 <strong>Info Gateway:</strong> Sistem menggunakan folder <code className="bg-blue-100 px-1 rounded">whatsapp-gateway</code> yang harus dijalankan secara terpisah (Node.js) di server lokal atau VPS Anda.
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="grid grid-cols-1 gap-4">
                             <Input
@@ -176,7 +176,8 @@ export default function SettingsIndex({ settings }: Props) {
                     </div>
                 </div>
 
-                {/* ── Integrasi ML/Forecasting ── */}
+                {/* ── Integrasi ML/Forecasting ──
+                    Belum Diimplementasikan
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div className="flex items-center gap-2 mb-5">
                         <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
@@ -197,7 +198,7 @@ export default function SettingsIndex({ settings }: Props) {
                         onChange={(e) => setData('ml_api_url', e.target.value)}
                         error={errors.ml_api_url}
                     />
-                </div>
+                </div> */}
 
                 {/* ── Save Button ── */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

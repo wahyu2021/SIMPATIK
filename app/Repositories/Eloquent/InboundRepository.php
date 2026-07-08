@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\InboundTransaction;
 use App\Repositories\Contracts\InboundRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class InboundRepository implements InboundRepositoryInterface
 {
@@ -37,12 +38,21 @@ class InboundRepository implements InboundRepositoryInterface
             $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
         }
 
-        return $query->paginate($perPage)->withQueryString();
+        $page = request()->get('page', 1);
+        $version = Cache::get('inbounds_version', '0');
+        $cacheKey = "inbounds_paginate_v{$version}_" . md5(json_encode(func_get_args()) . $page);
+
+        return Cache::remember($cacheKey, 3600, function () use ($query, $perPage) {
+            return $query->paginate($perPage)->onEachSide(1)->withQueryString();
+        });
     }
 
     public function findById(int $id): ?InboundTransaction
     {
-        return InboundTransaction::with(['user', 'details.item'])->find($id);
+        $version = Cache::get('inbounds_version', '0');
+        return Cache::remember("inbounds_find_v{$version}_{$id}", 3600, function () use ($id) {
+            return InboundTransaction::with(['user', 'details.item'])->find($id);
+        });
     }
 
     public function create(array $data): InboundTransaction

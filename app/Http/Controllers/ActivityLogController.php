@@ -34,7 +34,7 @@ class ActivityLogController extends Controller
             $query->where('log_name', $request->module);
         }
 
-        $logs = $query->paginate(20)->withQueryString();
+        $logs = $query->paginate(20)->onEachSide(1)->withQueryString();
 
         return Inertia::render('AuditLogs/Index', [
             'logs' => $logs,

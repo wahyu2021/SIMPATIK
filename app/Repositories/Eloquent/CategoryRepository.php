@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryRepository implements CategoryRepositoryInterface
 {
@@ -26,12 +27,21 @@ class CategoryRepository implements CategoryRepositoryInterface
             $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
         }
 
-        return $query->paginate($perPage)->withQueryString();
+        $page = request()->get('page', 1);
+        $version = Cache::get('categories_version', '0');
+        $cacheKey = "categories_paginate_v{$version}_" . md5(json_encode(func_get_args()) . $page);
+
+        return Cache::remember($cacheKey, 3600, function () use ($query, $perPage) {
+            return $query->paginate($perPage)->onEachSide(1)->withQueryString();
+        });
     }
 
     public function findById(int $id): ?Category
     {
-        return Category::withCount('items')->find($id);
+        $version = Cache::get('categories_version', '0');
+        return Cache::remember("categories_find_v{$version}_{$id}", 3600, function () use ($id) {
+            return Category::withCount('items')->find($id);
+        });
     }
 
     public function create(array $data): Category

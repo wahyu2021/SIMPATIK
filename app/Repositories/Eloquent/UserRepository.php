@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -44,12 +45,21 @@ class UserRepository implements UserRepositoryInterface
             }
         }
 
-        return $query->latest()->paginate($perPage);
+        $page = request()->get('page', 1);
+        $version = Cache::get('users_version', '0');
+        $cacheKey = "users_paginate_v{$version}_" . md5(json_encode(func_get_args()) . $page);
+
+        return Cache::remember($cacheKey, 3600, function () use ($query, $perPage) {
+            return $query->latest()->paginate($perPage)->onEachSide(1);
+        });
     }
 
     public function findById(int $id): ?User
     {
-        return User::with(['department', 'roles'])->find($id);
+        $version = Cache::get('users_version', '0');
+        return Cache::remember("users_find_v{$version}_{$id}", 3600, function () use ($id) {
+            return User::with(['department', 'roles'])->find($id);
+        });
     }
 
     public function findByEmail(string $email): ?User

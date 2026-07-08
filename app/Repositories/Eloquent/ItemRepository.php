@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Item;
 use App\Repositories\Contracts\ItemRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class ItemRepository implements ItemRepositoryInterface
 {
@@ -39,12 +40,21 @@ class ItemRepository implements ItemRepositoryInterface
             $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
         }
 
-        return $query->paginate($perPage)->withQueryString();
+        $page = request()->get('page', 1);
+        $version = Cache::get('items_version', '0');
+        $cacheKey = "items_paginate_v{$version}_" . md5(json_encode(func_get_args()) . $page);
+
+        return Cache::remember($cacheKey, 3600, function () use ($query, $perPage) {
+            return $query->paginate($perPage)->onEachSide(1)->withQueryString();
+        });
     }
 
     public function findById(int $id): ?Item
     {
-        return Item::with('category')->find($id);
+        $version = Cache::get('items_version', '0');
+        return Cache::remember("items_find_v{$version}_{$id}", 3600, function () use ($id) {
+            return Item::with('category')->find($id);
+        });
     }
 
     public function create(array $data): Item
