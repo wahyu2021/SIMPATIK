@@ -3,6 +3,7 @@
 ## Backend (Laravel 12)
 - **Architecture**: **Layered Repository Pattern**.
   - **Models**: Eloquent models dengan SoftDeletes dan custom Casts.
+  - **Observers & Caching**: Application-level caching menggunakan driver database dan Cache Invalidation cerdas berbasis Model Observers.
   - **Repositories**: Interface di `app/Repositories/Contracts`, implementasi di `app/Repositories/Eloquent`.
   - **Services**: Business logic di `app/Services`, mengonsumsi Repository.
   - **Controllers**: Thin controllers di `app/Http/Controllers`, mengonsumsi Service dan merender Inertia Response.
