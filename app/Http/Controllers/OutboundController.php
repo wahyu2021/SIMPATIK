@@ -28,6 +28,16 @@ class OutboundController extends Controller
 
     /**
      * Generate PDF Surat Permintaan Barang (SPB).
+     *
+     * @param int $id ID Transaksi Outbound
+     * @return \Illuminate\Http\Response
+     *
+     * [Catatan Teknis QR Code]
+     * - Format PNG digunakan karena mendukung fitur merge logo bawaan library (SVG tidak mendukung).
+     * - Parameter size(320) menghasilkan resolusi raksasa (Hi-Res/Retina ready).
+     *   Tujuannya agar saat dirender dan diperkecil (scaled down ke 80x80) oleh DomPDF, QR Code tidak blur/pecah.
+     * - errorCorrection('H') (High) wajib digunakan karena bagian tengah QR tertutup logo BSB (30%).
+     * - PERHATIAN: Ekstensi PHP Imagick harus terinstal dan aktif di server, jika tidak akan menyebabkan Error 500.
      */
     public function downloadSpb(int $id)
     {
@@ -47,6 +57,15 @@ class OutboundController extends Controller
 
     /**
      * Generate PDF Berita Acara Serah Terima (BAST).
+     *
+     * @param int $id ID Transaksi Outbound
+     * @return \Illuminate\Http\Response
+     *
+     * [Catatan Teknis QR Code & BAST]
+     * - Sama seperti SPB, QR Code utama dicetak dengan resolusi 320px agar tajam saat dicetak (Print Ready).
+     * - Logo BSB ditanam di tengah menggunakan fungsi merge() yang bergantung pada ekstensi PHP Imagick.
+     * - Validasi ketat di awal memastikan bahwa dokumen BAST secara hukum sah dan HANYA bisa dicetak
+     *   setelah fisik barang benar-benar berpindah tangan (status HandedOver atau Completed).
      */
     public function downloadBast(int $id)
     {

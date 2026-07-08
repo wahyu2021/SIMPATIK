@@ -12,6 +12,14 @@ use Carbon\Carbon;
 
 class OutboundJuli2026Seeder extends Seeder
 {
+    /**
+     * Run the database seeds for July 2026 Outbound (Barang Keluar).
+     *
+     * [Catatan Demonstrasi & Keamanan Stok]
+     * - Seeder ini dirancang untuk mendemonstrasikan sistem tanpa menghabiskan stok riil di gudang.
+     * - Hanya mengambil sedikit barang (1-5 pcs) dan hanya menargetkan barang yang memiliki stok > 15.
+     * - Status langsung diset menjadi 'Completed' agar BAST bisa langsung didemonstrasikan.
+     */
     public function run()
     {
         $admin = User::role('warehouse_admin')->first();
@@ -31,7 +39,7 @@ class OutboundJuli2026Seeder extends Seeder
                 'department_id' => $requester->department_id,
                 'document_number' => 'OUT-JUL-2026-' . str_pad($i, 3, '0', STR_PAD_LEFT),
                 'transaction_date' => $date->format('Y-m-d H:i:s'),
-                'status' => 'Completed',
+                'status' => 'Completed', // Langsung Completed agar bisa langsung cetak BAST
                 'is_special_request' => false,
                 'notes' => 'Pengajuan Rutin ATK Divisi',
                 'approver_id' => $head->id,
@@ -41,14 +49,14 @@ class OutboundJuli2026Seeder extends Seeder
                 'handed_over_by' => $admin->id,
                 'handed_over_at' => $date->copy()->addHours(2)->addMinutes(30),
                 'picked_up_by' => $requester->id,
-                'picked_up_at' => $date->copy()->addHours(3),
+                'picked_up_at' => $date->copy()->addHours(3), // Rantai logistik selesai di waktu ini
             ]);
 
-            // Hanya pilih barang yang stoknya masih di atas 15
+            // Hanya pilih barang yang stoknya masih di atas 15 (Proteksi stok agar tidak habis saat demo)
             $items = Item::where('current_stock', '>', 15)->inRandomOrder()->limit(rand(1, 4))->get();
 
             foreach ($items as $item) {
-                $qty = rand(1, 5); // Ambil sedikit saja agar stok tetap aman untuk didemokan
+                $qty = rand(1, 5); // Ambil sedikit saja agar stok di Dasbor tetap hijau/aman
 
                 OutboundTransactionDetail::create([
                     'outbound_transaction_id' => $transaction->id,
