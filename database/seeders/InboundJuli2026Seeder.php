@@ -12,6 +12,14 @@ use Carbon\Carbon;
 
 class InboundJuli2026Seeder extends Seeder
 {
+    /**
+     * Run the database seeds for July 2026 Inbound (Barang Masuk).
+     *
+     * [Catatan Demonstrasi & Keamanan Stok]
+     * - Seeder ini adalah fondasi utama agar Dasbor tidak kosong.
+     * - Sengaja menyuntikkan stok dalam jumlah sangat besar (50-150 pcs) ke banyak barang
+     *   untuk memastikan ketersediaan barang aman sebelum transaksi Outbound dieksekusi.
+     */
     public function run()
     {
         $admin = User::role('warehouse_admin')->first();
@@ -27,10 +35,10 @@ class InboundJuli2026Seeder extends Seeder
             'notes' => 'Restock Besar-besaran Juli 2026 (Persiapan Demo)'
         ]);
 
-        // Pilih 25 barang secara acak untuk di-restock secara masif
+        // Pilih 25 barang secara acak untuk di-restock secara masif (memenuhi gudang virtual)
         $items = Item::inRandomOrder()->limit(25)->get();
         foreach ($items as $item) {
-            $qty = rand(50, 150); // Restock dalam jumlah besar agar tidak habis
+            $qty = rand(50, 150); // Restock dalam jumlah besar agar terhindar dari status 'Out of Stock'
             
             InboundTransactionDetail::create([
                 'inbound_transaction_id' => $transaction->id,
