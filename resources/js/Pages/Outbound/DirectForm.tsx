@@ -6,8 +6,6 @@ import {
     Trash2, 
     Save, 
     User, 
-    Building2, 
-    Calendar, 
     PackagePlus,
     AlertTriangle,
     CheckCircle2
@@ -23,7 +21,6 @@ import {
     Breadcrumbs, 
     Card,
     Textarea,
-    Alert,
     ConfirmDialog
 } from '../../Components/UI';
 
@@ -50,7 +47,6 @@ interface DetailItem {
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
 export default function DirectRequestForm({ items, departments, users }: Props) {
-    const { auth } = usePage<PageProps>().props;
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -197,7 +193,7 @@ export default function DirectRequestForm({ items, departments, users }: Props) 
                             </div>
                             <Button 
                                 type="button" 
-                                variant="outline" 
+                                variant="secondary" 
                                 size="sm" 
                                 onClick={addDetail}
                                 className="flex items-center gap-1.5"
@@ -267,7 +263,7 @@ export default function DirectRequestForm({ items, departments, users }: Props) 
 
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="notes" className="text-blue-50">Catatan Internal</Label>
+                                <label htmlFor="notes" className="block text-sm font-medium text-blue-50">Catatan Internal</label>
                                 <Textarea 
                                     id="notes"
                                     placeholder="Alasan pengambilan langsung..."
@@ -289,7 +285,7 @@ export default function DirectRequestForm({ items, departments, users }: Props) 
                     </Card>
 
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                         <div className="text-xs text-amber-800 leading-relaxed">
                             <strong>Penting:</strong> Gunakan fitur ini hanya untuk pengambilan mendadak atau unit yang tidak terdaftar di sistem persetujuan digital (seperti Satpam).
                         </div>
