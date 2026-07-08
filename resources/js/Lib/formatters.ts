@@ -1,5 +1,11 @@
 /**
- * Utility formatting — sentralisasi format mata uang, tanggal, dan angka.
+ * Helper Module: Formatters
+ *
+ * [Fungsionalitas & Penggunaan]
+ * Modul ini menyediakan kumpulan fungsi utilitas murni (pure functions) untuk
+ * memformat tipe data string dan number ke dalam format lokal Indonesia (id-ID).
+ * Hal ini memastikan konsistensi format tanggal dan mata uang di seluruh
+ * komponen React tanpa menduplikasi logika lokalisasi.
  */
 
 /** Format angka ke Rupiah: 1500000 → "Rp 1.500.000" */

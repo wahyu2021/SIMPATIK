@@ -38,18 +38,32 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware(['auth'])->group(function () {
+    // =========================================================================
+    // MODUL DASHBOARD & CORE
+    // =========================================================================
+    // Rute utama setelah login.
     // Logout
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    // Routes that require auth
-        // Dashboard
+    // Dashboard
+
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Items (Barang)
+    // =========================================================================
+    // MODUL MASTER DATA: BARANG
+    // =========================================================================
+    // Middleware 'can:manage-items' membatasi akses edit/delete hanya untuk admin.
+    // Middleware 'can:view-items' mengizinkan pembacaan data bagi pengguna umum.
+    // Items (Barang)
         Route::resource('items', ItemController::class)->except(['index', 'show'])->middleware('can:manage-items');
         Route::resource('items', ItemController::class)->only(['index', 'show'])->middleware('can:view-items');
 
-        // User Management
+    // =========================================================================
+    // MODUL MANAJEMEN PENGGUNA & AUDIT
+    // =========================================================================
+    // Dibatasi khusus untuk pengguna dengan role 'general_affairs'.
+    // Termasuk pengelolaan user, import massal, dan log aktivitas (audit trail).
+    // User Management
         Route::middleware(['role:general_affairs'])->group(function () {
             Route::post('users/import', [UserManagementController::class, 'import'])->name('users.import');
             Route::resource('users', UserManagementController::class);
@@ -67,11 +81,21 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
         });
 
-        // Barang Masuk (Inbound)
+    // =========================================================================
+    // MODUL TRANSAKSI: BARANG MASUK (INBOUND)
+    // =========================================================================
+    // Pencatatan barang masuk dari pemasok/supplier.
+    // Barang Masuk (Inbound)
         Route::middleware(['can:view-inbound'])->group(function () {
             Route::resource('inbound', InboundController::class);
         });
-        // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
+    // =========================================================================
+    // MODUL TRANSAKSI: BARANG KELUAR (OUTBOUND)
+    // =========================================================================
+    // Meliputi alur pengajuan, persetujuan (Approve/Reject), penerbitan (Issue), 
+    // hingga serah terima (Handover & Pickup).
+    // Serta pembuatan dokumen PDF (SPB & BAST).
+    // Pengajuan Barang (Outbound) — otorisasi via OutboundPolicy
         Route::resource('outbound', OutboundController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
         Route::get('outbound-direct/create', [OutboundController::class, 'createDirect'])->name('outbound.create-direct');
         Route::post('outbound-direct', [OutboundController::class, 'storeDirect'])->name('outbound.store-direct');
@@ -82,13 +106,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('outbound/{id}/pickup', [OutboundController::class, 'pickup'])->name('outbound.pickup');
         Route::get('outbound/{id}/pdf/spb', [OutboundController::class, 'downloadSpb'])->name('outbound.pdf.spb');
         Route::get('outbound/{id}/pdf/bast', [OutboundController::class, 'downloadBast'])->name('outbound.pdf.bast');
-        // Categories & Departments
+    // =========================================================================
+    // MODUL MASTER DATA: KATEGORI & DEPARTEMEN
+    // =========================================================================
+    // Pengelolaan referensi data penunjang.
+    // Categories & Departments
         Route::resource('categories', CategoryController::class)->except(['index', 'show'])->middleware('can:manage-categories');
         Route::resource('categories', CategoryController::class)->only(['index', 'show'])->middleware('can:view-categories');
         Route::resource('departments', DepartmentController::class)->except(['index', 'show'])->middleware('can:manage-departments');
         Route::resource('departments', DepartmentController::class)->only(['index', 'show'])->middleware('can:view-departments');
         
-        // Reports
+    // =========================================================================
+    // MODUL LAPORAN & REKONSILIASI (REPORTS)
+    // =========================================================================
+    // Mencakup laporan unit kerja, kartu stok (stock ledger), dan rekonsiliasi fisik.
+    // Mendukung fitur ekspor data ke format PDF maupun Excel.
+    // Reports
         Route::middleware(['can:view-reports'])->group(function () {
             Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
             Route::get('/reports/department', [ReportController::class, 'departmentReport'])->name('reports.department');
