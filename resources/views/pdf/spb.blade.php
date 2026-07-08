@@ -74,9 +74,9 @@
                 @php
                     $requesterName = $outbound->requester->name ?? 'Pemohon';
                     $requesterInfo = "Diajukan secara elektronik oleh: " . $requesterName . " - Pihak Pemohon pada " . \Carbon\Carbon::parse($outbound->created_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $requesterQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($requesterInfo));
+                    $requesterQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($requesterInfo));
                 @endphp
-                <img src="data:image/svg+xml;base64, {!! $requesterQr !!}" class="signature-img">
+                <img src="data:image/png;base64, {!! $requesterQr !!}" class="signature-img">
                 <p><strong>{{ $requesterName }}</strong></p>
                 <p style="font-size: 9px; color: #666;">Pihak Pemohon<br>{{ \Carbon\Carbon::parse($outbound->created_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
@@ -87,9 +87,9 @@
                 @php
                     $approverName = $outbound->approver->name ?? 'Penyelia';
                     $approverInfo = "Disetujui secara elektronik oleh: " . $approverName . " - Penyelia pada " . \Carbon\Carbon::parse($outbound->approved_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $approverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($approverInfo));
+                    $approverQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($approverInfo));
                 @endphp
-                <img src="data:image/svg+xml;base64, {!! $approverQr !!}" class="signature-img">
+                <img src="data:image/png;base64, {!! $approverQr !!}" class="signature-img">
                 <p><strong>{{ $approverName }}</strong></p>
                 <p style="font-size: 9px; color: #666;">Penyelia / Pimpinan<br>{{ \Carbon\Carbon::parse($outbound->approved_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
@@ -100,9 +100,9 @@
                 @php
                     $issuerName = $outbound->issuedByUser->name ?? 'Admin Gudang';
                     $issuerInfo = "Diserahkan secara elektronik oleh: " . $issuerName . " - Admin Gudang pada " . \Carbon\Carbon::parse($outbound->issued_at ?? now())->translatedFormat('d F Y H:i:s');
-                    $issuerQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->margin(0)->generate($issuerInfo));
+                    $issuerQr = base64_encode(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(60)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate($issuerInfo));
                 @endphp
-                <img src="data:image/svg+xml;base64, {!! $issuerQr !!}" class="signature-img">
+                <img src="data:image/png;base64, {!! $issuerQr !!}" class="signature-img">
                 <p><strong>{{ $issuerName }}</strong></p>
                 <p style="font-size: 9px; color: #666;">Admin Gudang<br>{{ \Carbon\Carbon::parse($outbound->issued_at ?? now())->translatedFormat('d M Y H:i') }}</p>
             </td>
@@ -110,7 +110,7 @@
     </table>
 
     <div class="qr-code">
-        <img src="data:image/svg+xml;base64, {!! $qrCode !!}">
+        <img src="data:image/png;base64, {!! $qrCode !!}">
         <p style="font-size: 8px; color: #999;">Dokumen ini sah secara digital via SIMPATIK</p>
     </div>
 

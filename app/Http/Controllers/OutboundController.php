@@ -36,7 +36,7 @@ class OutboundController extends Controller
 
         $signatory = $this->reportService->getSignatory();
         
-        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+        $qrCode = base64_encode(QrCode::format('png')->size(80)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate(
             route('outbound.show', $id)
         ));
 
@@ -60,7 +60,7 @@ class OutboundController extends Controller
 
         $signatory = $this->reportService->getSignatory();
         
-        $qrCode = base64_encode(QrCode::format('svg')->size(80)->margin(0)->generate(
+        $qrCode = base64_encode(QrCode::format('png')->size(80)->margin(0)->errorCorrection('H')->merge(public_path('images/logo.png'), 0.3, true)->generate(
             route('outbound.show', $id)
         ));
 
