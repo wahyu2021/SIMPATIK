@@ -14,6 +14,13 @@ interface Props {
 }
 
 /** Tab navigasi modul laporan — dipakai di semua 3 halaman report. */
+/**
+ * Komponen: ReportTabs
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ReportTabs({ active }: Props) {
     const activeClass = 'px-4 py-2 text-sm font-medium text-white bg-[#003366] rounded-md shadow-sm';
     const inactiveClass = 'px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-white/60 transition-colors';

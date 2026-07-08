@@ -10,6 +10,13 @@ interface InboundTableProps {
 }
 
 /** Tabel transaksi barang masuk — referensi, tanggal, pencatat, jumlah, total, aksi. */
+/**
+ * Komponen: InboundTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InboundTable({ inbounds, onDelete }: InboundTableProps) {
     const calcTotalValue = (inbound: InboundTransaction): number => {
         return (inbound.details ?? []).reduce(

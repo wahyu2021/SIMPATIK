@@ -29,6 +29,13 @@ interface BreadcrumbsProps {
  *     { label: 'Tambah Barang' },
  * ]} />
  */
+/**
+ * Komponen: Breadcrumbs
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
     return (
         <nav aria-label="Breadcrumb" className="mb-4">

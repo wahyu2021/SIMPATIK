@@ -27,6 +27,13 @@ interface ModalProps {
  *     <p>Isi modal</p>
  * </Modal>
  */
+/**
+ * Komponen: Modal
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Modal({ open, onClose, title, children, footer, size = 'md' }: ModalProps) {
     if (!open) return null;
 

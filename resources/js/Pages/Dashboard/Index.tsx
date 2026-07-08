@@ -15,6 +15,13 @@ interface DashboardProps extends PageProps {
     statusDistribution: StatusDistribution[];
 }
 
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Dashboard({ auth, stats, recentRequests, lowStockItems, monthlyTrend, statusDistribution }: DashboardProps) {
     const role = auth.user.roles?.[0]?.name ?? '';
     

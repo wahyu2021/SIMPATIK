@@ -25,6 +25,13 @@ interface ListItemProps {
  *     trailing={<StatusBadge status="Pending" />}
  * />
  */
+/**
+ * Komponen: ListItem
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ListItem({ title, subtitle, trailing, onClick, className = '' }: ListItemProps) {
     const Component = onClick ? 'button' : 'div';
 

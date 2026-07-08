@@ -35,6 +35,13 @@ interface Props extends PageProps {
 /**
  * Halaman Laporan Penggunaan Barang per Unit Kerja.
  */
+/**
+ * Komponen: Department
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DepartmentReport({ reportData, departments, filters }: Props) {
     const { items, period } = reportData;
 

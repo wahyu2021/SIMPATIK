@@ -26,6 +26,13 @@ interface EmptyStateProps {
  *     action={<Link href="/categories/create"><Button>+ Tambah</Button></Link>}
  * />
  */
+/**
+ * Komponen: EmptyState
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function EmptyState({
     title = 'Belum Ada Data',
     message = 'Data belum tersedia saat ini.',

@@ -27,6 +27,13 @@ interface PaginationProps {
  *     total={categories.total}
  * />
  */
+/**
+ * Komponen: Pagination
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Pagination({ links, from, to, total }: PaginationProps) {
     if (links.length <= 3) return null; // Hanya prev + 1 page + next = tidak perlu pagination
 

@@ -10,6 +10,13 @@ interface Props extends PageProps {
 }
 
 /** Halaman detail transaksi barang masuk. */
+/**
+ * Komponen: Show
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InboundShow({ inbound }: Props) {
     const details = inbound.details ?? [];
     const grandTotal = details.reduce((sum, d) => sum + d.quantity * d.unit_price, 0);

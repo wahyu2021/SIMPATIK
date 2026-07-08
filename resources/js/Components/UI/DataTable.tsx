@@ -42,6 +42,13 @@ interface DataTableProps<T> {
  * ];
  * <DataTable columns={columns} data={categories.data} striped />
  */
+/**
+ * Komponen: DataTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DataTable<T extends object>({
     columns,
     data,

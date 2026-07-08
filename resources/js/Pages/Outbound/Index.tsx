@@ -14,6 +14,13 @@ interface Props extends PageProps {
     departments: Department[];
 }
 
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundIndex({ outbounds, filters, departments }: Props) {
     const { flash, auth } = usePage<PageProps>().props;
     const [deleteTarget, setDeleteTarget] = useState<OutboundTransaction | null>(null);

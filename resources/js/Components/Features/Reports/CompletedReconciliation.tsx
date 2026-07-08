@@ -8,6 +8,13 @@ interface Props {
 }
 
 /** Read-only view rekonsiliasi yang sudah selesai. */
+/**
+ * Komponen: CompletedReconciliation
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function CompletedReconciliation({ reconciliation }: Props) {
     const matchCount = reconciliation.details.filter(d => d.difference === 0).length;
     const totalDiff = reconciliation.details.reduce((s, d) => s + Math.abs(d.difference), 0);

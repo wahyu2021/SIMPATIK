@@ -7,6 +7,13 @@ interface Props extends PageProps {
     department?: Department;
 }
 
+/**
+ * Komponen: Form
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DepartmentForm({ department }: Props) {
     const isEdit = !!department;
 

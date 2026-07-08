@@ -28,6 +28,13 @@ const TYPE_CONFIG = {
     adjustment: { label: 'Penyesuaian', color: 'text-blue-700 bg-blue-50', icon: RefreshCw },
 } as const;
 
+/**
+ * Komponen: StockLedger
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function StockLedger({ entries, items, filters }: Props) {
     const itemOptions: ComboboxOption[] = [
         { value: '', label: 'Pilih Barang...' },

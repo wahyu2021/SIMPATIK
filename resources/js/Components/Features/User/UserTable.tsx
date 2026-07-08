@@ -17,6 +17,13 @@ interface UserTableProps {
 }
 
 /** Tabel pengguna — nama, email, unit kerja, role, status, aksi. */
+/**
+ * Komponen: UserTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function UserTable({ users, onDelete, onToggleStatus }: UserTableProps) {
     return (
         <div className="overflow-x-auto">

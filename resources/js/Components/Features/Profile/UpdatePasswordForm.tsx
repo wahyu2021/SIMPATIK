@@ -4,6 +4,13 @@ import { Input, Button } from '../../UI';
 /**
  * Komponen UpdatePasswordForm — form ganti password.
  */
+/**
+ * Komponen: UpdatePasswordForm
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function UpdatePasswordForm() {
     const { data, setData, put, processing, errors, reset } = useForm({
         current_password: '',

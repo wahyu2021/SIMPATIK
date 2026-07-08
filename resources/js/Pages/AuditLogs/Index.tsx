@@ -51,6 +51,13 @@ interface Props extends PageProps {
 /**
  * Halaman Audit Trail — Daftar riwayat aktivitas pengguna di sistem.
  */
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function AuditLogsIndex({ logs, filters, modules }: Props) {
     const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(false);

@@ -5,6 +5,13 @@ interface LoginPageProps {
     errors?: Record<string, string>;
 }
 
+/**
+ * Komponen: Login
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Login({ errors = {} }: LoginPageProps) {
     return (
         <>

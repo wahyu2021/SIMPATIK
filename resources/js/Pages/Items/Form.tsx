@@ -10,6 +10,13 @@ interface Props extends PageProps {
     nextCode?: string;
 }
 
+/**
+ * Komponen: Form
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ItemForm({ item, categories, nextCode }: Props) {
     const isEdit = !!item;
 

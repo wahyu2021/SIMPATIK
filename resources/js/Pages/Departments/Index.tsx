@@ -11,6 +11,13 @@ interface Props extends PageProps {
     filters: Record<string, string>;
 }
 
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DepartmentsIndex({ departments, filters }: Props) {
     const { auth, flash } = usePage<PageProps>().props;
     const canManageDepartments = auth.user.roles?.some((role: any) => role.name === 'general_affairs') ?? false;

@@ -19,6 +19,13 @@ interface BadgeProps {
  * <Badge variant="danger">Nonaktif</Badge>
  * <Badge variant="info" size="md">15 barang</Badge>
  */
+/**
+ * Komponen: Badge
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Badge({ variant = 'default', size = 'sm', children, className = '' }: BadgeProps) {
     const variants = {
         default: 'bg-gray-100 text-gray-700',

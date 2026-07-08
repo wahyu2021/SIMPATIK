@@ -20,6 +20,13 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
  *     {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
  * </Select>
  */
+/**
+ * Komponen: Select
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Select({ error, className = '', children, ...props }: SelectProps) {
     const classList = `
         w-full px-3 py-2 border rounded-lg

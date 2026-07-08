@@ -25,6 +25,13 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
  *     placeholder="Tulis catatan pengajuan..."
  * />
  */
+/**
+ * Komponen: Textarea
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Textarea({ error, label, className = '', ...props }: TextareaProps) {
     return (
         <div>

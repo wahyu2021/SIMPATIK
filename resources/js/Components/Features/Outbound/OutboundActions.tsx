@@ -14,6 +14,13 @@ interface OutboundActionsProps {
 }
 
 /** Panel tindakan pengajuan — approve/reject (Penyelia), issue/handover (Admin Gudang), pickup (Pemohon). */
+/**
+ * Komponen: OutboundActions
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundActions({ outbound, canApprove, canIssue, canReject, canHandover, canPickup }: OutboundActionsProps) {
     const [showRejectForm, setShowRejectForm] = useState(false);
     const [showApproveForm, setShowApproveForm] = useState(false);

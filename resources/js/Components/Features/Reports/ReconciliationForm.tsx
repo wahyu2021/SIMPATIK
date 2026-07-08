@@ -11,6 +11,13 @@ interface Props {
 }
 
 /** Form input stok fisik untuk rekonsiliasi yang belum dilakukan. */
+/**
+ * Komponen: ReconciliationForm
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ReconciliationForm({ items, filters }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         month: filters.month,

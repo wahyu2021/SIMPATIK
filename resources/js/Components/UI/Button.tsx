@@ -20,6 +20,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * <Button variant="danger" size="sm" onClick={handleDelete}>Hapus</Button>
  * <Button disabled={processing}>{processing ? 'Menyimpan...' : 'Simpan'}</Button>
  */
+/**
+ * Komponen: Button
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Button({
     variant = 'primary',
     size = 'md',

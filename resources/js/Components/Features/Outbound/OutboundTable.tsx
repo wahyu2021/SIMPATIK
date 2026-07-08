@@ -11,6 +11,13 @@ interface OutboundTableProps {
 }
 
 /** Tabel daftar pengajuan barang — layout 5 kolom agar tidak wrap. */
+/**
+ * Komponen: OutboundTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundTable({ outbounds, onDelete }: OutboundTableProps) {
     return (
         <div className="overflow-x-auto">

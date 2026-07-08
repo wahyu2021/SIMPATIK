@@ -22,7 +22,22 @@ interface Props extends PageProps {
     outbound?: OutboundTransaction;
 }
 
-/** Halaman form pengajuan barang — mendukung mode Buat dan Edit. */
+/**
+ * Halaman form pengajuan barang — mendukung mode Buat dan Edit.
+ * 
+ * [Inertia Data Flow]
+ * - \`items\` dan \`departments\` dipassing langsung dari Controller sebagai master data (Prop).
+ * - \`outbound\` dipassing HANYA jika dalam mode Edit (Berisi data transaksi yang sedang diedit).
+ * 
+ * @param props Props dari Inertia Server (Controller)
+ */
+/**
+ * Komponen: Form
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundForm({ items, departments, nextDocument, outbound }: Props) {
     const { auth } = usePage<PageProps>().props;
     const isEdit = !!outbound;
@@ -35,6 +50,20 @@ export default function OutboundForm({ items, departments, nextDocument, outboun
         }))
         : [{ ...emptyDetail }];
 
+    const initialDetails: OutboundDetailRow[] = isEdit
+        ? (outbound.details ?? []).map(d => ({
+            item_id: d.item_id.toString(),
+            quantity_requested: d.quantity_requested.toString(),
+            notes: d.notes ?? '',
+        }))
+        : [{ ...emptyDetail }];
+
+    /**
+     * [State Management via Inertia useForm]
+     * Mengelola seluruh data keranjang belanja dan metadata form.
+     * Mengikat nilai (data-binding) langsung ke UI komponen.
+     * 'data' memegang payload JSON yang akan dikirim ke endpoint store/update.
+     */
     const { data, setData, post, put, processing, errors } = useForm({
         department_id: isEdit
             ? outbound.department_id.toString()
@@ -71,6 +100,10 @@ export default function OutboundForm({ items, departments, nextDocument, outboun
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // [Inertia Submit Logic]
+        // Jika isEdit true, gunakan method PUT ke rute update.
+        // Jika false, gunakan method POST ke rute store.
+        // Inertia otomatis mem-bypass reload halaman dan menangani error validasi (302).
         if (isEdit) {
             put(`/outbound/${outbound.id}`);
         } else {

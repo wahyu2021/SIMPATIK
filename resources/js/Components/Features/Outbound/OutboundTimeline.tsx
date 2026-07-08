@@ -19,6 +19,13 @@ interface TimelineEvent {
  * created_at → approved_at → issued_at → handed_over_at → picked_up_at.
  * Jika status belum final, menampilkan indikator "menunggu" dengan animasi pulse.
  */
+/**
+ * Komponen: OutboundTimeline
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundTimeline({ outbound }: { outbound: OutboundTransaction }) {
     const events = buildTimelineEvents(outbound);
 

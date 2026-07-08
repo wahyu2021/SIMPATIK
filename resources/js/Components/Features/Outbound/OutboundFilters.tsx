@@ -24,6 +24,13 @@ const statusOptions: ComboboxOption[] = [
 ];
 
 /** Bar filter halaman pengajuan barang — search, status, unit kerja, tanggal. */
+/**
+ * Komponen: OutboundFilters
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundFilters({ filters, departments }: OutboundFiltersProps) {
     const applyFilter = (key: string, value: string) => {
         router.get('/outbound', {

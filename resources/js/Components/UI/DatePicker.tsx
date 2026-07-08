@@ -19,6 +19,13 @@ const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 /** Custom DatePicker — kalender popup yang lebih menarik dari input[type=date] native. */
+/**
+ * Komponen: DatePicker
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DatePicker({
     id,
     value,
@@ -44,7 +51,7 @@ export default function DatePicker({
     const maxDate = max ? new Date(max + 'T00:00:00') : null;
     const minDate = min ? new Date(min + 'T00:00:00') : null;
 
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         const handleOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setOpen(false);
@@ -55,7 +62,7 @@ export default function DatePicker({
     }, []);
 
     // Auto-detect alignment when opening
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         if (open && align === 'auto' && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
             const spaceRight = window.innerWidth - rect.right;

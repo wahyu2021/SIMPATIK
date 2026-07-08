@@ -20,6 +20,13 @@ interface LoadingProps {
  * // Full page overlay (saat submit form)
  * <Loading fullPage text="Menyimpan..." />
  */
+/**
+ * Komponen: Loading
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Loading({ size = 'md', text, fullPage = false }: LoadingProps) {
     const sizes = {
         sm: 'w-5 h-5 border-2',

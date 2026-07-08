@@ -35,6 +35,6 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 
 
 
-- [ ] **Track: documentation-phase-3-frontend**
+- [x] **Track: documentation-phase-3-frontend**
 *Link: [./tracks/documentation-phase-3-frontend_20260709/](./tracks/documentation-phase-3-frontend_20260709/)*
 

@@ -8,6 +8,13 @@ interface Props {
 }
 
 /** Bar chart — tren barang masuk vs keluar per bulan (6 bulan terakhir). */
+/**
+ * Komponen: MonthlyTrendChart
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function MonthlyTrendChart({ data }: Props) {
     if (!data || data.length === 0) {
         return (

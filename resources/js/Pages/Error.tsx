@@ -43,6 +43,13 @@ const ERROR_DATA: Record<number, { title: string; description: string; icon: Rea
     },
 };
 
+/**
+ * Komponen: Error
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ErrorPage({ status }: ErrorPageProps) {
     const error = ERROR_DATA[status] || ERROR_DATA[500];
     const Icon = error.icon;
