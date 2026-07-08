@@ -65,7 +65,7 @@ export default function UserIndex({ users, departments, roles, filters }: Props)
                 description="Kelola akun pengguna, role, dan status akses"
                 action={
                     <div className="flex gap-2">
-                        <Button variant="outline" className="flex items-center gap-2" onClick={() => setIsImportModalOpen(true)}>
+                        <Button variant="secondary" className="flex items-center gap-2" onClick={() => setIsImportModalOpen(true)}>
                             <UploadCloud className="w-4 h-4" />
                             Import Data
                         </Button>

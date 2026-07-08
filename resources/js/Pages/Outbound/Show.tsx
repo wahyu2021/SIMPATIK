@@ -280,7 +280,7 @@ function StatusContextBanner({ outbound, isAdmin, isPenyelia, isRequester }: {
 
     return (
         <div className={`flex items-start gap-3 p-4 rounded-xl border ${bgColor} mb-6`}>
-            <IconComponent className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColor}`} />
+            <IconComponent className={`w-5 h-5 shrink-0 mt-0.5 ${iconColor}`} />
             <p className={`text-sm font-medium ${textColor}`}>{message}</p>
         </div>
     );

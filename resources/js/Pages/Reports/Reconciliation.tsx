@@ -43,7 +43,7 @@ export default function Reconciliation({ reconData, filters }: Props) {
                 action={
                     <div className="flex gap-2">
                         <a href="/reports/reconciliation/export-worksheet">
-                            <Button variant="outline" className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50">
+                            <Button variant="secondary" className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50">
                                 <FileSpreadsheet className="w-4 h-4" />
                                 Worksheet Excel
                             </Button>
@@ -56,7 +56,7 @@ export default function Reconciliation({ reconData, filters }: Props) {
                                 </Button>
                             </a>
                         ) : (
-                            <Button variant="outline" className="flex items-center gap-2 opacity-50 cursor-not-allowed" onClick={() => alert('Submit rekonsiliasi terlebih dahulu untuk bisa mencetak Berita Acara.')}>
+                            <Button variant="secondary" className="flex items-center gap-2 opacity-50 cursor-not-allowed" onClick={() => alert('Submit rekonsiliasi terlebih dahulu untuk bisa mencetak Berita Acara.')}>
                                 <FileText className="w-4 h-4" />
                                 Berita Acara PDF
                             </Button>

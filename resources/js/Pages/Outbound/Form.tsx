@@ -2,8 +2,7 @@ import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { PageProps, Item, Department, OutboundTransaction } from '../../Types';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
-import { PageHeader, Button, Combobox, Breadcrumbs, Textarea, Label, DatePicker } from '../../Components/UI';
-import { ComboboxOption } from '../../Components/UI/Combobox';
+import { PageHeader, Button, Breadcrumbs, Textarea, Label, DatePicker } from '../../Components/UI';
 import OutboundDetailRowComponent, { OutboundDetailRow, emptyDetail } from '../../Components/Features/Outbound/OutboundDetailRow';
 /**
  * Komponen: Outbound/Form
@@ -38,7 +37,7 @@ interface Props extends PageProps {
  * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
-export default function OutboundForm({ items, departments, nextDocument, outbound }: Props) {
+export default function OutboundForm({ items, nextDocument, outbound }: Props) {
     const { auth } = usePage<PageProps>().props;
     const isEdit = !!outbound;
 
@@ -186,7 +185,7 @@ export default function OutboundForm({ items, departments, nextDocument, outboun
                         <Button
                             type="button"
                             onClick={addDetail}
-                            className="flex items-center gap-1.5 !text-sm"
+                            className="flex items-center gap-1.5 text-sm!"
                         >
                             <Plus className="w-4 h-4" />
                             Tambah Baris

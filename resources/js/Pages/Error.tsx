@@ -58,7 +58,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
         <>
             <Head title={`${status} — ${error.title}`} />
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6">
+            <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-6">
                 <div className="max-w-lg w-full text-center">
                     {/* Icon */}
                     <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl ${error.bg} mb-8`}>

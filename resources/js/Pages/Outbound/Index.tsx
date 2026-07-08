@@ -58,7 +58,7 @@ export default function OutboundIndex({ outbounds, filters, departments }: Props
                     <div className="flex gap-2">
                         {isAdmin && (
                             <Link href={route('outbound.create-direct')}>
-                                <Button variant="outline" className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+                                <Button variant="secondary" className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
                                     <PackagePlus className="w-4 h-4" />
                                     Input Langsung
                                 </Button>
