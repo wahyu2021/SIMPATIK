@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Loading, Badge } from '../../UI';
+import { useState, useEffect } from 'react';
+import { Modal, Button, Loading } from '../../UI';
 import { formatNumber } from '../../../Lib/formatters';
 import { Info, Building2, Package } from 'lucide-react';
 import axios from 'axios';

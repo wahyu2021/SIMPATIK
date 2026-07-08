@@ -19,7 +19,7 @@ interface CategoryTableProps {
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
 export default function CategoryTable({ categories, startNumber, onDelete, canManage = true }: CategoryTableProps) {
-    const columns = [
+    const columns: any[] = [
         {
             key: 'number',
             label: 'No',

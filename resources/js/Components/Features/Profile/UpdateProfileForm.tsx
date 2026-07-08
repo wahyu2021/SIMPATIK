@@ -17,7 +17,11 @@ interface Props {
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
 export default function UpdateProfileForm({ user }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm<{
+        name: string;
+        email: string;
+        phone_number: string;
+    }>({
         name: user.name,
         email: user.email,
         phone_number: user.phone_number || '',

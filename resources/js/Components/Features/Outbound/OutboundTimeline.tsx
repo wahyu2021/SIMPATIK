@@ -38,11 +38,11 @@ export default function OutboundTimeline({ outbound }: { outbound: OutboundTrans
                 return (
                     <div key={idx} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${event.iconBg} ${isWaiting ? 'ring-4 ring-amber-100 animate-pulse' : 'shadow-sm'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${event.iconBg} ${isWaiting ? 'ring-4 ring-amber-100 animate-pulse' : 'shadow-sm'}`}>
                                 {event.icon}
                             </div>
                             {!isLast && (
-                                <div className="w-0.5 flex-1 min-h-[24px] bg-gray-200" />
+                                <div className="w-0.5 flex-1 min-h-6 bg-gray-200" />
                             )}
                         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MutationCategory, MutationSummary, MutationPeriod, Signatory, MutationFilters } from '../../../Types/mutation';
 import { formatNumber } from '../../../Lib/formatters';
 import { Search } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function MutationTable({ categories, summary, period, signatory, 
                         <thead>
                             <tr className="bg-[#003366] text-white">
                                 <th className="px-3 py-3 text-center border-r border-blue-800 w-12">NO</th>
-                                <th className="px-3 py-3 text-left border-r border-blue-800 min-w-[200px]">NAMA BARANG</th>
+                                <th className="px-3 py-3 text-left border-r border-blue-800 min-w-50">NAMA BARANG</th>
                                 <th className="px-3 py-3 text-left border-r border-blue-800 w-24">SATUAN</th>
                                 <th className="px-3 py-3 text-right border-r border-blue-800 w-28">STOK AWAL</th>
                                 <th className="px-3 py-3 text-right border-r border-blue-800 w-28">STOK MASUK</th>

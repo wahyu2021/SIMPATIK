@@ -27,7 +27,7 @@ interface UserTableProps {
 export default function UserTable({ users, onDelete, onToggleStatus }: UserTableProps) {
     return (
         <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-175">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
@@ -52,7 +52,7 @@ export default function UserTable({ users, onDelete, onToggleStatus }: UserTable
                                 <tr key={user.id} className="hover:bg-blue-50/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                                 {user.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div>

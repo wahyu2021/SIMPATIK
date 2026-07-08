@@ -15,6 +15,7 @@ export interface User extends Timestamps {
     name: string;
     email: string;
     email_verified_at?: string;
+    phone_number?: string;
     signature_path?: string;
     signature_url?: string;
     is_active: boolean;
