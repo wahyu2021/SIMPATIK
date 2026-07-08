@@ -59,7 +59,7 @@ export default function ReconciliationForm({ items, filters }: Props) {
         <form onSubmit={handleSubmit}>
             {diffCount > 0 && (
                 <div className="flex items-center gap-2 px-4 py-3 mb-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
                     <span><strong>{diffCount} item</strong> memiliki selisih stok. Periksa sebelum menyimpan.</span>
                 </div>
             )}
@@ -117,7 +117,7 @@ export default function ReconciliationForm({ items, filters }: Props) {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-wrap items-end gap-4">
-                <div className="flex-1 min-w-[200px]">
+                <div className="flex-1 min-w-50">
                     <Label htmlFor="notes">Catatan Umum</Label>
                     <input id="notes" type="text" value={data.notes} onChange={(e) => setData('notes', e.target.value)}
                         placeholder="Opsional — catatan rekonsiliasi bulan ini"

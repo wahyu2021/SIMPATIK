@@ -20,7 +20,7 @@ interface ItemTableProps {
  * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
  */
 export default function ItemTable({ items, onDelete, canManage = true }: ItemTableProps) {
-    const columns = [
+    const columns: any[] = [
         {
             key: 'item_code',
             label: 'Kode',

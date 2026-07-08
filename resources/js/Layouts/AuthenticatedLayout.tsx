@@ -89,7 +89,7 @@ export default function AuthenticatedLayout({ title, children }: AuthenticatedLa
                         />
 
                         {/* Drawer Panel */}
-                        <div className="fixed inset-y-0 left-0 flex w-[260px] animate-slide-in-left">
+                        <div className="fixed inset-y-0 left-0 flex w-65 animate-slide-in-left">
                             <Sidebar
                                 collapsed={false}
                                 onToggle={() => {}}
@@ -99,7 +99,7 @@ export default function AuthenticatedLayout({ title, children }: AuthenticatedLa
                             {/* Close button */}
                             <button
                                 onClick={() => setMobileOpen(false)}
-                                className="absolute top-4 right-[-44px] p-2 rounded-lg bg-white/10 backdrop-blur text-white hover:bg-white/20 transition-colors"
+                                className="absolute top-4 -right-11 p-2 rounded-lg bg-white/10 backdrop-blur text-white hover:bg-white/20 transition-colors"
                                 aria-label="Tutup menu"
                             >
                                 <X className="w-5 h-5" />

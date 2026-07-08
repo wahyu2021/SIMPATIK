@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Modal, Button, Alert } from '../../UI';
-import { UploadCloud, X, FileSpreadsheet } from 'lucide-react';
+import { Modal, Button } from '../../UI';
+import { UploadCloud, FileSpreadsheet } from 'lucide-react';
 
 interface Props {
     open: boolean;

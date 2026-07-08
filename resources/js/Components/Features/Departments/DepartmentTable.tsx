@@ -25,7 +25,7 @@ export default function DepartmentTable({ departments, startNumber, onDelete, ca
     /** Helper untuk cast item dari DataTable ke Department */
     const asDepartment = (item: Record<string, unknown>) => item as unknown as Department;
 
-    const columns = [
+    const columns: any[] = [
         {
             key: 'number',
             label: 'No',

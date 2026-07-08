@@ -56,7 +56,7 @@ export default function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) 
             className={`
                 flex flex-col h-full bg-[#003366] text-white overflow-hidden
                 transition-all duration-300 ease-in-out
-                ${collapsed ? 'w-[72px]' : 'w-[260px]'}
+                ${collapsed ? 'w-18' : 'w-65'}
             `}
         >
             {/* ── Logo Area ── */}
