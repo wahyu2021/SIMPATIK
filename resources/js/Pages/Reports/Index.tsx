@@ -16,6 +16,13 @@ interface Props extends PageProps {
     filters: MutationFilters;
 }
 
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ReportsIndex({ reportData, signatory, categories, filters }: Props) {
     const { auth } = usePage<PageProps>().props;
     const { summary, period } = reportData;

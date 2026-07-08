@@ -16,6 +16,13 @@ interface UserFiltersProps {
 }
 
 /** Bar filter halaman daftar pengguna — search, unit kerja, role, status. */
+/**
+ * Komponen: UserFilters
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function UserFilters({ filters, departments, roles }: UserFiltersProps) {
     const applyFilter = (key: string, value: string) => {
         router.get('/users', {

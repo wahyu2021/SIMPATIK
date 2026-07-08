@@ -18,6 +18,13 @@ const stockOptions: ComboboxOption[] = [
 ];
 
 /** Komponen ItemFilters — bar filter untuk halaman daftar barang. */
+/**
+ * Komponen: ItemFilters
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ItemFilters({ filters, categories }: ItemFiltersProps) {
     const applyFilter = (key: string, value: string) => {
         router.get('/items', {

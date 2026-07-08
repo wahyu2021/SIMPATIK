@@ -11,6 +11,13 @@ interface CategoryTableProps {
 }
 
 /** Tabel kategori barang — nomor, nama, jumlah barang, aksi. */
+/**
+ * Komponen: CategoryTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function CategoryTable({ categories, startNumber, onDelete, canManage = true }: CategoryTableProps) {
     const columns = [
         {

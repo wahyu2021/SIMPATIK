@@ -30,6 +30,13 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 /** Halaman detail pengajuan barang dengan aksi approval sesuai role. */
+/**
+ * Komponen: Show
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundShow({ outbound }: Props) {
     const { flash, auth } = usePage<PageProps>().props;
     const details = outbound.details ?? [];

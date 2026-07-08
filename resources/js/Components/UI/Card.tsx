@@ -25,6 +25,13 @@ interface CardProps {
  * // Card untuk tabel (tanpa padding)
  * <Card title="Daftar Barang" noPadding><DataTable ... /></Card>
  */
+/**
+ * Komponen: Card
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Card({ title, description, children, footer, className = '', noPadding = false }: CardProps) {
     return (
         <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${className}`}>

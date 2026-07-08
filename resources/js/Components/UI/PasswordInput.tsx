@@ -6,6 +6,13 @@ interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
 }
 
+/**
+ * Komponen: PasswordInput
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function PasswordInput({ error, label, className = '', ...props }: PasswordInputProps) {
     const [showPassword, setShowPassword] = useState(false);
 

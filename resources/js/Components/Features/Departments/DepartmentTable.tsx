@@ -14,6 +14,13 @@ interface DepartmentTableProps {
  * Komponen DepartmentTable — tabel unit kerja dengan kolom nomor, nama, jumlah pengguna, dan aksi.
  * Menggunakan DataTable generik sebagai base component.
  */
+/**
+ * Komponen: DepartmentTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DepartmentTable({ departments, startNumber, onDelete, canManage = true }: DepartmentTableProps) {
     /** Helper untuk cast item dari DataTable ke Department */
     const asDepartment = (item: Record<string, unknown>) => item as unknown as Department;

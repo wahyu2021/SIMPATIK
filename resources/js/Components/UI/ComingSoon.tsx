@@ -8,6 +8,13 @@ interface Props {
 /**
  * Komponen ComingSoon — placeholder untuk halaman yang belum selesai dikembangkan.
  */
+/**
+ * Komponen: ComingSoon
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ComingSoon({ title, description }: Props) {
     return (
         <div className="flex flex-col items-center justify-center py-24 text-center">

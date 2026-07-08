@@ -11,6 +11,13 @@ interface OutboundDetailTableProps {
 }
 
 /** Tabel detail barang pengajuan dengan kolom stok kontekstual dan warning kekurangan stok. */
+/**
+ * Komponen: OutboundDetailTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundDetailTable({ details, status }: OutboundDetailTableProps) {
     const showStock = shouldShowStockColumn(status);
     const hasInsufficientStock = showStock && details.some(isStockInsufficient);

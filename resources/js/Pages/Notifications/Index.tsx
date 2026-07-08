@@ -22,6 +22,13 @@ interface Props extends PageProps {
 /**
  * Halaman daftar lengkap semua notifikasi user.
  */
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function NotificationsIndex({ notifications }: Props) {
     const markAllAsRead = () => {
         router.post(route('notifications.read-all'));

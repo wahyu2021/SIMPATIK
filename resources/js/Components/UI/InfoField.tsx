@@ -11,6 +11,13 @@ interface InfoFieldProps {
 }
 
 /** Field info reusable (dt/dd) untuk halaman detail transaksi. */
+/**
+ * Komponen: InfoField
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InfoField({ label, children, className = '', mono, labelClassName, icon: Icon }: InfoFieldProps) {
     return (
         <div className={className}>

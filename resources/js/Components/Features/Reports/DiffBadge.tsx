@@ -5,6 +5,13 @@ interface Props {
 }
 
 /** Tampilkan selisih stok — ✓ (cocok), +N (lebih), -N (kurang). Dipakai di Reconciliation. */
+/**
+ * Komponen: DiffBadge
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DiffBadge({ difference }: Props) {
     if (difference === 0) return <span className="text-green-600">✓</span>;
 

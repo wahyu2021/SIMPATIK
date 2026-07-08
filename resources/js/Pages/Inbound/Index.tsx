@@ -12,6 +12,13 @@ interface Props extends PageProps {
     filters: Record<string, string>;
 }
 
+/**
+ * Komponen: Index
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InboundIndex({ inbounds, filters }: Props) {
     const { flash } = usePage<PageProps>().props;
     const [deleteTarget, setDeleteTarget] = useState<InboundTransaction | null>(null);

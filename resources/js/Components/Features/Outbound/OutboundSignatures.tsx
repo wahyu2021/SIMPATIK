@@ -17,6 +17,13 @@ interface SignatureSlot {
  * dalam alur pengajuan (Pemohon, Penyelia, Admin Gudang, Penerima).
  * Slot kosong ditampilkan sebagai placeholder "Menunggu".
  */
+/**
+ * Komponen: OutboundSignatures
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundSignatures({ outbound }: OutboundSignaturesProps) {
     const slots: SignatureSlot[] = [
         {

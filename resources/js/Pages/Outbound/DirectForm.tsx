@@ -42,6 +42,13 @@ interface DetailItem {
 /**
  * Form khusus Admin Gudang untuk mencatat pengambilan barang langsung (bypass approval).
  */
+/**
+ * Komponen: DirectForm
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function DirectRequestForm({ items, departments, users }: Props) {
     const { auth } = usePage<PageProps>().props;
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -93,7 +100,7 @@ export default function DirectRequestForm({ items, departments, users }: Props) 
     };
 
     // Auto-fill department saat user dipilih
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         if (data.requester_id) {
             const selectedUser = users.find(u => u.id.toString() === data.requester_id);
             if (selectedUser?.department_id) {

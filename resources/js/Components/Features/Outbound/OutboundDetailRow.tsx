@@ -24,6 +24,13 @@ interface OutboundDetailRowProps {
 }
 
 /** Satu baris repeater pada form pengajuan barang (pilih barang, jumlah, catatan). */
+/**
+ * Komponen: OutboundDetailRow
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundDetailRowComponent({
     index, detail, items, usedItemIds, errors, canRemove, onUpdate, onRemove,
 }: OutboundDetailRowProps) {

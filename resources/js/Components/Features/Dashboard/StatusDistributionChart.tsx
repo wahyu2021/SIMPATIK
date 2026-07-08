@@ -14,6 +14,13 @@ interface Props {
 }
 
 /** Donut chart — distribusi status pengajuan barang. */
+/**
+ * Komponen: StatusDistributionChart
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function StatusDistributionChart({ data }: Props) {
     if (!data || data.length === 0) {
         return (

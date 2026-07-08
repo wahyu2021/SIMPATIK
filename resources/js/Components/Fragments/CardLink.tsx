@@ -21,6 +21,13 @@ interface CardLinkProps {
  *     <CardLink href="/outbound">Lihat semua pengajuan</CardLink>
  * </Card>
  */
+/**
+ * Komponen: CardLink
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function CardLink({ href, children }: CardLinkProps) {
     return (
         <div className="px-6 py-3">

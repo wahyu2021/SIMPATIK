@@ -7,6 +7,13 @@ interface Props extends PageProps {
     category?: Category;
 }
 
+/**
+ * Komponen: Form
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function CategoryForm({ category }: Props) {
     const isEdit = !!category;
 

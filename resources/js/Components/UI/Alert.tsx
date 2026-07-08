@@ -24,6 +24,13 @@ interface AlertProps {
  * // Dengan tombol close
  * <Alert type="warning" onClose={() => setShow(false)}>Stok hampir habis!</Alert>
  */
+/**
+ * Komponen: Alert
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Alert({ type = 'info', children, onClose, className = '' }: AlertProps) {
     const styles = {
         success: 'bg-emerald-50 border-emerald-300 text-emerald-800',

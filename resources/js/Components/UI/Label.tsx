@@ -16,6 +16,13 @@ interface LabelProps {
  * @example
  * <Label htmlFor="name" required>Nama Barang</Label>
  */
+/**
+ * Komponen: Label
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Label({ htmlFor, required = false, children }: LabelProps) {
     return (
         <label 

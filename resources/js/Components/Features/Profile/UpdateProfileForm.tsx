@@ -9,6 +9,13 @@ interface Props {
 /**
  * Komponen UpdateProfileForm — form edit nama, email, dan nomor HP.
  */
+/**
+ * Komponen: UpdateProfileForm
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function UpdateProfileForm({ user }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         name: user.name,

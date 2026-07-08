@@ -16,6 +16,13 @@ interface Props extends PageProps {
     user: User;
 }
 
+/**
+ * Komponen: Show
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function UserShow({ user }: Props) {
     const { flash } = usePage<PageProps>().props;
     const roleName = user.roles?.[0]?.name || '';

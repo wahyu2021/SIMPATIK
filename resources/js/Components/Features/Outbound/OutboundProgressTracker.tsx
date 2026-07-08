@@ -14,6 +14,13 @@ const AFTER_HANDOVER: OutboundStatus[] = ['Completed'];
  *
  * Pengajuan → Penyelia → Admin Gudang → Diserahkan → Diterima
  */
+/**
+ * Komponen: OutboundProgressTracker
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundProgressTracker({ status }: OutboundProgressTrackerProps) {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">

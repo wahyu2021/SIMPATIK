@@ -13,6 +13,13 @@ interface Props extends PageProps {
 }
 
 /** Halaman Form Barang Masuk — Create & Edit. */
+/**
+ * Komponen: Form
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InboundForm({ inbound, items, nextReference }: Props) {
     const isEdit = !!inbound;
 

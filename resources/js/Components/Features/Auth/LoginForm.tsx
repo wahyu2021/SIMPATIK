@@ -9,6 +9,13 @@ interface LoginFormProps {
     errors?: Record<string, string>;
 }
 
+/**
+ * Komponen: LoginForm
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function LoginForm({ errors = {} }: LoginFormProps) {
     const [formData, setFormData] = useState({
         email: '',

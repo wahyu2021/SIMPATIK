@@ -15,6 +15,13 @@ import { usePage } from '@inertiajs/react';
 /**
  * Komponen StatsGrid — Menampilkan statistik dashboard yang relevan sesuai role.
  */
+/**
+ * Komponen: StatsGrid
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function StatsGrid({ stats }: { stats: DashboardStats }) {
     const { auth } = usePage<PageProps>().props;
     const role = auth.user.roles?.[0]?.name ?? '';

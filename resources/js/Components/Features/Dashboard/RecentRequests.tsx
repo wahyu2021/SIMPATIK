@@ -9,6 +9,13 @@ import { ListItem, CardLink } from '../../Fragments';
  * @example
  * <RecentRequests data={recentRequests} />
  */
+/**
+ * Komponen: RecentRequests
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function RecentRequests({ data }: { data: RecentRequest[] }) {
     return (
         <Card title="Pengajuan Terbaru" description="5 pengajuan barang terakhir" noPadding>

@@ -26,6 +26,13 @@ interface ToggleProps {
  *     onChange={(val) => setData('is_special_request', val)}
  * />
  */
+/**
+ * Komponen: Toggle
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Toggle({ label, description, checked, onChange, disabled = false }: ToggleProps) {
     return (
         <label className={`flex items-center gap-3 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>

@@ -14,6 +14,13 @@ interface Props {
 }
 
 /** Tabel Rekapitulasi Mutasi Barang — Fokus pada kuantitas stok sesuai arahan dosen. */
+/**
+ * Komponen: MutationTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function MutationTable({ categories, summary, period, signatory, signerName, filters }: Props) {
     const [breakdown, setBreakdown] = useState<{ id: number; name: string } | null>(null);
     const fmtQty = (v: number) => v === 0 ? '-' : formatNumber(v);

@@ -11,6 +11,13 @@ interface InboundFiltersProps {
 }
 
 /** Bar filter halaman daftar barang masuk — search debounced + filter tanggal. */
+/**
+ * Komponen: InboundFilters
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function InboundFilters({ filters }: InboundFiltersProps) {
     const applyFilter = (key: string, value: string) => {
         router.get('/inbound', {

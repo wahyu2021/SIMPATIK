@@ -15,6 +15,13 @@ const STEPS = [
 ] as const;
 
 /** Panduan alur pengajuan — collapsible, step yang relevan di-highlight sesuai role user. */
+/**
+ * Komponen: OutboundWorkflowGuide
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function OutboundWorkflowGuide({ isAdmin, isPenyelia, canCreate }: WorkflowGuideProps) {
     const [open, setOpen] = useState(false);
 

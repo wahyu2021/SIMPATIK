@@ -35,6 +35,13 @@ const statusConfig: Record<OutboundStatus, {
  * <StatusBadge status="Completed" />   // ✅ Selesai (emerald)
  * <StatusBadge status="Rejected" />    // ✕ Ditolak (merah)
  */
+/**
+ * Komponen: StatusBadge
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function StatusBadge({ status }: StatusBadgeProps) {
     const config = statusConfig[status];
     const Icon = config.icon;

@@ -11,6 +11,13 @@ import { usePage } from '@inertiajs/react';
  * @example
  * <LowStockAlerts data={lowStockItems} />
  */
+/**
+ * Komponen: LowStockAlerts
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function LowStockAlerts({ data }: { data: LowStockItemData[] }) {
     const { auth } = usePage<PageProps>().props;
     const role = auth.user.roles?.[0]?.name ?? '';

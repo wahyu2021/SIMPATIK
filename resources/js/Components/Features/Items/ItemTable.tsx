@@ -12,6 +12,13 @@ interface ItemTableProps {
 /**
  * Komponen ItemTable — tabel barang dengan kolom kode, nama, kategori, stok, harga, dan aksi.
  */
+/**
+ * Komponen: ItemTable
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ItemTable({ items, onDelete, canManage = true }: ItemTableProps) {
     const columns = [
         {

@@ -25,6 +25,13 @@ interface StatCardProps {
  * import { Package } from 'lucide-react';
  * <StatCard title="Total Barang" value={156} icon={<Package />} color="blue" />
  */
+/**
+ * Komponen: StatCard
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function StatCard({ title, value, icon, trend, color = 'blue', className = '' }: StatCardProps) {
     const colors = {
         blue: 'bg-blue-50 text-[#0052A3]',

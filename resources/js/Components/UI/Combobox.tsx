@@ -20,6 +20,13 @@ interface ComboboxProps {
 }
 
 /** Custom searchable dropdown — pengganti <select> native dengan search, keyboard nav, dan styling premium. */
+/**
+ * Komponen: Combobox
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function Combobox({
     id,
     options,
@@ -48,7 +55,7 @@ export default function Combobox({
         );
     }, [options, search]);
 
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         if (open) {
             searchRef.current?.focus();
             setHighlightIndex(-1);
@@ -57,7 +64,7 @@ export default function Combobox({
         }
     }, [open]);
 
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         const handleOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setOpen(false);
@@ -67,7 +74,7 @@ export default function Combobox({
         return () => document.removeEventListener('mousedown', handleOutside);
     }, []);
 
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         if (highlightIndex >= 0 && listRef.current) {
             const el = listRef.current.children[highlightIndex] as HTMLElement;
             el?.scrollIntoView({ block: 'nearest' });

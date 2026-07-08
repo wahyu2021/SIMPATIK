@@ -21,11 +21,18 @@ interface Props {
 /**
  * Modal untuk menampilkan detail pengeluaran barang per unit kerja.
  */
+/**
+ * Komponen: BreakdownModal
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function BreakdownModal({ isOpen, onClose, itemId, itemName, month, year }: Props) {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<BreakdownEntry[]>([]);
 
-    useEffect(() => {
+    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
         if (isOpen && itemId) {
             fetchBreakdown();
         }

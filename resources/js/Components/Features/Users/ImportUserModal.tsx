@@ -8,6 +8,13 @@ interface Props {
     onClose: () => void;
 }
 
+/**
+ * Komponen: ImportUserModal
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function ImportUserModal({ open, onClose }: Props) {
     const { data, setData, post, processing, errors, reset, progress } = useForm<{
         file: File | null;

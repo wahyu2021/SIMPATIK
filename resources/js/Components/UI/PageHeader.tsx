@@ -25,6 +25,13 @@ interface PageHeaderProps {
  * // Halaman form (dengan back button)
  * <PageHeader title="Edit Kategori" backUrl="/categories" />
  */
+/**
+ * Komponen: PageHeader
+ *
+ * [State & Rendering]
+ * Merupakan komponen presentasional atau kontainer dalam arsitektur React.
+ * Lifecycle dikendalikan oleh Inertia (jika Page) atau parent props (jika Component).
+ */
 export default function PageHeader({ title, description, action, backUrl }: PageHeaderProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
