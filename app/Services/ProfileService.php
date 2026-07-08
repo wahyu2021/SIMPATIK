@@ -5,6 +5,15 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Service Layer: ProfileService
+ *
+ * [Business Logic & Transaksi]
+ * Class ini menangani seluruh alur logika bisnis utama (Business Rules).
+ * - Bertanggung jawab atas integritas data.
+ * - Sering dibungkus dalam DB::transaction() jika melibatkan multi-tabel.
+ * - Berkomunikasi dengan database HANYA melalui interface Repository.
+ */
 class ProfileService
 {
     /**

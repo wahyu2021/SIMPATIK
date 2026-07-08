@@ -1,3 +1,11 @@
+/**
+ * Komponen: Outbound/Show
+ *
+ * [Fungsionalitas]
+ * Komponen ini bertanggung jawab menampilkan detail transaksi barang keluar secara spesifik.
+ * Menyediakan tombol-tombol aksi dinamis (Approve, Issue, Handover, Pickup) yang render-nya
+ * bergantung pada peran (role) pengguna dan status dokumen saat ini (State Management).
+ */
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, AlertTriangle, Pencil, Info, Clock, Package, RefreshCw, CheckCircle2, FileText, Printer } from 'lucide-react';
 import { PageProps, OutboundTransaction } from '../../Types';

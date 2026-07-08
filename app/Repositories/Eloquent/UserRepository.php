@@ -7,6 +7,14 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Repository: UserRepository
+ *
+ * [Data Access Layer]
+ * Pattern Repository digunakan untuk memisahkan abstraksi query database dari logika bisnis.
+ * Hal ini memastikan bahwa kode yang berhubungan langsung dengan struktur tabel/kolom Eloquent
+ * terisolasi dan mudah di-mock (ditiru) saat melakukan Unit Testing.
+ */
 class UserRepository implements UserRepositoryInterface
 {
     public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator

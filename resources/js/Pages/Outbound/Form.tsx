@@ -5,6 +5,14 @@ import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout';
 import { PageHeader, Button, Combobox, Breadcrumbs, Textarea, Label, DatePicker } from '../../Components/UI';
 import { ComboboxOption } from '../../Components/UI/Combobox';
 import OutboundDetailRowComponent, { OutboundDetailRow, emptyDetail } from '../../Components/Features/Outbound/OutboundDetailRow';
+/**
+ * Komponen: Outbound/Form
+ *
+ * [Fungsionalitas]
+ * Formulir interaktif untuk pengajuan barang keluar (Outbound Request).
+ * Komponen ini menangani manajemen state keranjang barang (items array) dan validasi dasar
+ * di sisi klien (Client-side validation) sebelum dikirim via Inertia Form Helper.
+ */
 import { normalizeDate } from '../../Lib/formatters';
 
 interface Props extends PageProps {
