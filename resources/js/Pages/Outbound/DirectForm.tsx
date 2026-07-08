@@ -100,7 +100,12 @@ export default function DirectRequestForm({ items, departments, users }: Props) 
     };
 
     // Auto-fill department saat user dipilih
-    /**\n     * [React Hook: useEffect]\n     * Dieksekusi setelah proses render selesai.\n     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.\n     */\n    useEffect(() => {
+    /**
+     * [React Hook: useEffect]
+     * Dieksekusi setelah proses render selesai.
+     * Berhati-hati dengan Dependency Array agar tidak terjadi infinite loop.
+     */
+    useEffect(() => {
         if (data.requester_id) {
             const selectedUser = users.find(u => u.id.toString() === data.requester_id);
             if (selectedUser?.department_id) {

@@ -50,13 +50,7 @@ export default function OutboundForm({ items, departments, nextDocument, outboun
         }))
         : [{ ...emptyDetail }];
 
-    const initialDetails: OutboundDetailRow[] = isEdit
-        ? (outbound.details ?? []).map(d => ({
-            item_id: d.item_id.toString(),
-            quantity_requested: d.quantity_requested.toString(),
-            notes: d.notes ?? '',
-        }))
-        : [{ ...emptyDetail }];
+
 
     /**
      * [State Management via Inertia useForm]
