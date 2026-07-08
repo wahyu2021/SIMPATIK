@@ -1,9 +1,7 @@
-import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { 
     Bell, 
     Clock, 
-    CheckCircle2, 
     Info, 
     Package, 
     AlertCircle, 
@@ -62,7 +60,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                 description="Pantau seluruh pemberitahuan sistem dan aktivitas Anda"
                 action={
                     <Button 
-                        variant="outline" 
+                        variant="secondary" 
                         size="sm" 
                         onClick={markAllAsRead}
                         className="flex items-center gap-2"
@@ -95,7 +93,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                             >
                                 <div className="flex items-start gap-4 p-5">
                                     <div className={`
-                                        p-3 rounded-xl flex-shrink-0 transition-colors
+                                        p-3 rounded-xl shrink-0 transition-colors
                                         ${notif.read_at ? 'bg-gray-50 text-gray-400' : 'bg-blue-50 text-blue-600'}
                                     `}>
                                         {getIcon(notif.data.type)}
@@ -107,7 +105,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                                 {notif.data.title}
                                             </h4>
                                             {!notif.read_at && (
-                                                <Badge color="blue" variant="flat" size="sm">Baru</Badge>
+                                                <Badge variant="info" size="sm">Baru</Badge>
                                             )}
                                         </div>
                                         <p className={`text-sm leading-relaxed ${notif.read_at ? 'text-gray-500' : 'text-gray-600 font-medium'}`}>
@@ -124,7 +122,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                     <div className="flex flex-col gap-2">
                                         {notif.data.action_url && (
                                             <Button 
-                                                variant="outline" 
+                                                variant="secondary" 
                                                 size="sm" 
                                                 className="group/btn"
                                                 onClick={() => handleRead(notif.id, notif.data.action_url)}
@@ -135,7 +133,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                         )}
                                         {!notif.read_at && !notif.data.action_url && (
                                             <Button 
-                                                variant="ghost" 
+                                                variant="link" 
                                                 size="sm" 
                                                 onClick={() => handleRead(notif.id)}
                                             >
