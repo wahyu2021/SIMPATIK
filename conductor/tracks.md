@@ -32,6 +32,5 @@ Daftar jalur kerja (tracks) untuk menyelesaikan dan menstabilkan aplikasi SIMPAT
 
 
 
-- [x] **Track: documentation-phase-2-backend-logic**
-*Link: [./tracks/documentation-phase-2-backend-logic_20260709/](./tracks/documentation-phase-2-backend-logic_20260709/)*
+
 
