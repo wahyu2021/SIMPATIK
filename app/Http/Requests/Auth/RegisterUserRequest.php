@@ -7,6 +7,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Request Validator: RegisterUserRequest
+ *
+ * [Fungsionalitas]
+ * FormRequest ini bertanggung jawab menangani otorisasi (authorization) dan validasi (validation) 
+ * data masukan (input) dari pengguna secara terpusat sebelum dieksekusi oleh Controller.
+ */
 class RegisterUserRequest extends FormRequest
 {
     public function authorize(): bool
@@ -14,6 +21,15 @@ class RegisterUserRequest extends FormRequest
         return $this->user()?->can('manage-users') ?? false;
     }
 
+    /**
+     * Dapatkan aturan validasi (validation rules) yang diterapkan pada request ini.
+     * 
+     * [Konteks Keamanan & Bisnis]
+     * Aturan di bawah ini memastikan integritas tipe data dan batasan nilai
+     * sebelum data mencapai layer Controller.
+     * 
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
