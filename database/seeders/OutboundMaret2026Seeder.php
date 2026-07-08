@@ -55,13 +55,17 @@ class OutboundMaret2026Seeder extends Seeder
                 'department_id' => $requester->department_id,
                 'document_number' => 'OUT-MAR-2026-' . str_pad($docCounter++, 3, '0', STR_PAD_LEFT),
                 'transaction_date' => $date->format('Y-m-d H:i:s'),
-                'status' => 'Issued',
+                'status' => 'Completed',
                 'is_special_request' => false,
                 'notes' => 'Pengajuan Rutin ATK / Logistik',
                 'approver_id' => $head->id,
                 'approved_at' => $date->copy()->addHours(1),
                 'issued_by' => $admin->id,
                 'issued_at' => $date->copy()->addHours(2),
+                'handed_over_by' => $admin->id,
+                'handed_over_at' => $date->copy()->addHours(2)->addMinutes(30),
+                'picked_up_by' => $requester->id,
+                'picked_up_at' => $date->copy()->addHours(3),
             ]);
 
             foreach ($itemsForThisRequest as $data) {
