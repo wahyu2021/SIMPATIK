@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { AlertTriangle, ClipboardCheck } from 'lucide-react';
 import { ReconItem, ReconFilters } from '../../../Types/reconciliation';
-import { Label } from '../../UI';
+import { Label, Alert } from '../../UI';
 import { formatNumber } from '../../../Lib/formatters';
 import DiffBadge from './DiffBadge';
 
@@ -57,6 +57,10 @@ export default function ReconciliationForm({ items, filters }: Props) {
 
     return (
         <form onSubmit={handleSubmit}>
+            <Alert type="info" className="mb-4">
+                <strong>Informasi:</strong> Rekonsiliasi (Stock Opname) untuk bulan ini belum dilakukan. Tabel di bawah ini adalah Kertas Kerja. Silakan periksa sisa stok fisik di gudang dan ketik angkanya pada kolom <strong>Fisik</strong>.
+            </Alert>
+
             {diffCount > 0 && (
                 <div className="flex items-center gap-2 px-4 py-3 mb-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
                     <AlertTriangle className="w-4 h-4 shrink-0" />
