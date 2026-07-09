@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import LoginForm from '../../Components/Features/Auth/LoginForm';
+import ToastProvider from '@/Components/UI/ToastProvider';
 
 interface LoginPageProps {
     errors?: Record<string, string>;
@@ -16,6 +17,7 @@ export default function Login({ errors = {} }: LoginPageProps) {
     return (
         <>
             <Head title="Login" />
+            <ToastProvider />
 
             {/* Animasi entrance via CSS keyframes */}
             <style>{`

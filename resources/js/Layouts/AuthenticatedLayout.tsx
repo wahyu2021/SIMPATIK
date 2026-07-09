@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Sidebar from './Partials/Sidebar';
 import Topbar from './Partials/Topbar';
+import ToastProvider from '@/Components/UI/ToastProvider';
 
 /**
  * Props untuk AuthenticatedLayout.
@@ -65,6 +66,7 @@ export default function AuthenticatedLayout({ title, children }: AuthenticatedLa
     return (
         <>
             {title && <Head title={title} />}
+            <ToastProvider />
 
             <div className="flex h-screen bg-gray-50 overflow-hidden">
                 {/* ══════════════════════════════════════════
