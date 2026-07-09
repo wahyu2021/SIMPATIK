@@ -30,7 +30,7 @@ export default function Reconciliation({ reconData, filters }: Props) {
 
     const handleFilter = (key: string, value: string) => {
         router.get('/reports/reconciliation', { ...filters, [key]: value || undefined },
-            { preserveState: true, preserveScroll: true });
+            { preserveScroll: true });
     };
 
     return (
@@ -84,7 +84,7 @@ export default function Reconciliation({ reconData, filters }: Props) {
 
             {reconData.status === 'completed'
                 ? <CompletedReconciliation reconciliation={reconData.reconciliation!} />
-                : <ReconciliationForm items={reconData.items!} filters={filters} />
+                : <ReconciliationForm key={`${filters.month}-${filters.year}`} items={reconData.items!} filters={filters} />
             }
         </AuthenticatedLayout>
     );
