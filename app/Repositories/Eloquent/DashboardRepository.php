@@ -162,17 +162,12 @@ class DashboardRepository implements DashboardRepositoryInterface
      */
     private function applyScope(Builder $query, User $user): Builder
     {
-        // Jika Admin, bisa lihat semua (jangan difilter)
-        if ($user->hasRole('warehouse_admin')) {
+        // Jika Admin Gudang atau Bagian Umum, bisa lihat semua (Global)
+        if ($user->hasRole('warehouse_admin') || $user->hasRole('general_affairs')) {
             return $query;
         }
 
-        // Jika Penyelia, lihat data unitnya sendiri
-        if ($user->hasRole('division_head')) {
-            return $query->where('department_id', $user->department_id);
-        }
-
-        // Jika Staff, hanya lihat datanya sendiri
-        return $query->where('requester_id', $user->id);
+        // Jika Penyelia atau Staff Biasa, lihat data unit kerjanya saja (Satu Departemen)
+        return $query->where('department_id', $user->department_id);
     }
 }
